@@ -241,6 +241,31 @@ public class PapyrusCustomNodesItemProviderAdapterFactory extends PapyrusCustomN
     }
 
     /**
+     * This keeps track of the one adapter used for all
+     * {@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription} instances. <!--
+     * begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    protected CustomImageNodeStyleDescriptionItemProvider customImageNodeStyleDescriptionItemProvider;
+
+    /**
+     * This creates an adapter for a
+     * {@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription}. <!--
+     * begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
+    public Adapter createCustomImageNodeStyleDescriptionAdapter() {
+        if (this.customImageNodeStyleDescriptionItemProvider == null) {
+            this.customImageNodeStyleDescriptionItemProvider = new CustomImageNodeStyleDescriptionItemProvider(this);
+        }
+
+        return this.customImageNodeStyleDescriptionItemProvider;
+    }
+
+    /**
      * This returns the root adapter factory that contains this factory. <!-- begin-user-doc --> <!-- end-user-doc -->
      *
      * @generated
@@ -352,6 +377,8 @@ public class PapyrusCustomNodesItemProviderAdapterFactory extends PapyrusCustomN
             this.outerFlagNodeStyleDescriptionItemProvider.dispose();
         if (this.cuboidNodeStyleDescriptionItemProvider != null)
             this.cuboidNodeStyleDescriptionItemProvider.dispose();
+        if (this.customImageNodeStyleDescriptionItemProvider != null)
+            this.customImageNodeStyleDescriptionItemProvider.dispose();
     }
 
     /**
@@ -417,6 +444,9 @@ public class PapyrusCustomNodesItemProviderAdapterFactory extends PapyrusCustomN
                 this.newChildDescriptors.add(this.createChildParameter(DiagramPackage.Literals.NODE_DESCRIPTION__STYLE,
                         PapyrusCustomNodesFactory.eINSTANCE.createCuboidNodeStyleDescription()));
 
+                this.newChildDescriptors.add(this.createChildParameter(DiagramPackage.Literals.NODE_DESCRIPTION__STYLE,
+                        PapyrusCustomNodesFactory.eINSTANCE.createCustomImageNodeStyleDescription()));
+
                 return null;
             }
 
@@ -444,6 +474,9 @@ public class PapyrusCustomNodesItemProviderAdapterFactory extends PapyrusCustomN
 
                 this.newChildDescriptors.add(this.createChildParameter(DiagramPackage.Literals.CONDITIONAL_NODE_STYLE__STYLE,
                         PapyrusCustomNodesFactory.eINSTANCE.createCuboidNodeStyleDescription()));
+
+                this.newChildDescriptors.add(this.createChildParameter(DiagramPackage.Literals.CONDITIONAL_NODE_STYLE__STYLE,
+                        PapyrusCustomNodesFactory.eINSTANCE.createCustomImageNodeStyleDescription()));
 
                 return null;
             }

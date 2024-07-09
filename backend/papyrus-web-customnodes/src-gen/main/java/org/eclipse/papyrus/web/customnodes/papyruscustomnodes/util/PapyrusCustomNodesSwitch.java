@@ -17,6 +17,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.Switch;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CuboidNodeStyleDescription;
+import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.InnerFlagNodeStyleDescription;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.NoteNodeStyleDescription;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.OuterFlagNodeStyleDescription;
@@ -143,6 +144,17 @@ public class PapyrusCustomNodesSwitch<T> extends Switch<T> {
                     result = this.defaultCase(theEObject);
                 return result;
             }
+            case PapyrusCustomNodesPackage.CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION: {
+                CustomImageNodeStyleDescription customImageNodeStyleDescription = (CustomImageNodeStyleDescription) theEObject;
+                T result = this.caseCustomImageNodeStyleDescription(customImageNodeStyleDescription);
+                if (result == null)
+                    result = this.caseNodeStyleDescription(customImageNodeStyleDescription);
+                if (result == null)
+                    result = this.caseBorderStyle(customImageNodeStyleDescription);
+                if (result == null)
+                    result = this.defaultCase(theEObject);
+                return result;
+            }
             default:
                 return this.defaultCase(theEObject);
         }
@@ -236,6 +248,21 @@ public class PapyrusCustomNodesSwitch<T> extends Switch<T> {
      * @generated
      */
     public T caseCuboidNodeStyleDescription(CuboidNodeStyleDescription object) {
+        return null;
+    }
+
+    /**
+     * Returns the result of interpreting the object as an instance of '<em>Custom Image Node Style Description</em>'.
+     * <!-- begin-user-doc --> This implementation returns null; returning a non-null result will terminate the switch.
+     * <!-- end-user-doc -->
+     *
+     * @param object
+     *            the target of the switch.
+     * @return the result of interpreting the object as an instance of '<em>Custom Image Node Style Description</em>'.
+     * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+     * @generated
+     */
+    public T caseCustomImageNodeStyleDescription(CustomImageNodeStyleDescription object) {
         return null;
     }
 

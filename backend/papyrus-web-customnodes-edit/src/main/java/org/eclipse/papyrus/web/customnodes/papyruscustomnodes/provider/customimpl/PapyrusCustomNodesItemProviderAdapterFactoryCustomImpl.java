@@ -24,6 +24,14 @@ import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.provider.PapyrusCu
 public class PapyrusCustomNodesItemProviderAdapterFactoryCustomImpl extends PapyrusCustomNodesItemProviderAdapterFactory {
 
     @Override
+    public Adapter createCustomImageNodeStyleDescriptionAdapter() {
+        if (this.customImageNodeStyleDescriptionItemProvider == null) {
+            this.customImageNodeStyleDescriptionItemProvider = new CustomImageNodeStyleDescriptionItemProviderCustomImpl(this);
+        }
+        return this.customImageNodeStyleDescriptionItemProvider;
+    }
+
+    @Override
     public Adapter createCuboidNodeStyleDescriptionAdapter() {
         if (this.cuboidNodeStyleDescriptionItemProvider == null) {
             this.cuboidNodeStyleDescriptionItemProvider = new CuboidNodeStyleDescriptionItemProviderCustomImpl(this);

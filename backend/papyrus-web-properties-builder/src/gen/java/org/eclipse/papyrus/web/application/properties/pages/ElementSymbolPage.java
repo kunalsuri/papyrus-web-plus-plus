@@ -58,7 +58,7 @@ public class ElementSymbolPage {
                 .name("symbol") //
                 .label("aql:'Symbol'") //
                 .help("aql:'The symbol associated to this element'")
-                .uuidExpression("aql:self.getSymbolvalue()")
+                .uuidExpression("aql:self.getSymbolValue()")
                 .addOperation("")
                 .selectOperation("aql:self.createOrUpdateAnnotation(newUuid)")
                 .removeOperation("aql:self.removeSymbolFromAnnotation()");

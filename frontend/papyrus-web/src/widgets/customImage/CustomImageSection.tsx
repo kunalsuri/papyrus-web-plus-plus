@@ -256,19 +256,19 @@ export const CustomImageSection = ({
         {state.validImage ? (
           <img id={widget.id} src={state.url} width="25%" onError={onErrorLoadingImage} />
         ) : (
-          <Typography data-testid="custom-image-no-image" variant="caption">
+          <Typography data-testid="custom-image-widget-no-image" variant="caption">
             No image
           </Typography>
         )}
-        <div className={classes.toolbar} data-testid="custom-image-toolbar">
+        <div className={classes.toolbar} data-testid="custom-image-widget-toolbar">
           {modal}
-          <IconButton data-testid="custom-image-add" onClick={handleAddImageButton} size="small">
+          <IconButton data-testid="custom-image-widget-add" onClick={handleAddImageButton} size="small">
             <AddImageIcon />
           </IconButton>
-          <IconButton data-testid="custom-image-select" onClick={handleSelectImageButton} size="small">
+          <IconButton data-testid="custom-image-widget-select" onClick={handleSelectImageButton} size="small">
             <MoreHorizIcon />
           </IconButton>
-          <IconButton data-testid="custom-image-remove" onClick={handleRemoveImageButton} size="small">
+          <IconButton data-testid="custom-image-widget-remove" onClick={handleRemoveImageButton} size="small">
             <DeleteIcon />
           </IconButton>
         </div>

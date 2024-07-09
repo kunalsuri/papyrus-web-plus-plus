@@ -13,6 +13,7 @@
  */
 package org.eclipse.papyrus.web.customnodes.papyruscustomnodes;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
@@ -484,6 +485,84 @@ public interface PapyrusCustomNodesPackage extends EPackage {
     int CUBOID_NODE_STYLE_DESCRIPTION_OPERATION_COUNT = DiagramPackage.NODE_STYLE_DESCRIPTION_OPERATION_COUNT + 0;
 
     /**
+     * The meta object id for the
+     * '{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.CustomImageNodeStyleDescriptionImpl
+     * <em>Custom Image Node Style Description</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @see org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.CustomImageNodeStyleDescriptionImpl
+     * @see org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.PapyrusCustomNodesPackageImpl#getCustomImageNodeStyleDescription()
+     * @generated
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION = 6;
+
+    /**
+     * The feature id for the '<em><b>Border Color</b></em>' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__BORDER_COLOR = DiagramPackage.NODE_STYLE_DESCRIPTION__BORDER_COLOR;
+
+    /**
+     * The feature id for the '<em><b>Border Radius</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__BORDER_RADIUS = DiagramPackage.NODE_STYLE_DESCRIPTION__BORDER_RADIUS;
+
+    /**
+     * The feature id for the '<em><b>Border Size</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__BORDER_SIZE = DiagramPackage.NODE_STYLE_DESCRIPTION__BORDER_SIZE;
+
+    /**
+     * The feature id for the '<em><b>Border Line Style</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc
+     * -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__BORDER_LINE_STYLE = DiagramPackage.NODE_STYLE_DESCRIPTION__BORDER_LINE_STYLE;
+
+    /**
+     * The feature id for the '<em><b>Background</b></em>' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__BACKGROUND = DiagramPackage.NODE_STYLE_DESCRIPTION_FEATURE_COUNT + 0;
+
+    /**
+     * The feature id for the '<em><b>Shape</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__SHAPE = DiagramPackage.NODE_STYLE_DESCRIPTION_FEATURE_COUNT + 1;
+
+    /**
+     * The number of structural features of the '<em>Custom Image Node Style Description</em>' class. <!--
+     * begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION_FEATURE_COUNT = DiagramPackage.NODE_STYLE_DESCRIPTION_FEATURE_COUNT + 2;
+
+    /**
+     * The number of operations of the '<em>Custom Image Node Style Description</em>' class. <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated
+     * @ordered
+     */
+    int CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION_OPERATION_COUNT = DiagramPackage.NODE_STYLE_DESCRIPTION_OPERATION_COUNT + 0;
+
+    /**
      * Returns the meta object for class
      * '{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.PackageNodeStyleDescription <em>Package Node Style
      * Description</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -622,6 +701,41 @@ public interface PapyrusCustomNodesPackage extends EPackage {
     EReference getCuboidNodeStyleDescription_Background();
 
     /**
+     * Returns the meta object for class
+     * '{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription <em>Custom Image
+     * Node Style Description</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @return the meta object for class '<em>Custom Image Node Style Description</em>'.
+     * @see org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription
+     * @generated
+     */
+    EClass getCustomImageNodeStyleDescription();
+
+    /**
+     * Returns the meta object for the reference
+     * '{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription#getBackground
+     * <em>Background</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @return the meta object for the reference '<em>Background</em>'.
+     * @see org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription#getBackground()
+     * @see #getCustomImageNodeStyleDescription()
+     * @generated
+     */
+    EReference getCustomImageNodeStyleDescription_Background();
+
+    /**
+     * Returns the meta object for the attribute
+     * '{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription#getShape
+     * <em>Shape</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @return the meta object for the attribute '<em>Shape</em>'.
+     * @see org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription#getShape()
+     * @see #getCustomImageNodeStyleDescription()
+     * @generated
+     */
+    EAttribute getCustomImageNodeStyleDescription_Shape();
+
+    /**
      * Returns the factory that creates the instances of the model. <!-- begin-user-doc --> <!-- end-user-doc -->
      *
      * @return the factory that creates the instances of the model.
@@ -757,6 +871,33 @@ public interface PapyrusCustomNodesPackage extends EPackage {
          * @generated
          */
         EReference CUBOID_NODE_STYLE_DESCRIPTION__BACKGROUND = eINSTANCE.getCuboidNodeStyleDescription_Background();
+
+        /**
+         * The meta object literal for the
+         * '{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.CustomImageNodeStyleDescriptionImpl
+         * <em>Custom Image Node Style Description</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
+         *
+         * @see org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.CustomImageNodeStyleDescriptionImpl
+         * @see org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.PapyrusCustomNodesPackageImpl#getCustomImageNodeStyleDescription()
+         * @generated
+         */
+        EClass CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION = eINSTANCE.getCustomImageNodeStyleDescription();
+
+        /**
+         * The meta object literal for the '<em><b>Background</b></em>' reference feature. <!-- begin-user-doc --> <!--
+         * end-user-doc -->
+         *
+         * @generated
+         */
+        EReference CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__BACKGROUND = eINSTANCE.getCustomImageNodeStyleDescription_Background();
+
+        /**
+         * The meta object literal for the '<em><b>Shape</b></em>' attribute feature. <!-- begin-user-doc --> <!--
+         * end-user-doc -->
+         *
+         * @generated
+         */
+        EAttribute CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__SHAPE = eINSTANCE.getCustomImageNodeStyleDescription_Shape();
 
     }
 

@@ -7,7 +7,7 @@
     rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" codeFormatting="true"
     commentFormatting="true" testsDirectory="" importerID="org.eclipse.emf.importer.ecore"
     bundleManifest="false" complianceLevel="17.0" copyrightFields="false" editPluginID="papyrus-web-customnodes"
-    usedGenPackages="../../../../../sirius-components-view-diagram/src/main/resources/model/diagram.genmodel#//diagram ../../../../../sirius-components-view/src/main/resources/model/view.genmodel#//view"
+    usedGenPackages="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.genmodel#//diagram platform:/resource/sirius-components-view/src/main/resources/model/view.genmodel#//view"
     operationReflection="true" importOrganizing="true" cleanup="true">
   <foreignModel>papyrus-customnodes.ecore</foreignModel>
   <genPackages prefix="PapyrusCustomNodes" basePackage="org.eclipse.papyrus.web.customnodes"

@@ -38,8 +38,8 @@ describe('Details panel tests', () => {
       .get('div[role="tablist"] > button')
       .should(($buttons) => {
         const texts = $buttons.toArray().map((el) => el.innerText);
-        expect(texts).to.have.lengthOf(4);
-        expect(texts).to.deep.eq(['UML', 'Comments', 'Profile', 'Advanced']);
+        expect(texts).to.have.lengthOf(5);
+        expect(texts).to.deep.eq(['UML', 'Symbol', 'Comments', 'Profile', 'Advanced']);
       });
   });
 });

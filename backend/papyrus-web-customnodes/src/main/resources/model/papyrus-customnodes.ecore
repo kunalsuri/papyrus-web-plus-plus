@@ -2,23 +2,27 @@
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="papyruscustomnodes" nsURI="http://www.eclipse.org/papyrus-web/customnodes"
     nsPrefix="papyruscustomnodes">
-  <eClassifiers xsi:type="ecore:EClass" name="PackageNodeStyleDescription" eSuperTypes="../../../../../sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass ../../../../../sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PackageNodeStyleDescription" eSuperTypes="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RectangleWithExternalLabelNodeStyleDescription"
-      eSuperTypes="../../../../../sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass ../../../../../sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+      eSuperTypes="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="NoteNodeStyleDescription" eSuperTypes="../../../../../sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass ../../../../../sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="NoteNodeStyleDescription" eSuperTypes="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="InnerFlagNodeStyleDescription" eSuperTypes="../../../../../sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass ../../../../../sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="InnerFlagNodeStyleDescription" eSuperTypes="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="OuterFlagNodeStyleDescription" eSuperTypes="../../../../../sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass ../../../../../sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="OuterFlagNodeStyleDescription" eSuperTypes="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="CuboidNodeStyleDescription" eSuperTypes="../../../../../sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass ../../../../../sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CuboidNodeStyleDescription" eSuperTypes="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CustomImageNodeStyleDescription" eSuperTypes="platform:/resource/sirius-components-view-diagram/src/main/resources/model/diagram.ecore#//NodeStyleDescription">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="background" eType="ecore:EClass platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//UserColor"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="shape" eType="ecore:EDataType platform:/resource/sirius-components-view/src/main/resources/model/view.ecore#//InterpretedExpression"/>
   </eClassifiers>
 </ecore:EPackage>

@@ -15,7 +15,6 @@ import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { ExtensionRegistry } from '@eclipse-sirius/sirius-components-core';
 import { NodeTypeContribution, diagramPaletteToolExtensionPoint } from '@eclipse-sirius/sirius-components-diagrams';
 import {
-<<<<<<< Upstream, based on origin/master
   DiagramPaletteToolContributionProps,
   diagramPaletteToolExtensionPoint,
   EdgeData,
@@ -24,12 +23,6 @@ import {
 } from '@eclipse-sirius/sirius-components-diagrams';
 import {
   ApolloClientOptionsConfigurer,
-=======
-  ApolloClientOptionsConfigurer,
-  DiagramRepresentationConfiguration,
-  NodeTypeRegistry,
-  SiriusWebApplication,
->>>>>>> 0bbc31c [210] Added Custom Widgets and Symbol Page to all Nodes
   apolloClientOptionsConfigurersExtensionPoint,
   DefaultExtensionRegistryMergeStrategy,
   DiagramRepresentationConfiguration,
@@ -41,13 +34,7 @@ import {
 } from '@eclipse-sirius/sirius-web-application';
 import { forkRegistry } from '@eclipse-sirius/sirius-web-view-fork';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-<<<<<<< Upstream, based on origin/master
 import { Help } from './core/Help';
-=======
-import ReactDOM from 'react-dom';
-import { Help } from './core/Help';
-import { PapyrusIcon } from './core/PapyrusIcon';
->>>>>>> 0bbc31c [210] Added Custom Widgets and Symbol Page to all Nodes
 import { httpOrigin, wsOrigin } from './core/URL';
 import { CuboidNode } from './nodes/cuboid/CuboidNode';
 import { CuboidNodeConverter } from './nodes/cuboid/CuboidNodeConverter';
@@ -94,23 +81,17 @@ import './reset.css';
 import './variables.css';
 import { customWidgetsDocumentTransform } from './widgets/CustomWidgetsDocumentTransform';
 
-<<<<<<< Upstream, based on origin/master
 import { Edge, Node } from '@xyflow/react';
 import { ExtensionRegistryMergeStrategy } from './extensions/ExtensionRegistryMergeStrategy';
 import { createRoot } from 'react-dom/client';
 import { PapyrusNavigationBarIcon } from './core/PapyrusNavigationBarIcon';
-=======
->>>>>>> 0bbc31c [210] Added Custom Widgets and Symbol Page to all Nodes
 import { PublishProfileTreeItemContextMenuContribution } from './profile/publish-profile/PublishProfileTreeItemContextMenuContribution';
 import { ContainmentReferenceIcon } from './widgets/containmentReference/ContainmentReferenceIcon';
 import { ContainmentReferencePreview } from './widgets/containmentReference/ContainmentReferencePreview';
 import ContainmentReferenceSection from './widgets/containmentReference/ContainmentReferenceSection';
-<<<<<<< Upstream, based on origin/master
-=======
 import { CustomImageIcon } from './widgets/customImage/CustomImageIcon';
 import { CustomImagePreview } from './widgets/customImage/CustomImagePreview';
 import { CustomImageSection } from './widgets/customImage/CustomImageSection';
->>>>>>> 0bbc31c [210] Added Custom Widgets and Symbol Page to all Nodes
 import { LanguageExpressionIcon } from './widgets/languageExpression/LanguageExpressionIcon';
 import { LanguageExpressionPreview } from './widgets/languageExpression/LanguageExpressionPreview';
 import { LanguageExpressionSection } from './widgets/languageExpression/LanguageExpressionSection';

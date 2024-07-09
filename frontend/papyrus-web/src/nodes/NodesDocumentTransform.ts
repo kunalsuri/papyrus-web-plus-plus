@@ -66,6 +66,14 @@ const backgroundField: SelectionNode = {
   },
 };
 
+const shapeField: SelectionNode = {
+  kind: Kind.FIELD,
+  name: {
+    kind: Kind.NAME,
+    value: 'shape',
+  },
+};
+
 export const nodesStyleDocumentTransform = new DocumentTransform((document) => {
   if (shouldTransform(document)) {
     return visit(document, {
@@ -166,6 +174,21 @@ export const nodesStyleDocumentTransform = new DocumentTransform((document) => {
           },
         };
 
+        const customImageNodeStyleInlineFragment: InlineFragmentNode = {
+          kind: Kind.INLINE_FRAGMENT,
+          selectionSet: {
+            kind: Kind.SELECTION_SET,
+            selections: [shapeField, borderColorField, borderSizeField, borderStyleField, backgroundField],
+          },
+          typeCondition: {
+            kind: Kind.NAMED_TYPE,
+            name: {
+              kind: Kind.NAME,
+              value: 'CustomImageNodeStyle',
+            },
+          },
+        };
+
         return {
           ...field,
           selectionSet: {
@@ -178,6 +201,7 @@ export const nodesStyleDocumentTransform = new DocumentTransform((document) => {
               outerFlagNodeStyleInlineFragment,
               packageNodeStyleInlineFragment,
               rectangleWithExternalLabelNodeStyleInlineFragment,
+              customImageNodeStyleInlineFragment,
             ],
           },
         };

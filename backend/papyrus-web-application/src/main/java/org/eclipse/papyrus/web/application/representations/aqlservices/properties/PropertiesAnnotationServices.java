@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 210
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 210, 218
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.properties;
 
@@ -31,7 +31,7 @@ public class PropertiesAnnotationServices {
 
     private static final String SRC_PAPYRUS = "org.eclipse.papyrus";
 
-    public String getSymbolvalue(Element element) {
+    public String getSymbolValue(Element element) {
         EAnnotation annotation = element.getEAnnotation(SRC_PAPYRUS);
         if (annotation != null) {
             String value = annotation.getDetails().get(SYMBOL);

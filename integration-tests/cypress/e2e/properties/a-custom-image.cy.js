@@ -31,7 +31,7 @@ describe('Custom Image tests', () => {
   });
 
   const testNoImage = () => {
-    cy.getByTestId(`custom-image-no-image`).should('be.visible');
+    cy.getByTestId(`custom-image-widget-no-image`).should('be.visible');
   };
 
   it('Custom Image custom widget tests', () => {
@@ -49,12 +49,13 @@ describe('Custom Image tests', () => {
     cy.getByTestId(`page-tab-Symbol`).should('have.class', 'Mui-selected');
     // Upload the image
     testNoImage();
-    cy.getByTestId('custom-image-add').should('be.visible').click();
+    cy.getByTestId('custom-image-widget-add').should('be.visible').click();
+    cy.log('imageFullName: ', imageFullName);
     cy.getByTestId('file').selectFile(imagePath, { force: true });
     cy.getByTestId('file').its('0.files').should('have.length', 1).its('0.name').should('eq', imageFullName);
     cy.getByTestId('upload-image').should('be.visible').click();
     // Select the image
-    cy.getByTestId('custom-image-select').should('be.visible').click();
+    cy.getByTestId('custom-image-widget-select').should('be.visible').click();
     cy.getByTestId('select-image-select').should('be.visible').click();
     cy.getByTestId(`select-image-select-${imageFullName}`).click();
     cy.getByTestId('select-image-confirm').should('be.visible').click();
@@ -65,11 +66,11 @@ describe('Custom Image tests', () => {
     cy.getByTestId('input-Value').should('be.visible').should('contain', '/api/images/');
     // Select Symbol page
     cy.getByTestId('FunctionBehavior').should('be.visible').click();
-    cy.wait(250); // Make sure that the pages update properly following the previous click
+    cy.wait(250); // Make sure that the pages updates properly following the previous click
     cy.getByTestId(`page-tab-Symbol`).click();
     cy.getByTestId(`page-tab-Symbol`).should('have.class', 'Mui-selected');
     // Remove the image
-    cy.getByTestId('custom-image-remove').should('be.visible').click();
+    cy.getByTestId('custom-image-widget-remove').should('be.visible').click();
     testNoImage();
     cy.getByTestId('org.eclipse.papyrus').should('not.exist');
   });

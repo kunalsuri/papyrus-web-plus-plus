@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 210
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 210, 218
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations;
 
@@ -95,6 +95,7 @@ public class RepresentationServicesProvider implements IJavaServiceProvider {
             // Generic services
             services.add(UMLService.class);
             services.add(DebugService.class);
+            services.add(PropertiesAnnotationServices.class);
             String repName = representationDescription.getName();
             // Handle both in memory and serialized version
             if (repName != null) {

@@ -13,11 +13,13 @@
  */
 package org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CuboidNodeStyleDescription;
+import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.InnerFlagNodeStyleDescription;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.NoteNodeStyleDescription;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.OuterFlagNodeStyleDescription;
@@ -75,6 +77,13 @@ public class PapyrusCustomNodesPackageImpl extends EPackageImpl implements Papyr
      * @generated
      */
     private EClass cuboidNodeStyleDescriptionEClass = null;
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    private EClass customImageNodeStyleDescriptionEClass = null;
 
     /**
      * Creates an instance of the model <b>Package</b>, registered with {@link org.eclipse.emf.ecore.EPackage.Registry
@@ -269,6 +278,36 @@ public class PapyrusCustomNodesPackageImpl extends EPackageImpl implements Papyr
      * @generated
      */
     @Override
+    public EClass getCustomImageNodeStyleDescription() {
+        return this.customImageNodeStyleDescriptionEClass;
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
+    public EReference getCustomImageNodeStyleDescription_Background() {
+        return (EReference) this.customImageNodeStyleDescriptionEClass.getEStructuralFeatures().get(0);
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
+    public EAttribute getCustomImageNodeStyleDescription_Shape() {
+        return (EAttribute) this.customImageNodeStyleDescriptionEClass.getEStructuralFeatures().get(1);
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
     public PapyrusCustomNodesFactory getPapyrusCustomNodesFactory() {
         return (PapyrusCustomNodesFactory) this.getEFactoryInstance();
     }
@@ -309,6 +348,10 @@ public class PapyrusCustomNodesPackageImpl extends EPackageImpl implements Papyr
 
         this.cuboidNodeStyleDescriptionEClass = this.createEClass(CUBOID_NODE_STYLE_DESCRIPTION);
         this.createEReference(this.cuboidNodeStyleDescriptionEClass, CUBOID_NODE_STYLE_DESCRIPTION__BACKGROUND);
+
+        this.customImageNodeStyleDescriptionEClass = this.createEClass(CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION);
+        this.createEReference(this.customImageNodeStyleDescriptionEClass, CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__BACKGROUND);
+        this.createEAttribute(this.customImageNodeStyleDescriptionEClass, CUSTOM_IMAGE_NODE_STYLE_DESCRIPTION__SHAPE);
     }
 
     /**
@@ -349,6 +392,7 @@ public class PapyrusCustomNodesPackageImpl extends EPackageImpl implements Papyr
         this.innerFlagNodeStyleDescriptionEClass.getESuperTypes().add(theDiagramPackage.getNodeStyleDescription());
         this.outerFlagNodeStyleDescriptionEClass.getESuperTypes().add(theDiagramPackage.getNodeStyleDescription());
         this.cuboidNodeStyleDescriptionEClass.getESuperTypes().add(theDiagramPackage.getNodeStyleDescription());
+        this.customImageNodeStyleDescriptionEClass.getESuperTypes().add(theDiagramPackage.getNodeStyleDescription());
 
         // Initialize classes, features, and operations; add parameters
         this.initEClass(this.packageNodeStyleDescriptionEClass, PackageNodeStyleDescription.class, "PackageNodeStyleDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -380,6 +424,13 @@ public class PapyrusCustomNodesPackageImpl extends EPackageImpl implements Papyr
         this.initEReference(this.getCuboidNodeStyleDescription_Background(), theViewPackage.getUserColor(), null, "background", null, 0, 1, CuboidNodeStyleDescription.class, !IS_TRANSIENT,
                 !IS_VOLATILE,
                 IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+        this.initEClass(this.customImageNodeStyleDescriptionEClass, CustomImageNodeStyleDescription.class, "CustomImageNodeStyleDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+        this.initEReference(this.getCustomImageNodeStyleDescription_Background(), theViewPackage.getUserColor(), null, "background", null, 0, 1, CustomImageNodeStyleDescription.class, !IS_TRANSIENT,
+                !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+        this.initEAttribute(this.getCustomImageNodeStyleDescription_Shape(), theViewPackage.getInterpretedExpression(), "shape", null, 0, 1, CustomImageNodeStyleDescription.class, !IS_TRANSIENT,
+                !IS_VOLATILE,
+                IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
         // Create resource
         this.createResource(eNS_URI);
