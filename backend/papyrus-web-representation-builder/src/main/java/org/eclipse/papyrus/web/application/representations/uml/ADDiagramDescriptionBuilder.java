@@ -11,7 +11,7 @@
  * Contributors:
  *  Obeo - Initial API and implementation
  *  Aurelien Didier (Artal Technologies) - Issue 199
- *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 219
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 219, 227
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -267,6 +267,8 @@ public class ADDiagramDescriptionBuilder extends AbstractRepresentationDescripti
         this.createHideSymbolTool(diagramDescription,
                 SHOW_HIDE);
         this.createShowSymbolTool(diagramDescription, SHOW_HIDE);
+        this.createHideAllNonSymbolCompartmentTool(diagramDescription, SHOW_HIDE);
+        this.createShowAllNonSymbolCompartmentTool(diagramDescription, SHOW_HIDE);
 
         this.createActivityTopNodeDescription(diagramDescription);
         this.createObjectFlowEdgeDescription(diagramDescription);
@@ -618,7 +620,7 @@ public class ADDiagramDescriptionBuilder extends AbstractRepresentationDescripti
         EClass activityPartitionEClass = this.umlPackage.getActivityPartition();
         InsideLabelStyle labelStyle = this.getViewBuilder().createDefaultInsideLabelStyleIcon();
         labelStyle.setWithHeader(true);
-        labelStyle.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
+        labelStyle.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.IF_CHILDREN);
         NodeDescription adActivityPartitionSharedNodeDescription = this.newNodeBuilder(activityPartitionEClass, rectangularNodeStyle) //
                 .name(this.getIdBuilder().getSpecializedDomainNodeName(activityPartitionEClass, SHARED_SUFFIX)) //
                 .layoutStrategyDescription(DiagramFactory.eINSTANCE.createFreeFormLayoutStrategyDescription()) //

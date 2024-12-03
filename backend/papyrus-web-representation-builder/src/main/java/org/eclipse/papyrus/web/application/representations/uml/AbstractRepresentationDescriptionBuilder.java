@@ -11,7 +11,7 @@
  * Contributors:
  *  Obeo - Initial API and implementation
  *  Aurelien Didier (Artal Technologies) - Issue 190
- *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issue 219
+ *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issue 219, 227
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -1279,14 +1279,14 @@ public abstract class AbstractRepresentationDescriptionBuilder {
     }
 
     /**
-     * Create the 'Hide all symbol' Tool.
+     * Create the 'Hide all symbols' Tool.
      *
      * @param diagramDescription
      * @param toolSectionName
      */
     protected void createHideSymbolTool(DiagramDescription diagramDescription, String toolSectionName) {
         NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
-        nodeTool.setName("Hide all symbol");
+        nodeTool.setName("Hide all symbols");
         nodeTool.setIconURLsExpression(ICON_PATH + HIDETOOL + ICON_SVG_EXTENSION);
         ChangeContext createElement = ViewFactory.eINSTANCE.createChangeContext();
         createElement.setExpression("aql:diagramServices.hide(diagramContext.getAllSymbol(editingContext))");
@@ -1295,17 +1295,49 @@ public abstract class AbstractRepresentationDescriptionBuilder {
     }
 
     /**
-     * Create the 'Show all symbol' Tool.
+     * Create the 'Show all symbols' Tool.
      *
      * @param diagramDescription
      * @param toolSectionName
      */
     protected void createShowSymbolTool(DiagramDescription diagramDescription, String toolSectionName) {
         NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
-        nodeTool.setName("Show all symbol");
+        nodeTool.setName("Show all symbols");
         nodeTool.setIconURLsExpression(ICON_PATH + SHOWTOOL + ICON_SVG_EXTENSION);
         ChangeContext createElement = ViewFactory.eINSTANCE.createChangeContext();
         createElement.setExpression("aql:diagramServices.reveal(diagramContext.getAllSymbol(editingContext))");
+        nodeTool.getBody().add(createElement);
+        this.addDiagramToolInToolSection(diagramDescription, nodeTool, toolSectionName);
+    }
+
+    /**
+     * Create the 'Hide all other compartments' Tool.
+     *
+     * @param diagramDescription
+     * @param toolSectionName
+     */
+    protected void createHideAllNonSymbolCompartmentTool(DiagramDescription diagramDescription, String toolSectionName) {
+        NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
+        nodeTool.setName("Hide all other compartments");
+        nodeTool.setIconURLsExpression(ICON_PATH + HIDETOOL + ICON_SVG_EXTENSION);
+        ChangeContext createElement = ViewFactory.eINSTANCE.createChangeContext();
+        createElement.setExpression("aql:diagramServices.hide(diagramContext.getAllNonSymbol(editingContext))");
+        nodeTool.getBody().add(createElement);
+        this.addDiagramToolInToolSection(diagramDescription, nodeTool, toolSectionName);
+    }
+
+    /**
+     * Create the 'Show all other compartments' Tool.
+     *
+     * @param diagramDescription
+     * @param toolSectionName
+     */
+    protected void createShowAllNonSymbolCompartmentTool(DiagramDescription diagramDescription, String toolSectionName) {
+        NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
+        nodeTool.setName("Show all other compartments");
+        nodeTool.setIconURLsExpression(ICON_PATH + SHOWTOOL + ICON_SVG_EXTENSION);
+        ChangeContext createElement = ViewFactory.eINSTANCE.createChangeContext();
+        createElement.setExpression("aql:diagramServices.reveal(diagramContext.getAllNonSymbol(editingContext))");
         nodeTool.getBody().add(createElement);
         this.addDiagramToolInToolSection(diagramDescription, nodeTool, toolSectionName);
     }

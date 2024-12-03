@@ -77,6 +77,8 @@ public class Services {
 
     public static final String GET_SYMBOL = "getAllSymbol";
 
+    public static final String GET_ALL_NON_SYMBOL = "getAllNonSymbol";
+
     /**
      * The name of the service that check is the root model is not a Profile model.
      */

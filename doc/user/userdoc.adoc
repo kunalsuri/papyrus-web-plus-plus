@@ -274,6 +274,73 @@ image::deletion-dialog.png[Semantic Deletion Dialog,300, align="center"]
 This preference is stored in the browser's local storage. You can reset it by deleting the Papyrus Web data in your browser's cache.
 ====
 
+==== Symbols
+
+The goal of the sympbol support in Papyrus web is to give users access to some custom representations. They can use their own representation, i.e. their own svg and png files, in their diagrams, so the model can be easily read and understood. 
+
+Symbols can be added on most diagram elements (except notes, constraints and elements represented by an icon).
+
+image::symbolAndCompartment.png[Diagram using symbols,400, align="center"]
+
+For more information about the definition of a symbol on an element, please go to the Right Side panel section -> <<Symbol panel>>
+
+===== Show / hide tools
+
+Once symbols are added on the diagram, it is possible to switch from the default representation with both symbols and default compartment, to symbol only representation or no symbol representation using show hide tools.
+
+image::symbolShowHideTools.png[Show hide symbol tools,300, align="center"]
+
+====== Show / hide symbols
+
+If symbol are added on the diagram as in the following picture.
+
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::symbolAndCompartment.png[Symbols and others compartment displayed,400, align="center"]
+|image::symbolOnPackage.png[Symbols and others compartment displayed,300, align="center"]
+|===
+
+The hide symbols tool will hide all the symbol of the current diagram.
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::symbolHidden.png[Symbols hidden,400, align="center"]
+|image::symbolHiddenOnPackage.png[Symbols and others compartment displayed,300, align="center"]
+|===
+
+The show symbol tool will allow to display again all the symbol defined in the diagram.
+
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::symbolAndCompartment.png[Symbols shown again,400, align="center"]
+|image::symbolOnPackage.png[Symbols and others compartment displayed,300, align="center"]
+|===
+
+====== Show / hide all other compartment
+
+Hide all other compartment tool will hide compartments only when a symbol is defined on an element and when we are working with element using ListLayout.
+
+[NOTE]
+====
+* List layout elements are elements that display their child using vertical compartment (like the class example used here).
+* Other compartment are free form, i.e that their child can be placed freely on the diagram (such as package used in this example).
+====
+
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::symbolHideOther.png[Other compartment hidden,400, align="center"]
+|image::symbolOnPackage.png[Symbols and others compartment displayed,300, align="center"]
+|===
+
+If symbol are already hidden, then all the compartment (symbol and others) will be hidden.
+
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::symbolHideAll.png[Symbol and other compartment hidden,400, align="center"]
+|image::symbolHiddenOnPackage.png[Symbols and others compartment displayed,300, align="center"]
+|===
+
+Show all other compartment tools will display again all the compartment that are not symbol in the diagram.
+
 ==== Activity Diagram
 
 Activity diagrams help to focus on workflows. They are therefore particularly suitable for modeling control flows and data flows. They allow to graphically represent the behavior of a method or the course of a use case. 
@@ -681,6 +748,57 @@ Each profile definition can be removed using the trash button.
 
 WARNING: The remove action only remove the profile definition from the model.
 It does not "unpublish" the profile.
+
+===== Symbol panel
+
+The symbol panel allows to add symbol on the selected element.
+
+====== Uploading images
+
+The first step is to add the image that we want to use in the database.
+This is done by selecting any elements of  the diagram and using the Right Side panel.
+
+image::symbolView.png[Symbol edition on right panel,300, align="center"]
+
+On this page, the three following button are respectively for the "Upload", "Select" and "Delete".
+
+image::symbolViewButton.png[Symbol edition button,100, align="center"]
+
+Using the upload button will allow you to select the image to upload:
+
+image::symbolUpload.png[Symbol edition on right panel,300, align="center"]
+
+====== Applying symbol
+
+Once the image as been added to the database, it can be added has a symbol on any elements in the diagram.
+
+For this, select the element on which you want to add a symbol. And, in the same symbol panel, use the select button.
+
+image::symbolSelection.png[Symbol selection,300, align="center"]
+
+And then confirm.
+
+image::symbolImageAdded.png[Symbol added on right panel,300, align="center"]
+
+[NOTE]
+====
+When the symbol is added, an annotation is created under the element to store the applied symbol (i.e the image id).
+====
+
+image::symbolAnnotation.png[Symbol annotation,300, align="center"]
+
+The result can be visualized on the diagram.
+
+image::symbolAddedOnDiagrams.png[Symbol added on diagrams,100, align="center"]
+
+====== Removing symbol
+
+Symbol can be removed from an element using the delete button.
+
+====== Using symbol on diagram
+
+For more information on the usage of symbols in the diagram: See <<Symbols>>.
+
 
 ===== Comments panel
 

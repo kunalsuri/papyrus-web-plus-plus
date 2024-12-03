@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issues 200, 203, 219
+ *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issues 200, 203, 219, 227
  *  Aurelien Didier (Artal Technologies) - Issue 199, Issue 190
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
@@ -126,6 +126,8 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
         this.createHideSymbolTool(diagramDescription,
                 SHOW_HIDE);
         this.createShowSymbolTool(diagramDescription, SHOW_HIDE);
+        this.createHideAllNonSymbolCompartmentTool(diagramDescription, SHOW_HIDE);
+        this.createShowAllNonSymbolCompartmentTool(diagramDescription, SHOW_HIDE);
 
         this.createClassTopNodeDescription(diagramDescription);
         this.createInterfaceTopDescription(diagramDescription);

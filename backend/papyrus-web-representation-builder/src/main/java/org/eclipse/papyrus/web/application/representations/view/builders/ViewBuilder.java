@@ -11,6 +11,7 @@
  * Contributors:
  *  Obeo - Initial API and implementation
  *  Aurelien Didier (Artal Technologies) - Issue 199
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 227
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.view.builders;
 
@@ -593,7 +594,7 @@ public class ViewBuilder {
         NodeDescription result = this.createNodeDescription(this.idBuilder.getSpecializedDomainNodeName(domain, specialization), domain, semanticCandidateExpression,
                 this.createRectangularNodeStyle(), SynchronizationPolicy.UNSYNCHRONIZED);
         result.getInsideLabel().getStyle().setWithHeader(true);
-        result.getInsideLabel().getStyle().setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
+        result.getInsideLabel().getStyle().setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.IF_CHILDREN);
         this.addDefaultDeleteTool(result);
         this.addDirectEditTool(result);
         return result;
@@ -658,7 +659,7 @@ public class ViewBuilder {
         style.setShowIconExpression("aql:" + showIcon);
         style.setBorderSize(0);
         style.setWithHeader(isHeader);
-        style.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
+        style.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.IF_CHILDREN);
         return style;
     }
 

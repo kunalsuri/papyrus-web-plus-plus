@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 210, 218, 219
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 210, 218, 219, 227
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.properties;
 
@@ -27,7 +27,9 @@ import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
+import org.eclipse.sirius.components.core.services.ObjectService;
 import org.eclipse.sirius.components.diagrams.Diagram;
+import org.eclipse.sirius.components.diagrams.ListLayoutStrategy;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.view.diagram.NodeDescription;
 import org.eclipse.sirius.components.view.emf.diagram.api.IViewDiagramDescriptionSearchService;
@@ -48,8 +50,11 @@ public class PropertiesAnnotationServices {
 
     private final IViewDiagramDescriptionSearchService viewDiagramDescriptionSearchService;
 
-    public PropertiesAnnotationServices(IViewDiagramDescriptionSearchService viewDiagramDescriptionSearchService) {
+    private final ObjectService objectService;
+
+    public PropertiesAnnotationServices(IViewDiagramDescriptionSearchService viewDiagramDescriptionSearchService, ObjectService objectService) {
         this.viewDiagramDescriptionSearchService = Objects.requireNonNull(viewDiagramDescriptionSearchService);
+        this.objectService = Objects.requireNonNull(objectService);
     }
 
     public String getSymbolValue(Element element) {
@@ -125,6 +130,32 @@ public class PropertiesAnnotationServices {
                 NodeDescription nodeDesc = optionalNodeDesc.get();
                 if (nodeDesc.getName().contains(SYMBOL)) {
                     result.add(node);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<Node> getAllNonSymbol(IDiagramContext diagramContext, IEditingContext editionContext) {
+        List<Node> nodes = this.getAllNodes(diagramContext.getDiagram());
+        List<Node> result = new ArrayList<>();
+
+        for (Node node : nodes) {
+            if (node.getChildrenLayoutStrategy() instanceof ListLayoutStrategy) {
+                for (Node child : node.getChildNodes()) {
+                    Optional<NodeDescription> optionalChildNodeDesc = this.viewDiagramDescriptionSearchService.findViewNodeDescriptionById(editionContext, child.getDescriptionId());
+                    if (optionalChildNodeDesc.isPresent()) {
+                        NodeDescription childNodeDesc = optionalChildNodeDesc.get();
+                        String semanticElementId = node.getTargetObjectId();
+
+                        Optional<Object> optSemanticElement = this.objectService.getObject(editionContext, semanticElementId);
+                        if (optSemanticElement.get() instanceof Element elem) {
+                            if (!this.getSymbolValue(elem).equals("") && !childNodeDesc.getName().contains(SYMBOL)) {
+                                result.add(child);
+                            }
+                        }
+                    }
                 }
             }
         }

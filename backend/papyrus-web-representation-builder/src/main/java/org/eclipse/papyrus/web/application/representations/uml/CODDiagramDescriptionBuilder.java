@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issue 219
+ *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issues 219, 227
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -102,6 +102,8 @@ public final class CODDiagramDescriptionBuilder extends AbstractRepresentationDe
         this.createHideSymbolTool(diagramDescription,
                 SHOW_HIDE);
         this.createShowSymbolTool(diagramDescription, SHOW_HIDE);
+        this.createHideAllNonSymbolCompartmentTool(diagramDescription, SHOW_HIDE);
+        this.createShowAllNonSymbolCompartmentTool(diagramDescription, SHOW_HIDE);
 
         NodeDescription codInteractionDescription = this.createInteractionTopNodeDescription(diagramDescription);
         this.createLifelineSubNodeDescription(codInteractionDescription);
