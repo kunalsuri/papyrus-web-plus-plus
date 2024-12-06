@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,9 +10,13 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.component;
 
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.CONTENT_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.HOLDER_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.UNDERSCORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,6 +58,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @WebAppConfiguration
 public class ComponentDiagramServiceTests extends AbstractDiagramTest {
+
+    private static final String TOP_HOLDER_SUFFIX = UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String TOP_CONTENT_SUFFIX = UNDERSCORE + CONTENT_SUFFIX;
 
     private static final IdBuilder ID_BUILDER = new IdBuilder(CPDDiagramDescriptionBuilder.CPD_PREFIX, new UMLMetamodelHelper());
 
@@ -173,7 +181,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Package rootPack = this.init();
         Component component = this.createIn(Component.class, rootPack);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
+        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -205,8 +213,9 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Component componentType = this.createIn(Component.class, rootPack);
         typedProperty.setType(componentType);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
-        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, typedProperty, componentNode);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node componentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, typedProperty, componentNodeContent);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -238,8 +247,9 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Actor actorType = this.createIn(Actor.class, rootPack);
         typedProperty.setType(actorType);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
-        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, typedProperty, componentNode);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node componentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, typedProperty, componentNodeContent);
 
         this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -279,8 +289,9 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Property untypedProperty = this.create(Property.class);
         component.getOwnedAttributes().add(untypedProperty);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
-        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, untypedProperty, componentNode);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node componentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, untypedProperty, componentNodeContent);
 
         this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -299,11 +310,12 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Package rootPack = this.init();
         Component component = this.createIn(Component.class, rootPack);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node componentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, component);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createPropertyCPD(component, componentNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createPropertyCPD(component, componentNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -314,7 +326,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(component.getOwnedAttributes().contains(property));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CPD_PROPERTY_NODE_NAME, componentNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, componentNodeContent, newElement);
     }
 
     /**
@@ -331,8 +343,11 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Component componentType = this.createIn(Component.class, rootPack);
         typedProperty.setType(componentType);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
-        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, typedProperty, componentNode);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node componentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, component);
+        this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, typedProperty, componentNodeContent);
+        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_PROPERTY_NODE_NAME + TOP_CONTENT_SUFFIX,
+                typedProperty);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -347,7 +362,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(componentType.getOwnedAttributes().contains(property));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CPD_PROPERTY_NODE_NAME, typedPropertyNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, typedPropertyNode, newElement);
     }
 
     /**
@@ -364,8 +379,9 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Actor actorType = this.createIn(Actor.class, rootPack);
         typedProperty.setType(actorType);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
-        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, typedProperty, componentNode);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node componentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, typedProperty, componentNodeContent);
 
         this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -386,8 +402,9 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Property untypedProperty = this.create(Property.class);
         component.getOwnedAttributes().add(untypedProperty);
 
-        org.eclipse.sirius.components.diagrams.Node componentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, component);
-        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, untypedProperty, componentNode);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node componentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, component);
+        org.eclipse.sirius.components.diagrams.Node typedPropertyNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, untypedProperty, componentNodeContent);
 
         this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -583,13 +600,14 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         rootComponent.getPackagedElements().add(type2);
         Port portTarget = this.createIn(Port.class, type2);
 
-        Node rootComponentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, rootComponent);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, rootComponent);
+        Node rootComponentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, rootComponent);
 
-        Node type1Node = this.getDiagramHelper().createNodeInParent(CPD_COMPONENT_SHARED_NODE_NAME, type1, rootComponentNode);
-        Node type2Node = this.getDiagramHelper().createNodeInParent(CPD_COMPONENT_SHARED_NODE_NAME, type2, rootComponentNode);
+        Node type1NodeHolder = this.getDiagramHelper().createNodeInParent(CPD_COMPONENT_SHARED_NODE_NAME + TOP_HOLDER_SUFFIX, type1, rootComponentNodeContent);
+        Node type2NodeHolder = this.getDiagramHelper().createNodeInParent(CPD_COMPONENT_SHARED_NODE_NAME + TOP_HOLDER_SUFFIX, type2, rootComponentNodeContent);
 
-        Node portSourceNode = this.getDiagramHelper().createNodeInParent(CPD_PORT_NODE_NAME, portSource, type1Node);
-        Node portTargetNode = this.getDiagramHelper().createNodeInParent(CPD_PORT_NODE_NAME, portTarget, type2Node);
+        Node portSourceNode = this.getDiagramHelper().createNodeInParent(CPD_PORT_NODE_NAME, portSource, type1NodeHolder);
+        Node portTargetNode = this.getDiagramHelper().createNodeInParent(CPD_PORT_NODE_NAME, portTarget, type2NodeHolder);
 
         this.checkConnectorEdge(portSource, portSourceNode.getId(), portTarget, portTargetNode.getId(), rootComponent);
 
@@ -629,12 +647,13 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         targetProp.setType(type2);
         Port targetPort = this.createIn(Port.class, type2);
 
-        Node rootComponentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, rootComponent);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, rootComponent);
+        Node rootComponentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, rootComponent);
 
-        Node prop1Node = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, sourceProp, rootComponentNode);
+        Node prop1Node = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, sourceProp, rootComponentNodeContent);
         Node sourceNode = this.getDiagramHelper().createNodeInParent(CPD_PORT_NODE_NAME, sourcePort, prop1Node);
 
-        Node prop2Node = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, targetProp, rootComponentNode);
+        Node prop2Node = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, targetProp, rootComponentNodeContent);
         Node targetNode = this.getDiagramHelper().createNodeInParent(CPD_PORT_NODE_NAME, targetPort, prop2Node);
 
         this.checkConnectorEdge(sourcePort, sourceProp, sourceNode.getId(), targetPort, targetProp, targetNode.getId(), rootComponent);
@@ -670,10 +689,11 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
         Property targetProp = this.createIn(Property.class, rootComponent);
         targetProp.setType(type2);
 
-        Node rootComponentNode = this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME, rootComponent);
+        this.getDiagramHelper().createNodeInDiagram(CPD_COMPONENT_NODE_NAME + TOP_HOLDER_SUFFIX, rootComponent);
+        Node rootComponentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CPD_COMPONENT_NODE_NAME + TOP_CONTENT_SUFFIX, rootComponent);
 
-        Node sourcePropNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, sourceProp, rootComponentNode);
-        Node targetPropNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME, targetProp, rootComponentNode);
+        Node sourcePropNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, sourceProp, rootComponentNodeContent);
+        Node targetPropNode = this.getDiagramHelper().createNodeInParent(CPD_PROPERTY_NODE_NAME + TOP_HOLDER_SUFFIX, targetProp, rootComponentNodeContent);
 
         this.checkConnectorEdge(sourceProp, sourcePropNode.getId(), targetProp, targetPropNode.getId(), rootComponent);
 

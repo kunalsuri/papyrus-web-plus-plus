@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.usecase;
 
@@ -93,7 +94,7 @@ public class UCDGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("packageAndDiagramDropParameters")
     public void testDropOnDiagram(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node containerNode = (Node) this.findGraphicalElementByLabel(PACKAGE_NAME);
+        Node containerNode = (Node) this.findGraphicalElementContentByLabel(PACKAGE_NAME);
         Node nodeToDrop = this.createNodeWithLabel(containerNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
 
         NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, null,
@@ -113,7 +114,7 @@ public class UCDGraphicalDropTest extends GraphicalDropTest {
     public void testDropOnPackage(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
         Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
 
-        NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_NAME),
+        NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_NAME),
                 UCDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_NAME), containmentReference);
@@ -157,7 +158,7 @@ public class UCDGraphicalDropTest extends GraphicalDropTest {
     private void testDropNodeOnSubject(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference, String containerName) {
         Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
 
-        NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(containerName),
+        NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(containerName),
                 UCDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(containerName), containmentReference);

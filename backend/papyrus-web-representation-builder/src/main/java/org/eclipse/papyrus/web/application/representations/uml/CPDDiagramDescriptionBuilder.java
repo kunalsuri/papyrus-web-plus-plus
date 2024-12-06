@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,8 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 199
- *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issues 219, 227
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -30,12 +29,12 @@ import org.eclipse.sirius.components.view.diagram.ArrowStyle;
 import org.eclipse.sirius.components.view.diagram.ConditionalInsideLabelStyle;
 import org.eclipse.sirius.components.view.diagram.ConditionalNodeStyle;
 import org.eclipse.sirius.components.view.diagram.DiagramDescription;
-import org.eclipse.sirius.components.view.diagram.DiagramFactory;
 import org.eclipse.sirius.components.view.diagram.DiagramToolSection;
 import org.eclipse.sirius.components.view.diagram.DropNodeTool;
 import org.eclipse.sirius.components.view.diagram.EdgeDescription;
 import org.eclipse.sirius.components.view.diagram.EdgeStyle;
 import org.eclipse.sirius.components.view.diagram.EdgeTool;
+import org.eclipse.sirius.components.view.diagram.HeaderSeparatorDisplayMode;
 import org.eclipse.sirius.components.view.diagram.InsideLabelDescription;
 import org.eclipse.sirius.components.view.diagram.InsideLabelStyle;
 import org.eclipse.sirius.components.view.diagram.LineStyle;
@@ -61,6 +60,16 @@ import org.eclipse.uml2.uml.Usage;
  * @author <a href="mailto:jessy.mallet@obeo.fr">Jessy Mallet</a>
  */
 public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDescriptionBuilder {
+
+    /**
+     * The String used to suffix the name of the holder {@link NodeDescription}s.
+     */
+    public static final String HOLDER_SUFFIX = "Holder";
+
+    /**
+     * The String used to suffix the name of the holder {@link NodeDescription}s.
+     */
+    public static final String CONTENT_SUFFIX = "Content";
 
     /**
      * The suffix used to identify <i>operations</i> compartments.
@@ -98,16 +107,6 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
     public static final String IN_COMPONENT = "inComponent";
 
     /**
-     * The name used to identify the Tool section.
-     */
-    public static final String SHOW_HIDE = "SHOW_HIDE";
-
-    /**
-     * AQL expression to set children not draggable from its container.
-     */
-    private static final String CHILD_NOT_DRAGGABLE_EXPRESSION = "aql:false";
-
-    /**
      * Factory used to create UML elements.
      */
     private final UMLPackage umlPackage = UMLPackage.eINSTANCE;
@@ -125,12 +124,23 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      */
     private NodeDescription cpdSharedDescription;
 
+    private NodeDescription symbolNodeDescription;
+
     public CPDDiagramDescriptionBuilder() {
         super(CPD_PREFIX, CPD_REP_NAME, UMLPackage.eINSTANCE.getPackage());
     }
 
     @Override
     protected void fillDescription(DiagramDescription diagramDescription) {
+
+        this.cpdSharedDescription = this.createSharedDescription(diagramDescription);
+        List<EClass> symbolOwners = List.of(
+                this.umlPackage.getComponent(),
+                this.umlPackage.getInterface(),
+                this.umlPackage.getProperty(),
+                this.umlPackage.getPackage());
+
+        this.symbolNodeDescription = this.createSymbolSharedNodeDescription(diagramDescription, symbolOwners, List.of(), SYMBOLS_COMPARTMENT_SUFFIX);
 
         // create diagram tool sections
         this.createDefaultToolSectionInDiagramDescription(diagramDescription);
@@ -154,7 +164,6 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
         this.createPackageTopNodeDescription(diagramDescription);
 
         // create shared node descriptions with their tools
-        this.cpdSharedDescription = this.createSharedDescription(diagramDescription);
         this.createCommentSubNodeDescription(diagramDescription, this.cpdSharedDescription, NODES,
                 this.getIdBuilder().getSpecializedDomainNodeName(this.umlPackage.getComment(), SHARED_SUFFIX), List.of(this.umlPackage.getPackage()));
         this.createConstraintSubNodeDescription(diagramDescription, this.cpdSharedDescription, NODES,
@@ -186,14 +195,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
         this.createSubstitutionEdgeDescription(diagramDescription);
         this.createUsageEdgeDescription(diagramDescription);
 
-        List<EClass> symbolOwners = List.of(
-                this.umlPackage.getComponent(),
-                this.umlPackage.getInterface(),
-                this.umlPackage.getProperty(),
-                this.umlPackage.getPackage());
-
-        this.createSymbolSharedNodeDescription(diagramDescription, this.cpdSharedDescription, symbolOwners, List.of(), SYMBOLS_COMPARTMENT_SUFFIX);
-
+        this.cpdSharedDescription.getChildrenDescriptions().add(this.symbolNodeDescription);
         diagramDescription.getPalette().setDropTool(this.getViewBuilder().createGenericSemanticDropTool(this.getIdBuilder().getDiagramSemanticDropToolName()));
 
         // Add dropped tool on diagram
@@ -201,7 +203,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
         List<EClass> children = List.of(this.umlPackage.getComponent(), this.umlPackage.getComment(), this.umlPackage.getConstraint(), this.umlPackage.getInterface(), this.umlPackage.getModel(),
                 this.umlPackage.getPackage());
         this.registerCallback(diagramDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, List.of());
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
             cpdGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
         diagramDescription.getPalette().setDropNodeTool(cpdGraphicalDropTool);
@@ -216,30 +218,30 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      */
     private void createComponentTopNodeDescription(DiagramDescription diagramDescription) {
         EClass componentEClass = this.umlPackage.getComponent();
-        NodeDescription cpdComponentTopNodeDescription = this.newNodeBuilder(componentEClass, this.getViewBuilder().createRectangularNodeStyle())//
-                .name(this.getIdBuilder().getDomainNodeName(componentEClass)) //
+        NodeDescription cpdComponentHolderTopNodeDescription = this.newNodeBuilder(componentEClass, this.getViewBuilder().createRectangularNodeStyle())//
                 .semanticCandidateExpression(this.getQueryBuilder().queryAllReachableExactType(componentEClass))//
                 .synchronizationPolicy(SynchronizationPolicy.UNSYNCHRONIZED)//
-                .layoutStrategyDescription(DiagramFactory.eINSTANCE.createFreeFormLayoutStrategyDescription())//
                 .labelEditTool(this.getViewBuilder().createDirectEditTool(componentEClass.getName()))//
                 .deleteTool(this.getViewBuilder().createNodeDeleteTool(componentEClass.getName())) //
                 .insideLabelDescription(this.getViewBuilder().createDefaultInsideLabelDescription(true, true))
                 .build();
-        diagramDescription.getNodeDescriptions().add(cpdComponentTopNodeDescription);
 
-        this.createDefaultToolSectionsInNodeDescription(cpdComponentTopNodeDescription);
+        NodeDescription cpdComponentContentTopNodeDescription = this.createContentNodeDescription(componentEClass, false);
+        this.addContent(componentEClass, false, cpdComponentHolderTopNodeDescription, cpdComponentContentTopNodeDescription, this.symbolNodeDescription);
+        this.copyDimension(cpdComponentHolderTopNodeDescription, cpdComponentContentTopNodeDescription);
+        diagramDescription.getNodeDescriptions().add(cpdComponentHolderTopNodeDescription);
 
         NodeTool cpdComponentTopNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getComponent_PackagedElement(), componentEClass);
         this.addDiagramToolInToolSection(diagramDescription, cpdComponentTopNodeCreationTool, NODES);
 
         // Add dropped tool on Component container
-        DropNodeTool cpdComponentGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdComponentTopNodeDescription));
+        DropNodeTool cpdComponentGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdComponentHolderTopNodeDescription));
         List<EClass> children = List.of(this.umlPackage.getComponent(), this.umlPackage.getProperty());
-        this.registerCallback(cpdComponentTopNodeDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, this.borderNodeTypes);
+        this.registerCallback(cpdComponentContentTopNodeDescription, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, this.borderNodeTypes);
             cpdComponentGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
-        cpdComponentTopNodeDescription.getPalette().setDropNodeTool(cpdComponentGraphicalDropTool);
+        cpdComponentContentTopNodeDescription.getPalette().setDropNodeTool(cpdComponentGraphicalDropTool);
     }
 
     /**
@@ -249,7 +251,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the Component {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createInterfaceTopNodeDescription(DiagramDescription diagramDescription) {
-        ListLayoutStrategyDescription listLayoutStrategyDescription = DiagramFactory.eINSTANCE.createListLayoutStrategyDescription();
+        ListLayoutStrategyDescription listLayoutStrategyDescription = this.createListLayoutStrategy();
         listLayoutStrategyDescription.setAreChildNodesDraggableExpression(CHILD_NOT_DRAGGABLE_EXPRESSION);
         EClass interfaceEClass = this.umlPackage.getInterface();
         NodeDescription cpdInterfaceTopNodeDescription = this.newNodeBuilder(interfaceEClass, this.getViewBuilder().createRectangularNodeStyle())//
@@ -276,23 +278,29 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      */
     private void createModelTopNodeDescription(DiagramDescription diagramDescription) {
         EClass modelEClass = this.umlPackage.getModel();
-        NodeDescription cpdModelTopNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(modelEClass, this.getQueryBuilder().queryAllReachableExactType(modelEClass));
-        diagramDescription.getNodeDescriptions().add(cpdModelTopNodeDescription);
+        NodeDescription cpdModelHolderTopNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(modelEClass,
+                this.getQueryBuilder().queryAllReachableExactType(modelEClass));
+        cpdModelHolderTopNodeDescription.setInsideLabel(this.getViewBuilder().createDefaultInsideLabelDescription(true, true));
+        cpdModelHolderTopNodeDescription.setStyle(this.getViewBuilder().createPackageNodeStyle());
 
-        this.createDefaultToolSectionsInNodeDescription(cpdModelTopNodeDescription);
+        NodeDescription cpdModelContentTopNodeDescription = this.createContentNodeDescription(modelEClass, false);
+        this.addContent(modelEClass, false, cpdModelHolderTopNodeDescription, cpdModelContentTopNodeDescription, this.symbolNodeDescription);
+        this.copyDimension(cpdModelHolderTopNodeDescription, cpdModelContentTopNodeDescription);
+
+        diagramDescription.getNodeDescriptions().add(cpdModelHolderTopNodeDescription);
 
         NodeTool cpdProfileTopNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getPackage_PackagedElement(), modelEClass);
         this.addDiagramToolInToolSection(diagramDescription, cpdProfileTopNodeCreationTool, NODES);
 
         // Add dropped tool on Profile container
-        DropNodeTool cpdModelGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdModelTopNodeDescription));
+        DropNodeTool cpdModelGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdModelHolderTopNodeDescription));
         List<EClass> children = List.of(this.umlPackage.getComponent(), this.umlPackage.getComment(), this.umlPackage.getConstraint(), this.umlPackage.getInterface(), this.umlPackage.getModel(),
                 this.umlPackage.getPackage());
-        this.registerCallback(cpdModelTopNodeDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, List.of());
+        this.registerCallback(cpdModelContentTopNodeDescription, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
             cpdModelGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
-        cpdModelTopNodeDescription.getPalette().setDropNodeTool(cpdModelGraphicalDropTool);
+        cpdModelContentTopNodeDescription.getPalette().setDropNodeTool(cpdModelGraphicalDropTool);
     }
 
     /**
@@ -303,14 +311,19 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      */
     private void createPackageTopNodeDescription(DiagramDescription diagramDescription) {
         EClass packageEClass = this.umlPackage.getPackage();
-        NodeDescription cpdPackageTopNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(packageEClass,
-                this.getQueryBuilder().queryAllReachableExactType(this.umlPackage.getPackage()));
-        diagramDescription.getNodeDescriptions().add(cpdPackageTopNodeDescription);
+        NodeDescription cpdPackageHolderTopNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(packageEClass,
+                this.getQueryBuilder().queryAllReachableExactType(packageEClass));
+        cpdPackageHolderTopNodeDescription.setName(this.getIdBuilder().getSpecializedDomainNodeName(packageEClass, HOLDER_SUFFIX));
+        cpdPackageHolderTopNodeDescription.setInsideLabel(this.getViewBuilder().createDefaultInsideLabelDescription(true, true));
 
-        cpdPackageTopNodeDescription.setStyle(this.getViewBuilder().createPackageNodeStyle());
+        cpdPackageHolderTopNodeDescription.setStyle(this.getViewBuilder().createPackageNodeStyle());
 
-        // create Package tool sections
-        this.createDefaultToolSectionsInNodeDescription(cpdPackageTopNodeDescription);
+        NodeDescription cpdPackageContentTopNodeDescription = this.createContentNodeDescription(packageEClass, false);
+        this.addContent(packageEClass, false, cpdPackageHolderTopNodeDescription, cpdPackageContentTopNodeDescription, this.symbolNodeDescription);
+        this.copyDimension(cpdPackageHolderTopNodeDescription, cpdPackageContentTopNodeDescription);
+
+        diagramDescription.getNodeDescriptions().add(cpdPackageHolderTopNodeDescription);
+        cpdPackageHolderTopNodeDescription.getChildrenDescriptions().add(cpdPackageContentTopNodeDescription);
 
         NodeTool cpdPackageTopNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getPackage_PackagedElement(), packageEClass);
         this.addDiagramToolInToolSection(diagramDescription, cpdPackageTopNodeCreationTool, NODES);
@@ -318,14 +331,14 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
         // No direct children for Package: the NodeDescriptions it can contain are all defined as shared descriptions.
 
         // Add dropped tool on Package container
-        DropNodeTool cpdPackageGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdPackageTopNodeDescription));
+        DropNodeTool cpdPackageGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdPackageHolderTopNodeDescription));
         List<EClass> children = List.of(this.umlPackage.getComponent(), this.umlPackage.getComment(), this.umlPackage.getConstraint(), this.umlPackage.getInterface(), this.umlPackage.getModel(),
                 this.umlPackage.getPackage());
-        this.registerCallback(cpdPackageTopNodeDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, List.of());
+        this.registerCallback(cpdPackageContentTopNodeDescription, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
             cpdPackageGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
-        cpdPackageTopNodeDescription.getPalette().setDropNodeTool(cpdPackageGraphicalDropTool);
+        cpdPackageContentTopNodeDescription.getPalette().setDropNodeTool(cpdPackageGraphicalDropTool);
     }
 
     /**
@@ -339,31 +352,33 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      */
     private void createComponentSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass componentEClass = this.umlPackage.getComponent();
-        NodeDescription cpdComponentSharedNodeDescription = this.newNodeBuilder(componentEClass, this.getViewBuilder().createRectangularNodeStyle())//
-                .name(this.getIdBuilder().getSpecializedDomainNodeName(componentEClass, SHARED_SUFFIX)) //
-                .layoutStrategyDescription(DiagramFactory.eINSTANCE.createFreeFormLayoutStrategyDescription())//
+        NodeDescription cpdComponentHolderSharedNodeDescription = this.newNodeBuilder(componentEClass, this.getViewBuilder().createRectangularNodeStyle())//
                 .semanticCandidateExpression(CallQuery.queryAttributeOnSelf(this.umlPackage.getComponent_PackagedElement()))//
                 .synchronizationPolicy(SynchronizationPolicy.UNSYNCHRONIZED)//
                 .insideLabelDescription(this.getViewBuilder().createDefaultInsideLabelDescription(true, true))
                 .labelEditTool(this.getViewBuilder().createDirectEditTool(componentEClass.getName()))//
                 .deleteTool(this.getViewBuilder().createNodeDeleteTool(componentEClass.getName())) //
                 .build();
-        this.cpdSharedDescription.getChildrenDescriptions().add(cpdComponentSharedNodeDescription);
 
-        this.createDefaultToolSectionsInNodeDescription(cpdComponentSharedNodeDescription);
+        NodeDescription cpdComponentContentSharedNodeDescription = this.createContentNodeDescription(componentEClass, true);
+        this.addContent(componentEClass, true, cpdComponentHolderSharedNodeDescription, cpdComponentContentSharedNodeDescription, this.symbolNodeDescription);
+        this.copyDimension(cpdComponentHolderSharedNodeDescription, cpdComponentContentSharedNodeDescription);
+        this.cpdSharedDescription.getChildrenDescriptions().add(cpdComponentHolderSharedNodeDescription);
 
-        NodeTool cpdClassifierSharedNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getComponent_PackagedElement(), componentEClass);
-        List<EClass> owners = List.of(this.umlPackage.getPackage(), this.umlPackage.getModel(), this.umlPackage.getComponent());
-        this.reuseNodeAndCreateTool(cpdComponentSharedNodeDescription, diagramDescription, cpdClassifierSharedNodeCreationTool, NODES, owners.toArray(EClass[]::new));
+        NodeTool cpdComponentSharedNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getComponent_PackagedElement(), componentEClass);
+        List<EClass> owners = List.of(this.umlPackage.getPackage(), this.umlPackage.getModel(),
+                this.umlPackage.getComponent());
+        this.reuseNodeAndCreateTool(cpdComponentHolderSharedNodeDescription,
+                diagramDescription, cpdComponentSharedNodeCreationTool, NODES, owners, List.of());
 
         // Add dropped tool on Shared Component container
-        DropNodeTool cpdComponentGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdComponentSharedNodeDescription));
+        DropNodeTool cpdComponentGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdComponentContentSharedNodeDescription));
         List<EClass> children = List.of(this.umlPackage.getComponent(), this.umlPackage.getProperty());
-        this.registerCallback(cpdComponentSharedNodeDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, this.borderNodeTypes);
+        this.registerCallback(cpdComponentContentSharedNodeDescription, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, this.borderNodeTypes);
             cpdComponentGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
-        cpdComponentSharedNodeDescription.getPalette().setDropNodeTool(cpdComponentGraphicalDropTool);
+        cpdComponentContentSharedNodeDescription.getPalette().setDropNodeTool(cpdComponentGraphicalDropTool);
     }
 
     /**
@@ -376,7 +391,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createInterfaceSharedNodeDescription(DiagramDescription diagramDescription) {
-        ListLayoutStrategyDescription listLayoutStrategyDescription = DiagramFactory.eINSTANCE.createListLayoutStrategyDescription();
+        ListLayoutStrategyDescription listLayoutStrategyDescription = this.createListLayoutStrategy();
         listLayoutStrategyDescription.setAreChildNodesDraggableExpression(CHILD_NOT_DRAGGABLE_EXPRESSION);
         EClass interfaceEClass = this.umlPackage.getInterface();
         NodeDescription cpdInterfaceSharedNodeDescription = this.newNodeBuilder(interfaceEClass, this.getViewBuilder().createRectangularNodeStyle())//
@@ -408,28 +423,36 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      */
     private void createModelSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass modelEClass = this.umlPackage.getModel();
-        NodeDescription cpdModelSharedNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(modelEClass,
+        ListLayoutStrategyDescription llsd = this.createListLayoutStrategy();
+        NodeDescription cpdModelHolderSharedNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(modelEClass,
                 CallQuery.queryAttributeOnSelf(this.umlPackage.getPackage_PackagedElement()));
-        cpdModelSharedNodeDescription.setName(this.getIdBuilder().getSpecializedDomainNodeName(modelEClass, SHARED_SUFFIX));
-        cpdModelSharedNodeDescription.setStyle(this.getViewBuilder().createPackageNodeStyle());
+        cpdModelHolderSharedNodeDescription.setName(this.getIdBuilder().getSpecializedDomainNodeName(modelEClass, SHARED_SUFFIX + UNDERSCORE + HOLDER_SUFFIX));
+        cpdModelHolderSharedNodeDescription.setStyle(this.getViewBuilder().createPackageNodeStyle());
+        cpdModelHolderSharedNodeDescription.setInsideLabel(this.getViewBuilder().createDefaultInsideLabelDescription(true, true));
 
-        this.cpdSharedDescription.getChildrenDescriptions().add(cpdModelSharedNodeDescription);
-
-        this.createDefaultToolSectionsInNodeDescription(cpdModelSharedNodeDescription);
+        NodeDescription cpdModelContentSharedNodeDescription = this.createContentNodeDescription(modelEClass, true);
+        this.copyDimension(cpdModelHolderSharedNodeDescription, cpdModelContentSharedNodeDescription);
+        this.addContent(modelEClass, true, cpdModelHolderSharedNodeDescription, cpdModelContentSharedNodeDescription, this.symbolNodeDescription);
+        this.cpdSharedDescription.getChildrenDescriptions().add(cpdModelHolderSharedNodeDescription);
+        cpdModelHolderSharedNodeDescription.getChildrenDescriptions().add(cpdModelContentSharedNodeDescription);
 
         NodeTool cpdModelSharedNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getPackage_PackagedElement(), modelEClass);
         List<EClass> owners = List.of(this.umlPackage.getPackage(), this.umlPackage.getModel());
-        this.reuseNodeAndCreateTool(cpdModelSharedNodeDescription, diagramDescription, cpdModelSharedNodeCreationTool, NODES, owners.toArray(EClass[]::new));
+        this.reuseNodeAndCreateTool(cpdModelHolderSharedNodeDescription, diagramDescription,
+                cpdModelSharedNodeCreationTool, NODES, owners, List.of());
+
+        llsd.getGrowableNodes().add(cpdModelContentSharedNodeDescription);
+        cpdModelHolderSharedNodeDescription.setChildrenLayoutStrategy(llsd);
 
         // Add dropped tool on Shared Package container
-        DropNodeTool cpdModelGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdModelSharedNodeDescription));
+        DropNodeTool cpdModelGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdModelHolderSharedNodeDescription));
         List<EClass> children = List.of(this.umlPackage.getComponent(), this.umlPackage.getComment(), this.umlPackage.getConstraint(), this.umlPackage.getInterface(), this.umlPackage.getModel(),
                 this.umlPackage.getPackage());
-        this.registerCallback(cpdModelSharedNodeDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, List.of());
+        this.registerCallback(cpdModelContentSharedNodeDescription, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
             cpdModelGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
-        cpdModelSharedNodeDescription.getPalette().setDropNodeTool(cpdModelGraphicalDropTool);
+        cpdModelContentSharedNodeDescription.getPalette().setDropNodeTool(cpdModelGraphicalDropTool);
     }
 
     /**
@@ -443,28 +466,32 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      */
     private void createPackageSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass packageEClass = this.umlPackage.getPackage();
-        NodeDescription cpdPackageSharedNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(packageEClass,
+        NodeDescription cpdPackageHolderSharedNodeDescription = this.getViewBuilder().createPackageStyleUnsynchonizedNodeDescription(packageEClass,
                 CallQuery.queryAttributeOnSelf(this.umlPackage.getPackage_PackagedElement()));
-        cpdPackageSharedNodeDescription.setName(this.getIdBuilder().getSpecializedDomainNodeName(packageEClass, SHARED_SUFFIX));
-        cpdPackageSharedNodeDescription.setStyle(this.getViewBuilder().createPackageNodeStyle());
+        cpdPackageHolderSharedNodeDescription.setName(this.getIdBuilder().getSpecializedDomainNodeName(packageEClass, SHARED_SUFFIX + UNDERSCORE + HOLDER_SUFFIX));
+        cpdPackageHolderSharedNodeDescription.setStyle(this.getViewBuilder().createPackageNodeStyle());
+        cpdPackageHolderSharedNodeDescription.setInsideLabel(this.getViewBuilder().createDefaultInsideLabelDescription(true, true));
 
-        this.cpdSharedDescription.getChildrenDescriptions().add(cpdPackageSharedNodeDescription);
-
-        this.createDefaultToolSectionsInNodeDescription(cpdPackageSharedNodeDescription);
+        NodeDescription cpdPackageContentSharedNodeDescription = this.createContentNodeDescription(packageEClass, true);
+        this.copyDimension(cpdPackageHolderSharedNodeDescription, cpdPackageContentSharedNodeDescription);
+        this.addContent(packageEClass, true, cpdPackageHolderSharedNodeDescription, cpdPackageContentSharedNodeDescription, this.symbolNodeDescription);
+        this.cpdSharedDescription.getChildrenDescriptions().add(cpdPackageHolderSharedNodeDescription);
+        cpdPackageHolderSharedNodeDescription.getChildrenDescriptions().add(cpdPackageContentSharedNodeDescription);
 
         NodeTool cpdPackageSharedNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getPackage_PackagedElement(), packageEClass);
         List<EClass> owners = List.of(this.umlPackage.getPackage(), this.umlPackage.getModel());
-        this.reuseNodeAndCreateTool(cpdPackageSharedNodeDescription, diagramDescription, cpdPackageSharedNodeCreationTool, NODES, owners.toArray(EClass[]::new));
+        this.reuseNodeAndCreateTool(cpdPackageHolderSharedNodeDescription, diagramDescription,
+                cpdPackageSharedNodeCreationTool, NODES, owners, List.of());
 
         // Add dropped tool on Shared Package container
-        DropNodeTool cpdPackageGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdPackageSharedNodeDescription));
+        DropNodeTool cpdPackageGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdPackageContentSharedNodeDescription));
         List<EClass> children = List.of(this.umlPackage.getComponent(), this.umlPackage.getComment(), this.umlPackage.getConstraint(), this.umlPackage.getInterface(), this.umlPackage.getModel(),
                 this.umlPackage.getPackage());
-        this.registerCallback(cpdPackageSharedNodeDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, List.of());
+        this.registerCallback(cpdPackageContentSharedNodeDescription, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
             cpdPackageGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
-        cpdPackageSharedNodeDescription.getPalette().setDropNodeTool(cpdPackageGraphicalDropTool);
+        cpdPackageContentSharedNodeDescription.getPalette().setDropNodeTool(cpdPackageGraphicalDropTool);
     }
 
     /**
@@ -484,7 +511,8 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
         this.createDefaultToolSectionsInNodeDescription(cpdPortSharedNodeDescription);
 
         // create tools
-        NodeTool cpdPortSharedNodeCreationTool = this.getViewBuilder().createCreationTool(portEClass.getName(), this.getIdBuilder().getCreationToolId(portEClass), ComponentDiagramServices.CREATE_PORT,
+        NodeTool cpdPortSharedNodeCreationTool = this.getViewBuilder().createCreationTool(portEClass.getName(), this.getIdBuilder().getCreationToolId(portEClass),
+                ComponentDiagramServices.CREATE_PORT_IN_HOLDER,
                 List.of(SELECTED_NODE, DIAGRAM_CONTEXT, CONVERTED_NODES));
         cpdPortSharedNodeCreationTool
                 .setPreconditionExpression(
@@ -519,26 +547,25 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
         rectangularDashAndUnderlineNodeStyle.setBorderLineStyle(LineStyle.DASH);
         InsideLabelStyle consitionalStyle = this.getViewBuilder().createDefaultInsideLabelStyle(true, true);
         consitionalStyle.setUnderline(true);
+        consitionalStyle.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
+
         ConditionalInsideLabelStyle conditionalLabelDescription = this.getViewBuilder().createConditionalInsideLabelStyle(condition, consitionalStyle);
         insideLabelDescription.getConditionalStyles().add(conditionalLabelDescription);
 
-        ConditionalNodeStyle dashAndUnderlineConditionalStyle = this.getViewBuilder().createConditionalNodeStyle(
-                condition, //
-                rectangularDashAndUnderlineNodeStyle);
-
-        NodeDescription cpdPropertySharedNodeDescription = this.newNodeBuilder(propertyEClass, this.getViewBuilder().createRectangularNodeStyle())//
-                .name(this.getIdBuilder().getSpecializedDomainNodeName(propertyEClass, CPDDiagramDescriptionBuilder.SHARED_SUFFIX)) //
+        NodeDescription cpdPropertySharedHolderNodeDescription = this.newNodeBuilder(propertyEClass, this.getViewBuilder().createRectangularNodeStyle())//
                 .semanticCandidateExpression(CallQuery.queryServiceOnSelf(ComponentDiagramServices.GET_PROPERTY_NODE_CANDIDATES))//
                 .synchronizationPolicy(SynchronizationPolicy.UNSYNCHRONIZED)//
-                .layoutStrategyDescription(DiagramFactory.eINSTANCE.createFreeFormLayoutStrategyDescription())//
                 .labelEditTool(this.getViewBuilder().createDirectEditTool(propertyEClass.getName()))//
                 .deleteTool(this.getViewBuilder().createNodeDeleteTool(propertyEClass.getName())) //
                 .insideLabelDescription(insideLabelDescription)
-                .conditionalStyles(List.of(dashAndUnderlineConditionalStyle, dashConditionalStyle)) //
+                .conditionalStyles(List.of(dashConditionalStyle)) //
                 .build();
-        this.cpdSharedDescription.getChildrenDescriptions().add(cpdPropertySharedNodeDescription);
 
-        this.createDefaultToolSectionsInNodeDescription(cpdPropertySharedNodeDescription);
+        NodeDescription cpdPropertySharedContentNodeDescription = this.createContentNodeDescription(propertyEClass, true);
+        this.addContent(propertyEClass, true, cpdPropertySharedHolderNodeDescription, cpdPropertySharedContentNodeDescription, this.symbolNodeDescription);
+        // this.copyDimension(cpdPropertySharedHolderNodeDescription, cpdPropertySharedContentNodeDescription);
+        this.cpdSharedDescription.getChildrenDescriptions().add(cpdPropertySharedHolderNodeDescription);
+        cpdPropertySharedHolderNodeDescription.getInsideLabel().getStyle().setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
 
         // create tools
         NodeTool cpdPropertySharedNodeCreationTool = this.getViewBuilder().createCreationTool(propertyEClass.getName(), this.getIdBuilder().getCreationToolId(propertyEClass),
@@ -548,19 +575,23 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
                 .setPreconditionExpression(
                         CallQuery.queryServiceOnSelf(ComponentDiagramServices.CAN_CREATE_PROPERTY_INTO_PARENT));
 
+        // cpdPropertySharedContentNodeDescription.setPreconditionExpression(
+        // CallQuery.queryServiceOnSelf(ComponentDiagramServices.CAN_CREATE_PROPERTY_INTO_PARENT));
+
         List<EClass> owners = List.of(this.umlPackage.getProperty(), //
                 this.umlPackage.getStructuredClassifier());
         // Port should be exclude from owners because it is not possible to create Property in Port
-        this.reuseNodeAndCreateTool(cpdPropertySharedNodeDescription, diagramDescription, cpdPropertySharedNodeCreationTool, NODES, owners, List.of(this.umlPackage.getPort()));
+        this.reuseNodeAndCreateTool(cpdPropertySharedHolderNodeDescription, diagramDescription, cpdPropertySharedNodeCreationTool, NODES, owners, List.of(this.umlPackage.getPort()));
 
         // Add dropped tool on Component container
-        DropNodeTool cpdPropertyGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdPropertySharedNodeDescription));
+        DropNodeTool cpdPropertyGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(cpdPropertySharedContentNodeDescription));
         List<EClass> children = List.of(this.umlPackage.getProperty());
-        this.registerCallback(cpdPropertySharedNodeDescription, () -> {
-            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, children, List.of());
+        this.registerCallback(cpdPropertySharedContentNodeDescription, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
             cpdPropertyGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
-        cpdPropertySharedNodeDescription.getPalette().setDropNodeTool(cpdPropertyGraphicalDropTool);
+        cpdPropertySharedContentNodeDescription.getPalette().setDropNodeTool(cpdPropertyGraphicalDropTool);
+
     }
 
     /**
@@ -661,8 +692,8 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the Component {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createComponentRealizationEdgeDescription(DiagramDescription diagramDescription) {
-        Supplier<List<NodeDescription>> componentTargetCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getComponent());
-        Supplier<List<NodeDescription>> classifierSourceCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getClassifier());
+        Supplier<List<NodeDescription>> componentTargetCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getComponent());
+        Supplier<List<NodeDescription>> classifierSourceCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getClassifier());
         EdgeDescription cpdComponentRealizationEdgeDescription = this.getViewBuilder().createDefaultSynchonizedDomainBaseEdgeDescription(this.umlPackage.getComponentRealization(),
                 this.getQueryBuilder().queryAllReachableExactType(this.umlPackage.getComponentRealization()), classifierSourceCollector, componentTargetCollector);
         EdgeStyle style = cpdComponentRealizationEdgeDescription.getStyle();
@@ -678,7 +709,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
 
     private void createConnectorEdgeDescription(DiagramDescription diagramDescription) {
 
-        Supplier<List<NodeDescription>> sourceAndTargets = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getPort(), this.umlPackage.getProperty());
+        Supplier<List<NodeDescription>> sourceAndTargets = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getPort(), this.umlPackage.getProperty());
 
         EdgeDescription cpdConnectorEdgeDescription = this.getViewBuilder().createDefaultSynchonizedDomainBaseEdgeDescription(this.umlPackage.getConnector(),
                 this.getQueryBuilder().queryAllReachable(this.umlPackage.getConnector()), sourceAndTargets, sourceAndTargets);
@@ -717,7 +748,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the Component {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createGeneralizationEdgeDescription(DiagramDescription diagramDescription) {
-        Supplier<List<NodeDescription>> sourceAndTargetDescriptionsSupplier = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getClassifier());
+        Supplier<List<NodeDescription>> sourceAndTargetDescriptionsSupplier = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getClassifier());
 
         EClass generalizationEClass = this.umlPackage.getGeneralization();
         EdgeDescription cpdGeneralizationEdgeDescription = this.getViewBuilder().createDefaultSynchonizedDomainBaseEdgeDescription(generalizationEClass,
@@ -741,8 +772,8 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the Component {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createInterfaceRealizationEdgeDescription(DiagramDescription diagramDescription) {
-        Supplier<List<NodeDescription>> interfaceTargetCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getInterface());
-        Supplier<List<NodeDescription>> behavioredClassifierSourceCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getBehavioredClassifier());
+        Supplier<List<NodeDescription>> interfaceTargetCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getInterface());
+        Supplier<List<NodeDescription>> behavioredClassifierSourceCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getBehavioredClassifier());
         EdgeDescription cpdInterfaceRealizationEdgeDescription = this.getViewBuilder().createDefaultSynchonizedDomainBaseEdgeDescription(this.umlPackage.getInterfaceRealization(),
                 this.getQueryBuilder().queryAllReachableExactType(this.umlPackage.getInterfaceRealization()), behavioredClassifierSourceCollector, interfaceTargetCollector);
         EdgeStyle style = cpdInterfaceRealizationEdgeDescription.getStyle();
@@ -763,8 +794,8 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the Component {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createManifestationEdgeDescription(DiagramDescription diagramDescription) {
-        Supplier<List<NodeDescription>> packageableELementTargetCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getPackageableElement());
-        Supplier<List<NodeDescription>> namedElementSourceCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getNamedElement());
+        Supplier<List<NodeDescription>> packageableELementTargetCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getPackageableElement());
+        Supplier<List<NodeDescription>> namedElementSourceCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getNamedElement());
         EdgeDescription cpdManifestationEdgeDescription = this.getViewBuilder().createDefaultSynchonizedDomainBaseEdgeDescription(this.umlPackage.getManifestation(),
                 this.getQueryBuilder().queryAllReachableExactType(this.umlPackage.getManifestation()), namedElementSourceCollector, packageableELementTargetCollector);
         EdgeStyle style = cpdManifestationEdgeDescription.getStyle();
@@ -785,7 +816,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the Component {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createSubstitutionEdgeDescription(DiagramDescription diagramDescription) {
-        Supplier<List<NodeDescription>> classifierSourceTargetCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getClassifier());
+        Supplier<List<NodeDescription>> classifierSourceTargetCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getClassifier());
         EdgeDescription cpdSubstitutionEdgeDescription = this.getViewBuilder().createDefaultSynchonizedDomainBaseEdgeDescription(this.umlPackage.getSubstitution(),
                 this.getQueryBuilder().queryAllReachableExactType(this.umlPackage.getSubstitution()), classifierSourceTargetCollector, classifierSourceTargetCollector);
         EdgeStyle style = cpdSubstitutionEdgeDescription.getStyle();
@@ -822,7 +853,7 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
      *            the arrow style of the edge
      */
     private void createDependencyOrSubTypeEdgeDescription(DiagramDescription diagramDescription, EClass edgeToCreate, LineStyle lineStyle, ArrowStyle arrowStyle) {
-        Supplier<List<NodeDescription>> namedElementCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getNamedElement());
+        Supplier<List<NodeDescription>> namedElementCollector = () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.umlPackage.getNamedElement());
         EdgeDescription cpdDependencyEdgeDescription = this.getViewBuilder().createDefaultSynchonizedDomainBaseEdgeDescription(edgeToCreate,
                 this.getQueryBuilder().queryAllReachableExactType(edgeToCreate), namedElementCollector, namedElementCollector);
         EdgeStyle style = cpdDependencyEdgeDescription.getStyle();

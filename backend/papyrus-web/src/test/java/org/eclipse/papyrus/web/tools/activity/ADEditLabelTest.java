@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.activity;
 
@@ -202,7 +203,8 @@ public class ADEditLabelTest extends EditLabelTest {
     @BeforeEach
     public void setUp() {
         this.setUpWithIntermediateRoot(ROOT_ACTIVITY, UML.getActivity());
-        String activityId = this.getDiagram().getNodes().get(0).getId();
+        Node rootActivity = (Node) this.findGraphicalElementContentByLabel(ROOT_ACTIVITY);
+        String activityId = rootActivity.getId();
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.ACCEPT_EVENT_ACTION, UML.getAcceptCallAction()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.ACCEPT_EVENT_ACTION, UML.getAcceptEventAction()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getActivityFinalNode()));
@@ -220,7 +222,7 @@ public class ADEditLabelTest extends EditLabelTest {
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getDecisionNode()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.CREATE_OBJECT_ACTION, UML.getDestroyObjectAction()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionRegion()));
-        Node expansionRegion = (Node) this.findGraphicalElementByLabel(EXPANSION_REGION);
+        Node expansionRegion = (Node) this.findGraphicalContentIfExistByLabel(EXPANSION_REGION);
         this.applyNodeCreationTool(expansionRegion.getId(), new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionNode()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getFlowFinalNode()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getForkNode()));
@@ -229,7 +231,7 @@ public class ADEditLabelTest extends EditLabelTest {
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getLoopNode()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getMergeNode()));
         this.applyNodeCreationTool(activityId, new ADCreationTool(ADToolSections.EXECUTABLE_NODE, UML.getOpaqueAction()));
-        Node opaqueActionNode = (Node) this.findGraphicalElementByLabel(OPAQUE_ACTION);
+        Node opaqueActionNode = (Node) this.findGraphicalContentIfExistByLabel(OPAQUE_ACTION);
         this.applyNodeCreationTool(opaqueActionNode.getId(), new ADCreationTool(ADToolSections.PIN, UML.getActionInputPin()));
         this.applyNodeCreationTool(opaqueActionNode.getId(), new ADCreationTool(ADToolSections.PIN, UML.getInputPin()));
         this.applyNodeCreationTool(opaqueActionNode.getId(), new ADCreationTool(ADToolSections.PIN, UML.getOutputPin()));

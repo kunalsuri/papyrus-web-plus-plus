@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.test;
 
@@ -36,6 +37,8 @@ import org.eclipse.sirius.components.diagrams.Node;
  * @author <a href="mailto:gwendal.daniel@obeosoft.com">Gwendal Daniel</a>
  */
 public class NodeCreationTest extends AbstractPapyrusWebTest {
+
+    private static final String CANNOT_FIND_NODE_MSG = "Cannot find Node container with label ";
 
     private static final String CHECKER_IS_NULL_ERROR = "checker cannot be null";
 
@@ -86,28 +89,42 @@ public class NodeCreationTest extends AbstractPapyrusWebTest {
      */
     protected void createSubNode(String parentName, CreationTool nodeCreationTool, Checker checker) {
         assertThat(checker).as(CHECKER_IS_NULL_ERROR).isNotNull();
-        IDiagramElement diagramElement = this.findGraphicalElementByLabel(parentName);
-        assertThat(diagramElement).as(NODE_CONTAINER_IS_NOT_NODE_ERROR).isInstanceOf(Node.class);
-        assertThat(diagramElement).as("Cannot find Node container with label " + parentName).isNotNull();
-        Node parentNode = (Node) diagramElement;
-        int initialNumberOfChild = parentNode.getChildNodes().size();
-        List<String> initialBorderNodeIds = parentNode.getBorderNodes().stream()
+        IDiagramElement diagramElementHolder = this.findGraphicalElementExcludingContentByLabel(parentName);
+        IDiagramElement diagramElementContent = this.findGraphicalElementContentByLabel(parentName);
+        assertThat(diagramElementHolder).as(NODE_CONTAINER_IS_NOT_NODE_ERROR).isInstanceOf(Node.class);
+        assertThat(diagramElementHolder).as(CANNOT_FIND_NODE_MSG + parentName).isNotNull();
+
+        // Holder and Content might be the same
+        if (diagramElementContent == null) {
+            diagramElementContent = diagramElementHolder;
+        }
+        Node parentNodeHolder = (Node) diagramElementHolder;
+        Node parentNodeContent = (Node) diagramElementContent;
+        int initialNumberOfChild = parentNodeContent.getChildNodes().size();
+        List<String> initialBorderNodeIds = parentNodeHolder.getBorderNodes().stream()
                 .map(node -> node.getId())
                 .toList();
 
         // int initialNumberOfBorderNodes = parentNode.getBorderNodes().size();
-        this.applyNodeCreationTool(parentNode.getId(), nodeCreationTool);
+        this.applyNodeCreationTool(diagramElementContent.getId(), nodeCreationTool);
         // Reload the parent element to ensure it contains the created element
-        IDiagramElement updatedDiagramElement = this.findGraphicalElementByLabel(parentName);
-        assertThat(updatedDiagramElement).as(NODE_CONTAINER_IS_NOT_NODE_ERROR).isInstanceOf(Node.class);
-        assertThat(updatedDiagramElement).as("Cannot find Node container with label " + parentName).isNotNull();
-        Node updatedNodeElement = (Node) updatedDiagramElement;
+        IDiagramElement updatedDiagramElementHolder = this.findGraphicalElementExcludingContentByLabel(parentName);
+        IDiagramElement updatedDiagramElementContent = this.findGraphicalElementContentByLabel(parentName);
+        assertThat(updatedDiagramElementHolder).as(NODE_CONTAINER_IS_NOT_NODE_ERROR).isInstanceOf(Node.class);
+        assertThat(updatedDiagramElementHolder).as(CANNOT_FIND_NODE_MSG + parentName).isNotNull();
+        Node updatedNodeElementHolder = (Node) updatedDiagramElementHolder;
+        Node updatedNodeElementContent = (Node) updatedDiagramElementContent;
+
+        // Holder and Content might be the same
+        if (updatedNodeElementContent == null) {
+            updatedNodeElementContent = updatedNodeElementHolder;
+        }
         Node createdNode = null;
-        if (updatedNodeElement.getChildNodes().size() > initialNumberOfChild) {
+        if (updatedNodeElementContent.getChildNodes().size() > initialNumberOfChild) {
             // We assume the created element is always added at the end of the getChildNodes list
-            createdNode = updatedNodeElement.getChildNodes().get(initialNumberOfChild);
-        } else if (updatedNodeElement.getBorderNodes().size() > initialBorderNodeIds.size()) {
-            createdNode = updatedNodeElement.getBorderNodes().stream()
+            createdNode = updatedNodeElementContent.getChildNodes().get(initialNumberOfChild);
+        } else if (updatedNodeElementHolder.getBorderNodes().size() > initialBorderNodeIds.size()) {
+            createdNode = updatedNodeElementHolder.getBorderNodes().stream()
                     .filter(node -> !initialBorderNodeIds.contains(node.getId()))
                     .findFirst()
                     .orElse(null);

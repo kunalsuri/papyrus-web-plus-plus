@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,28 +10,9 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.activity;
-
-import static org.eclipse.uml2.uml.UMLPackage.ACCEPT_CALL_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.ADD_STRUCTURAL_FEATURE_VALUE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CALL_OPERATION_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CLEAR_ASSOCIATION_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CLEAR_STRUCTURAL_FEATURE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CREATE_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.DESTROY_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_EXTENT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_IS_CLASSIFIED_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_SELF_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_STRUCTURAL_FEATURE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.RECLASSIFY_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.REDUCE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.SEND_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.SEND_SIGNAL_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.START_CLASSIFIER_BEHAVIOR_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.START_OBJECT_BEHAVIOR_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.TEST_IDENTITY_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.VALUE_SPECIFICATION_ACTION;
 
 import java.util.stream.Stream;
 
@@ -40,6 +21,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.ADDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.activity.checker.ADActivityNodeWithPinsDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.activity.utils.ADCreationTool;
+import org.eclipse.papyrus.web.tools.activity.utils.ADMappingTypes;
 import org.eclipse.papyrus.web.tools.activity.utils.ADToolSections;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
 import org.eclipse.papyrus.web.tools.checker.DeletionGraphicalChecker;
@@ -479,7 +461,7 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @BeforeEach
     public void setUp() {
         super.setUpWithIntermediateRoot(ROOT_ACTIVITY, UML.getActivity());
-        this.rootActivityId = this.getDiagram().getNodes().get(0).getId();
+        this.rootActivityId = this.findGraphicalElementContentByLabel(ROOT_ACTIVITY).getId();
         // Nodes to delete are created in individual test cases to speed up the test suite
     }
 
@@ -782,7 +764,9 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("activityParameters")
     public void testDeleteSemanticNodeInActivity(EClass elementType, EReference containmentReference) {
         // Create all the Activity sub-nodes to delete
-        Node activityContainer = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivity()), ACTIVITY_LABEL);
+        Node activityContainerHolder = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivity()), ACTIVITY_LABEL);
+        Node activityContainer = this.getSubNode(activityContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getActivity()));
+
         this.createActivitySubNodes(activityContainer, ACTIVITY_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, ACTIVITY_LABEL);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -800,7 +784,9 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("activityPartitionParameters")
     public void testDeleteSemanticNodeInActivityPartition(EClass elementType, EReference containmentReference) {
         // Create all the ActivityPartition sub-nodes to delete
-        Node activityPartitionContainer = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivityPartition()), ACTIVITY_PARTITION_LABEL);
+        Node activityPartitionContainerHolder = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivityPartition()), ACTIVITY_PARTITION_LABEL);
+        Node activityPartitionContainer = this.getSubNode(activityPartitionContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getActivityPartition()));
+
         this.createActivityPartitionSubNodes(activityPartitionContainer, ACTIVITY_PARTITION_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, ACTIVITY_PARTITION_LABEL);
         final String expectedSemanticOwner;
@@ -818,8 +804,10 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("conditionalNodeParameters")
     public void testDeleteSemanticNodeInConditionalNode(EClass elementType, EReference containmentReference) {
         // Create all the ConditionalNode sub-nodes to delete
-        Node conditionalNodeContainer = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getConditionalNode()),
+        Node conditionalNodeContainerHolder = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getConditionalNode()),
                 CONDITIONAL_NODE_LABEL);
+        Node conditionalNodeContainer = this.getSubNode(conditionalNodeContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getConditionalNode()));
+
         this.createConditionalNodeSubNodes(conditionalNodeContainer, CONDITIONAL_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, CONDITIONAL_NODE_LABEL);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -831,8 +819,10 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("expansionRegionParameters")
     public void testDeleteSemanticNodeInExpansionRegion(EClass elementType, EReference containmentReference) {
         // Create all the ExpansionRegion sub-nodes to delete
-        Node expansionRegionNodeContainer = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionRegion()),
+        Node expansionRegionNodeContainerHolder = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionRegion()),
                 EXPANSION_REGION_LABEL);
+        Node expansionRegionNodeContainer = this.getSubNode(expansionRegionNodeContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getExpansionRegion()));
+
         this.createExpansionRegionSubNodes(expansionRegionNodeContainer, EXPANSION_REGION_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, EXPANSION_REGION_LABEL);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -844,7 +834,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("interruptibleActivityRegionParameters")
     public void testDeleteSemanticNodeInInterruptibleActivityRegion(EClass elementType, EReference containmentReference) {
         // Create all the InterruptibleActivityRegion sub-nodes to delete
-        Node activityPartitionContainer = this.createNode(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getInterruptibleActivityRegion()));
+        Node activityPartitionContainerHolder = this.createNode(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getInterruptibleActivityRegion()));
+        Node activityPartitionContainer = this.getSubNode(activityPartitionContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getInterruptibleActivityRegion()));
         this.createInterruptibleActivityRegionSubNodes(activityPartitionContainer, INTERRUPTIBLE_ACTIVITY_REGION_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, INTERRUPTIBLE_ACTIVITY_REGION_LABEL);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -856,8 +847,10 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("loopNodeAndStructuredActivityNodeParameters")
     public void testDeleteSemanticNodeInLoopNode(EClass elementType, EReference containmentReference) {
         // Create all the LoopNode sub-nodes to delete
-        Node loopNodeContainer = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getLoopNode()),
+        Node loopNodeContainerHolder = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getLoopNode()),
                 LOOP_NODE_LABEL);
+        Node loopNodeContainer = this.getSubNode(loopNodeContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getLoopNode()));
+
         this.createLoopNodeAndStructuredActivityNodeSubNodes(loopNodeContainer, LOOP_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, LOOP_NODE_LABEL);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -869,8 +862,10 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("loopNodeAndStructuredActivityNodeParameters")
     public void testDeleteSemanticNodeInStructuredActivityNode(EClass elementType, EReference containmentReference) {
         // Create all the StructuredActivityNode sub-nodes to delete
-        Node structuredActivityNodeContainer = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getStructuredActivityNode()),
+        Node structuredActivityNodeContainerHolder = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getStructuredActivityNode()),
                 STRUCTURED_ACTIVITY_NODE_LABEL);
+        Node structuredActivityNodeContainer = this.getSubNode(structuredActivityNodeContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getStructuredActivityNode()));
+
         this.createLoopNodeAndStructuredActivityNodeSubNodes(structuredActivityNodeContainer, STRUCTURED_ACTIVITY_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, STRUCTURED_ACTIVITY_NODE_LABEL);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -882,8 +877,10 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("sequenceNodeParameters")
     public void testDeleteSemanticNodeInSequenceNode(EClass elementType, EReference containmentReference) {
         // Create all the SequenceNode sub-nodes to delete
-        Node sequenceNodeContainer = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getSequenceNode()),
+        Node sequenceNodeContainerHolder = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getSequenceNode()),
                 SEQUENCE_NODE_LABEL);
+        Node sequenceNodeContainer = this.getSubNode(sequenceNodeContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getSequenceNode()));
+
         this.createSequenceNodeSubNodes(sequenceNodeContainer, SEQUENCE_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, SEQUENCE_NODE_LABEL);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -896,7 +893,7 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     public void testDeleteSemanticPinInNode(CreationTool parentCreationTool, String parentLabel, CreationTool nodeCreationTool, EClass elementType, EReference containmentReference) {
         // Create the container node
         this.createNodeWithLabel(this.rootActivityId, parentCreationTool, parentLabel);
-        Node parentNode = (Node) this.findGraphicalElementByLabel(parentLabel);
+        Node parentNode = (Node) this.findGraphicalElementExcludingContentByLabel(parentLabel);
         this.createNodeWithLabel(parentNode.getId(), nodeCreationTool, elementType.getName() + "In_Node");
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, parentLabel);
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
@@ -908,7 +905,7 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     protected Node createNodeWithLabel(String parentElementId, CreationTool creationTool, String label) {
         if (UML.getReadSelfAction().equals(creationTool.getToolEClass())) {
             this.applyNodeCreationTool(parentElementId, creationTool);
-            Node createdNode = (Node) this.findGraphicalElementByLabel("this");
+            Node createdNode = (Node) this.findGraphicalElementExcludingContentByLabel("this");
             this.applyEditLabelTool(createdNode.getInsideLabel().getId(), label);
             return (Node) this.findGraphicalElementById(createdNode.getId());
         } else {
@@ -917,35 +914,10 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
     }
 
     private DeletionGraphicalChecker getGraphicalCheckerFor(EClass expectedType, String graphicalContainerLabel) {
-        int expectedNumberOfPins = switch (expectedType.getClassifierID()) {
-            case ACCEPT_CALL_ACTION, //
-                    CALL_OPERATION_ACTION, //
-                    CLEAR_ASSOCIATION_ACTION, //
-                    CREATE_OBJECT_ACTION, //
-                    DESTROY_OBJECT_ACTION, //
-                    READ_EXTENT_ACTION, //
-                    READ_SELF_ACTION, //
-                    RECLASSIFY_OBJECT_ACTION, //
-                    SEND_SIGNAL_ACTION, //
-                    START_CLASSIFIER_BEHAVIOR_ACTION, //
-                    START_OBJECT_BEHAVIOR_ACTION, //
-                    VALUE_SPECIFICATION_ACTION -> 1;
-            case CLEAR_STRUCTURAL_FEATURE_ACTION, //
-                    READ_IS_CLASSIFIED_OBJECT_ACTION, //
-                    READ_STRUCTURAL_FEATURE_ACTION, //
-                    REDUCE_ACTION, //
-                    SEND_OBJECT_ACTION -> 2;
-            case TEST_IDENTITY_ACTION -> 3;
-            case ADD_STRUCTURAL_FEATURE_VALUE_ACTION -> 4;
-            default -> 0;
-        };
+        int expectedNumberOfPins = ADMappingTypes.getExpectedNumberOfCreatedElement(expectedType);
         DeletionGraphicalChecker checker;
-        if (expectedNumberOfPins == 0) {
-            checker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(graphicalContainerLabel));
-        } else {
-            checker = new ADActivityNodeWithPinsDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(graphicalContainerLabel),
-                    expectedNumberOfPins);
-        }
+        checker = new ADActivityNodeWithPinsDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(graphicalContainerLabel),
+                expectedNumberOfPins);
         return checker;
     }
 }

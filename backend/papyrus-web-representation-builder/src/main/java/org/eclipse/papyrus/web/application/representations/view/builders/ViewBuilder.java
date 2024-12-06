@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,8 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 199
- *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 227
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.view.builders;
 
@@ -113,7 +112,7 @@ public class ViewBuilder {
      * Creates a semantic drop tool with the given {@code semanticDropToolId}.
      *
      * @param semanticDropToolId
-     *         identifier of the semantic tool to create
+     *            identifier of the semantic tool to create
      * @return the new semantic drop tool.
      */
     public DropTool createGenericSemanticDropTool(String semanticDropToolId) {
@@ -130,7 +129,7 @@ public class ViewBuilder {
      * Creates a graphical drop tool with the given {@code graphicalDropToolId}.
      *
      * @param graphicalDropToolId
-     *         identifier of the graphical tool to create
+     *            identifier of the graphical tool to create
      * @return the new graphical drop tool.
      */
     public DropNodeTool createGraphicalDropTool(String graphicalDropToolId) {
@@ -270,19 +269,49 @@ public class ViewBuilder {
      * Create a creation tool to create a unsynchronized {@link NodeDescription}.
      *
      * @param name
-     *         the name of the tool
+     *            the name of the tool
      * @param containementRef
-     *         the containment reference used to contained the new element
+     *            the containment reference used to contained the new element
      * @param newType
-     *         the type of the element to create
+     *            the type of the element to create
      * @return a new {@link NodeTool}
      */
     public NodeTool createCreationTool(String name, EReference containementRef, EClass newType) {
         return this.createCreationTool(name, Variables.SELF, containementRef, newType);
     }
 
+    /**
+     * Create a creation tool to create a unsynchronized {@link NodeDescription}.
+     *
+     * @param name
+     *            the name of the tool
+     * @param selfValue
+     *            the self expression
+     * @param containementRef
+     *            the containment reference used to contained the new element
+     * @param newType
+     *            the type of the element to create
+     * @return a new {@link NodeTool}
+     */
     public NodeTool createCreationTool(String name, String selfValue, EReference containementRef, EClass newType) {
         return this.createCreationTool(name, selfValue, containementRef, this.metamodelHelper.getDomain(newType));
+    }
+
+    /**
+     * Create a creation tool to create a unsynchronized {@link NodeDescription}.
+     *
+     * @param name
+     *            the name of the tool
+     * @param selfValue
+     *            the self expression
+     * @param containementRef
+     *            the containment reference used to contained the new element
+     * @param newType
+     *            the type of the element to create
+     * @return a new {@link NodeTool}
+     */
+    public NodeTool createCreationToolInHolder(String name, String selfValue, EReference containementRef, EClass newType) {
+        return this.createCreationToolInHolder(name, selfValue, containementRef, this.metamodelHelper.getDomain(newType));
     }
 
     private NodeTool createCreationTool(String name, String selfValue, EReference containementRef, String newType) {
@@ -299,18 +328,64 @@ public class ViewBuilder {
     /**
      * Creates a creation {@link NodeTool} that delegates to the provided {@code serviceName}.
      * <p>
-     * This method is used to create creation tools that rely on diagram-specific creation services. See {@link ViewBuilder#createCreationTool(EReference, EClass)} to create a creation
-     * {@link NodeTool} that relies on the default creation mechanism.
+     * This method is used to create creation tools that rely on diagram-specific creation services. See
+     * {@link ViewBuilder#createCreationTool(EReference, EClass)} to create a creation {@link NodeTool} that relies on
+     * the default creation mechanism.
+     * </p>
+     *
+     * @param containementRef
+     *            the containment reference used to contained the new element
+     * @param newType
+     *            the type of the element to create
+     * @return the created {@link NodeTool}
+     */
+    public NodeTool createCreationToolInHolder(EReference containementRef, EClass newType) {
+        return this.createCreationToolInHolder(this.idBuilder.getCreationToolId(newType), Variables.SELF, containementRef, this.metamodelHelper.getDomain(newType));
+    }
+
+    /**
+     * Creates a creation {@link NodeTool} that delegates to the provided {@code serviceName}.
+     * <p>
+     * This method is used to create creation tools that rely on diagram-specific creation services. See
+     * {@link ViewBuilder#createCreationTool(EReference, EClass)} to create a creation {@link NodeTool} that relies on
+     * the default creation mechanism.
+     * </p>
+     *
+     * @param name
+     *            the name of the tool to create
+     * @param serviceName
+     *            the name of the service to call
+     * @param serviceParameters
+     *            the parameters provided to the service
+     * @return the created {@link NodeTool}
+     */
+    public NodeTool createCreationToolInHolder(String name, String selfValue, EReference containementRef, String newType) {
+        NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
+        nodeTool.setName(name);
+        nodeTool.setIconURLsExpression(getIconURLFromToolName(newType));
+        ChangeContext createElement = ViewFactory.eINSTANCE.createChangeContext();
+        createElement.setExpression(this.queryBuilder.createNodeInHolderQuery(newType, selfValue, containementRef));
+        nodeTool.getBody().add(createElement);
+
+        return nodeTool;
+    }
+
+    /**
+     * Creates a creation {@link NodeTool} that delegates to the provided {@code serviceName}.
+     * <p>
+     * This method is used to create creation tools that rely on diagram-specific creation services. See
+     * {@link ViewBuilder#createCreationTool(EReference, EClass)} to create a creation {@link NodeTool} that relies on
+     * the default creation mechanism.
      * </p>
      *
      * @param domain
-     *         the kind of element to create
+     *            the kind of element to create
      * @param toolName
-     *         the name of the tool to create
+     *            the name of the tool to create
      * @param serviceName
-     *         the name of the service to call
+     *            the name of the service to call
      * @param serviceParameters
-     *         the parameters provided to the service
+     *            the parameters provided to the service
      * @return the created {@link NodeTool}
      */
     public NodeTool createCreationTool(String domain, String toolName, String serviceName, List<String> serviceParameters) {
@@ -324,17 +399,47 @@ public class ViewBuilder {
     }
 
     /**
-     * Creates a creation {@link NodeTool} to create {@code newType} elements inside the {@code compartmentName} compartment of the containing element.
+     * Creates a creation {@link NodeTool} that delegates to the provided {@code serviceName}.
+     * <p>
+     * This method is used to create creation tools that rely on diagram-specific creation services. See
+     * {@link ViewBuilder#createCreationTool(EReference, EClass)} to create a creation {@link NodeTool} that relies on
+     * the default creation mechanism.
+     * </p>
+     *
+     * @param domain
+     *            the kind of element to create
+     * @param toolName
+     *            the name of the tool to create
+     * @param serviceName
+     *            the name of the service to call
+     * @param serviceParameters
+     *            the parameters provided to the service
+     * @return the created {@link NodeTool}
+     */
+    public NodeTool createCreationToolInHolder(String domain, String toolName, String serviceName, List<String> serviceParameters) {
+        NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
+        nodeTool.setName(toolName);
+        nodeTool.setIconURLsExpression(getIconURLFromToolName(domain));
+        ChangeContext createElement = ViewFactory.eINSTANCE.createChangeContext();
+        createElement.setExpression(CallQuery.queryServiceOnSelf(serviceName, serviceParameters.toArray(String[]::new)));
+        nodeTool.getBody().add(createElement);
+        return nodeTool;
+    }
+
+    /**
+     * Creates a creation {@link NodeTool} to create {@code newType} elements inside the {@code compartmentName}
+     * compartment of the containing element.
      *
      * @param toolName
-     *         the name of the tool to create
+     *            the name of the tool to create
      * @param compartmentName
-     *         the name of the compartment where to create
+     *            the name of the compartment where to create
      * @param containementRef
-     *         the containment reference used to contained the new element
+     *            the containment reference used to contained the new element
      * @param newType
-     *         the new type to create
-     * @return the created {@link NodeTool} used to create {@code newType} elements inside the {@code compartmentName} compartment of the containing element
+     *            the new type to create
+     * @return the created {@link NodeTool} used to create {@code newType} elements inside the {@code compartmentName}
+     *         compartment of the containing element
      */
     public NodeTool createInCompartmentCreationTool(String toolName, String compartmentName, EReference containementRef, String newType) {
         NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
@@ -517,7 +622,7 @@ public class ViewBuilder {
      * Create tool section in the diagram palette.
      *
      * @param name
-     *         the name of the tool section to create
+     *            the name of the tool section to create
      * @return the tool section in the diagram palette
      */
     public DiagramToolSection createDiagramToolSection(String name) {
@@ -530,7 +635,7 @@ public class ViewBuilder {
      * Create tool section in the given node description palette.
      *
      * @param name
-     *         the name of the tool section to create
+     *            the name of the tool section to create
      * @return the tool section in the given node description palette
      */
     public NodeToolSection createNodeToolSection(String name) {
@@ -726,7 +831,7 @@ public class ViewBuilder {
      * Compute the path of the icon.
      *
      * @param name
-     *         the name of element kind
+     *            the name of element kind
      * @return the path of the icon to use for the tool
      */
     public static String getIconPathFromString(String name) {
@@ -737,7 +842,7 @@ public class ViewBuilder {
      * Compute the path of the icon.
      *
      * @param toolName
-     *         the name of the tool
+     *            the name of the tool
      * @return the path of the icon to use for the tool
      */
     public static String getIconURLFromToolName(String toolName) {

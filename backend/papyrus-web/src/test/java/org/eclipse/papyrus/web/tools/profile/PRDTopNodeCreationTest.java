@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.profile;
 
@@ -19,6 +20,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.PRDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationSemanticChecker;
 import org.eclipse.papyrus.web.tools.profile.checker.PRDClassifierCreationGraphicalChecker;
@@ -82,6 +84,8 @@ public class PRDTopNodeCreationTest extends NodeCreationTest {
             graphicalChecker = new PRDEnumerationCreationGraphicalChecker(this::getDiagram, null, mappingType, this.getCapturedNodes());
         } else if (UML.getClassifier().isSuperTypeOf(expectedType) && !UML.getPrimitiveType().isSuperTypeOf(expectedType)) {
             graphicalChecker = new PRDClassifierCreationGraphicalChecker(this::getDiagram, null, mappingType, this.getCapturedNodes());
+        } else if (UML.getPackage().isSuperTypeOf(expectedType)) {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, null, mappingType, this.getCapturedNodes());
         } else {
             graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, null, mappingType, this.getCapturedNodes());
         }

@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.component;
 
@@ -19,6 +20,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.CPDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
 import org.eclipse.papyrus.web.tools.checker.DeletionGraphicalChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeGraphicalDeletionSemanticChecker;
 import org.eclipse.papyrus.web.tools.component.checker.CPDInterfaceDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.test.NodeDeletionTest;
@@ -84,8 +86,10 @@ public class CPDTopNodeGraphicalDeletionTest extends NodeDeletionTest {
         DeletionGraphicalChecker graphicalChecker;
         if (INTERFACE1.equals(elementName)) {
             graphicalChecker = new CPDInterfaceDeletionGraphicalChecker(this::getDiagram, null);
-        } else {
+        } else if (CONSTRAINT1.equals(elementName)) {
             graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, null);
+        } else {
+            graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, null);
         }
         NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, this::getRootSemanticElement,
                 containmentReference);

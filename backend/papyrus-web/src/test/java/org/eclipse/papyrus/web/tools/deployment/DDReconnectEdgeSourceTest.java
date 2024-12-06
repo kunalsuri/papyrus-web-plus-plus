@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.deployment;
 
@@ -104,7 +105,7 @@ public class DDReconnectEdgeSourceTest extends ReconnectEdgeSourceTest {
     public void testReconnectCommunicationPathSource(EClass newSourceType) {
         String communicationPathId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getCommunicationPath()));
         String newSourceLabel = newSourceType.getName() + NEW_SOURCE;
-        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementByLabel(newSourceLabel));
+        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newSourceLabel));
         this.reconnectEdgeSource(communicationPathId, newSourceLabel, graphicalChecker);
     }
 
@@ -113,7 +114,7 @@ public class DDReconnectEdgeSourceTest extends ReconnectEdgeSourceTest {
     public void testReconnectDependencySource(EClass newSourceType) {
         String dependencyId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getDependency()));
         String newSourceLabel = newSourceType.getName() + NEW_SOURCE;
-        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementByLabel(newSourceLabel));
+        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newSourceLabel));
         this.reconnectEdgeSource(dependencyId, newSourceLabel, graphicalChecker);
     }
 
@@ -122,7 +123,7 @@ public class DDReconnectEdgeSourceTest extends ReconnectEdgeSourceTest {
     public void testReconnectDeploymentSource(EClass newSourceType) {
         String deploymentPathId = this.createEdge(ARTIFACT_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getDeployment()));
         String newSourceLabel = newSourceType.getName() + NEW_SOURCE;
-        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementByLabel(newSourceLabel));
+        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newSourceLabel));
         this.reconnectEdgeSource(deploymentPathId, newSourceLabel, graphicalChecker);
     }
 
@@ -131,7 +132,7 @@ public class DDReconnectEdgeSourceTest extends ReconnectEdgeSourceTest {
     public void testReconnectGeneralizationSource(EClass newSourceType) {
         String generalizationId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getGeneralization()));
         String newSourceLabel = newSourceType.getName() + NEW_SOURCE;
-        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementByLabel(newSourceLabel));
+        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newSourceLabel));
         this.reconnectEdgeSource(generalizationId, newSourceLabel, graphicalChecker);
     }
 
@@ -140,7 +141,7 @@ public class DDReconnectEdgeSourceTest extends ReconnectEdgeSourceTest {
     public void testReconnectManifestationSource(EClass newSourceType) {
         String manifestationId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getDependency()));
         String newSourceLabel = newSourceType.getName() + NEW_SOURCE;
-        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementByLabel(newSourceLabel));
+        Checker graphicalChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newSourceLabel));
         this.reconnectEdgeSource(manifestationId, newSourceLabel, graphicalChecker);
     }
 }

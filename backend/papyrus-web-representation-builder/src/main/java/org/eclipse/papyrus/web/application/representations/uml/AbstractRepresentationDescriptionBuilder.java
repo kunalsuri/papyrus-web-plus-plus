@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,8 +10,8 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 190
- *  Titouan BOUËTE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issue 219, 227
+ *  Aurelien Didier (Artal Technologies) - Issue 190, 229
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issue 219, 227
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -63,6 +63,7 @@ import org.eclipse.sirius.components.view.diagram.DiagramPackage;
 import org.eclipse.sirius.components.view.diagram.DiagramToolSection;
 import org.eclipse.sirius.components.view.diagram.EdgeDescription;
 import org.eclipse.sirius.components.view.diagram.EdgeTool;
+import org.eclipse.sirius.components.view.diagram.HeaderSeparatorDisplayMode;
 import org.eclipse.sirius.components.view.diagram.InsideLabelDescription;
 import org.eclipse.sirius.components.view.diagram.InsideLabelPosition;
 import org.eclipse.sirius.components.view.diagram.InsideLabelStyle;
@@ -75,6 +76,7 @@ import org.eclipse.sirius.components.view.diagram.NodeTool;
 import org.eclipse.sirius.components.view.diagram.NodeToolSection;
 import org.eclipse.sirius.components.view.diagram.SynchronizationPolicy;
 import org.eclipse.sirius.components.view.diagram.Tool;
+import org.eclipse.sirius.components.view.diagram.UserResizableDirection;
 import org.eclipse.uml2.uml.Comment;
 import org.eclipse.uml2.uml.Constraint;
 import org.eclipse.uml2.uml.UMLPackage;
@@ -91,7 +93,20 @@ public abstract class AbstractRepresentationDescriptionBuilder {
      */
     public static final String PACKAGE_CHILD = "inPackage";
 
+    /**
+     * Predicate used to filter package children.
+     */
     public static final Predicate<NodeDescription> PACKAGE_CHILDREN_FILTER = n -> n.getName().endsWith(PACKAGE_CHILD);
+
+    /**
+     * The String used to suffix the name of the holder {@link NodeDescription}s.
+     */
+    public static final String HOLDER_SUFFIX = "Holder";
+
+    /**
+     * The String used to suffix the name of the holder {@link NodeDescription}s.
+     */
+    public static final String CONTENT_SUFFIX = "Content";
 
     /**
      * The String used to suffix the name of shared {@link NodeDescription}s.
@@ -135,6 +150,18 @@ public abstract class AbstractRepresentationDescriptionBuilder {
      * Underscore.
      */
     public static final String UNDERSCORE = "_";
+
+    /**
+     * AQL expression to set children not draggable from its container.
+     */
+    protected static final String CHILD_NOT_DRAGGABLE_EXPRESSION = "aql:false";
+
+    /**
+     * AQL expression to set children draggable from its container.
+     */
+    protected static final String CHILD_DRAGGABLE_EXPRESSION = "aql:true";
+
+    protected static final String SHOW_HIDE = "Show/Hide";
 
     /**
      * AQL expression used to specify gap size at the end of compartment.
@@ -358,7 +385,24 @@ public abstract class AbstractRepresentationDescriptionBuilder {
         List<NodeDescription> forbiddenDescription = this.collectNodesWithDomain(description, forbiddenDomains.toArray(EClass[]::new));
         return this.collectNodesWithDomain(description, domains.toArray(EClass[]::new)).stream() //
                 .filter(nd -> !SHARED_DESCRIPTIONS.equals(nd.getName())) //
+                .filter(nd -> !nd.getName().contains(HOLDER_SUFFIX))
                 .filter(nd -> !forbiddenDescription.contains(nd)) //
+                .toList();
+    }
+
+    protected List<NodeDescription> collectNodesWithDomainAndFilterWithoutContent(DiagramDescription description, List<EClass> domains, List<EClass> forbiddenDomains) {
+        List<NodeDescription> forbiddenDescription = this.collectNodesWithDomain(description, forbiddenDomains.toArray(EClass[]::new));
+        return this.collectNodesWithDomain(description, domains.toArray(EClass[]::new)).stream() //
+                .filter(nd -> !SHARED_DESCRIPTIONS.equals(nd.getName())) //
+                .filter(nd -> !nd.getName().contains(CONTENT_SUFFIX))
+                .filter(nd -> !forbiddenDescription.contains(nd)) //
+                .toList();
+    }
+
+    protected List<NodeDescription> collectNodesWithDomainAndWithoutContent(DiagramDescription description, EClass... domains) {
+        return this.collectNodesWithDomain(description, domains).stream() //
+                .filter(nd -> !SHARED_DESCRIPTIONS.equals(nd.getName())) //
+                .filter(nd -> !nd.getName().contains(CONTENT_SUFFIX))
                 .toList();
     }
 
@@ -474,7 +518,7 @@ public abstract class AbstractRepresentationDescriptionBuilder {
                 .buildIn(diagramDescription, parentNodeDescription);
 
         NodeTool nodeTool = this.getViewBuilder().createCreationTool(this.pack.getElement_OwnedComment(), this.pack.getComment());
-        this.reuseNodeAndCreateTool(commentDescription, diagramDescription, nodeTool, toolSectionName, owners.toArray(EClass[]::new));
+        this.reuseNodeAndCreateTool(commentDescription, diagramDescription, nodeTool, toolSectionName, owners, List.of());
     }
 
     /**
@@ -537,7 +581,7 @@ public abstract class AbstractRepresentationDescriptionBuilder {
                 .buildIn(diagramDescription, parentNodeDescription);
 
         NodeTool nodeTool = this.getViewBuilder().createCreationTool(this.pack.getNamespace_OwnedRule(), this.pack.getConstraint());
-        this.reuseNodeAndCreateTool(constraintDescription, diagramDescription, nodeTool, toolSectionName, owners.toArray(EClass[]::new));
+        this.reuseNodeAndCreateTool(constraintDescription, diagramDescription, nodeTool, toolSectionName, owners, List.of());
     }
 
     /**
@@ -726,6 +770,35 @@ public abstract class AbstractRepresentationDescriptionBuilder {
         });
     }
 
+    public void registerGrowableNodes(NodeDescription nodeDescription, DiagramDescription diagramDescription, String toolSectionName, List<EClass> owners,
+            List<EClass> resizableParents) {
+        this.registerCallback(nodeDescription, () -> {
+            Supplier<List<NodeDescription>> growableNodeDescriptions = () -> this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, resizableParents, List.of());
+            this.addGrowableNodesDescriptionInOwners(nodeDescription, growableNodeDescriptions.get());
+        });
+
+    }
+
+    /**
+     * This method add the node description as a growable node of its {@code resizableParents} list.
+     *
+     * @param nodeDescription
+     *            the {@link NodeDescription} to reuse
+     * @param resizableParents
+     *            the type of the {@link NodeDescription} to setup to reuse the provided {@code nodeDescription}
+     */
+    private void addGrowableNodesDescriptionInOwners(NodeDescription nodeDescription, List<NodeDescription> resizableParents) {
+        for (NodeDescription owner : resizableParents) {
+            if (owner != nodeDescription.eContainer()) {
+                if (nodeDescription.eContainingFeature() == DiagramPackage.eINSTANCE.getNodeDescription_ChildrenDescriptions()) {
+                    if (owner.getChildrenLayoutStrategy() instanceof ListLayoutStrategyDescription listLayoutDescription) {
+                        listLayoutDescription.getGrowableNodes().add(nodeDescription);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * This method add the node description as a growable node of its {@code resizableParents} list.
      *
@@ -754,26 +827,6 @@ public abstract class AbstractRepresentationDescriptionBuilder {
             Supplier<List<NodeDescription>> growableNodeDescriptions = () -> this.collectNodesWithDomainAndFilter(diagramDescription, resizableParents, forbiddenOwners);
             this.addGrowableNodesDescriptionInOwners(nodeDescription, growableNodeDescriptions.get());
         });
-    }
-
-    /**
-     * This method add the node description as a growable node of its {@code resizableParents} list.
-     *
-     * @param nodeDescription
-     *            the {@link NodeDescription} to reuse
-     * @param resizableParents
-     *            the type of the {@link NodeDescription} to setup to reuse the provided {@code nodeDescription}
-     */
-    private void addGrowableNodesDescriptionInOwners(NodeDescription nodeDescription, List<NodeDescription> resizableParents) {
-        for (NodeDescription owner : resizableParents) {
-            if (owner != nodeDescription.eContainer()) {
-                if (nodeDescription.eContainingFeature() == DiagramPackage.eINSTANCE.getNodeDescription_ChildrenDescriptions()) {
-                    if (owner.getChildrenLayoutStrategy() instanceof ListLayoutStrategyDescription listLayoutDescription) {
-                        listLayoutDescription.getGrowableNodes().add(nodeDescription);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -812,6 +865,31 @@ public abstract class AbstractRepresentationDescriptionBuilder {
         });
     }
 
+    public void reuseNodeWithoutContent(NodeDescription nodeDescription, DiagramDescription diagramDescription, List<EClass> owners,
+            List<EClass> forbiddenOwners) {
+        this.registerCallback(nodeDescription, () -> {
+            Supplier<List<NodeDescription>> ownerNodeDescriptions = () -> this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, owners, forbiddenOwners);
+            this.reusedNodeDescriptionInOwners(nodeDescription, ownerNodeDescriptions.get());
+        });
+    }
+
+    public void reuseNodeWithoutContent(NodeDescription nodeDescription, DiagramDescription diagramDescription, List<EClass> owners,
+            List<EClass> forbiddenOwners, Predicate<NodeDescription> filter) {
+        this.registerCallback(nodeDescription, () -> {
+            Supplier<List<NodeDescription>> ownerNodeDescriptions = () -> this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, owners, forbiddenOwners).stream().filter(filter)
+                    .collect(toList());
+            this.reusedNodeDescriptionInOwners(nodeDescription, ownerNodeDescriptions.get());
+        });
+    }
+
+    public void reuseNodeWithoutHolder(NodeDescription nodeDescription, DiagramDescription diagramDescription, List<EClass> owners,
+            List<EClass> forbiddenOwners) {
+        this.registerCallback(nodeDescription, () -> {
+            Supplier<List<NodeDescription>> ownerNodeDescriptions = () -> this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, owners, forbiddenOwners);
+            this.reusedNodeDescriptionInOwners(nodeDescription, ownerNodeDescriptions.get());
+        });
+    }
+
     /**
      * Reuses the provided {@code nodeDescription} as a child of the {@link NodeDescription} representing
      * {@code owners}.
@@ -834,7 +912,11 @@ public abstract class AbstractRepresentationDescriptionBuilder {
             // descriptions. It is already in the children descriptions of the owner.
             if (owner != nodeDescription.eContainer()) {
                 if (nodeDescription.eContainingFeature() == DiagramPackage.eINSTANCE.getNodeDescription_BorderNodesDescriptions()) {
-                    owner.getReusedBorderNodeDescriptions().add(nodeDescription);
+                    if (owner.eContainer() instanceof NodeDescription parentND && parentND.getName().contains(HOLDER_SUFFIX)) {
+                        parentND.getReusedBorderNodeDescriptions().add(nodeDescription);
+                    } else {
+                        owner.getReusedBorderNodeDescriptions().add(nodeDescription);
+                    }
                 } else if (nodeDescription.eContainingFeature() == DiagramPackage.eINSTANCE.getNodeDescription_ChildrenDescriptions()) {
                     owner.getReusedChildNodeDescriptions().add(nodeDescription);
                 } else if (nodeDescription.eContainingFeature() == DiagramPackage.eINSTANCE.getDiagramDescription_NodeDescriptions()) {
@@ -1139,7 +1221,7 @@ public abstract class AbstractRepresentationDescriptionBuilder {
      */
     protected NodeDescription createSharedCompartmentsDescription(DiagramDescription diagramDescription, NodeDescription parentNodeDescription, EClass domainType, String compartmentName,
             List<EClass> owners, List<EClass> forbiddenOwners, Predicate<NodeDescription> forbiddenNodeDescriptionPredicate) {
-        ListLayoutStrategyDescription listLayoutStrategyDescription = DiagramFactory.eINSTANCE.createListLayoutStrategyDescription();
+        ListLayoutStrategyDescription listLayoutStrategyDescription = this.createListLayoutStrategy(true);
         listLayoutStrategyDescription.setBottomGapExpression(GAP_SIZE);
         NodeDescription sharedCompartmentDescription = this.newNodeBuilder(domainType, this.getViewBuilder().createRectangularNodeStyle())//
                 .name(this.getIdBuilder().getSpecializedCompartmentDomainNodeName(domainType, compartmentName, SHARED_SUFFIX)) //
@@ -1154,7 +1236,8 @@ public abstract class AbstractRepresentationDescriptionBuilder {
 
         // add reuse of compartment in its node description parent
         this.registerCallback(sharedCompartmentDescription, () -> {
-            List<NodeDescription> ownerNodeDescriptions = this.collectNodesWithDomainAndFilter(diagramDescription, owners, forbiddenOwners).stream().filter(forbiddenNodeDescriptionPredicate).toList();
+            List<NodeDescription> ownerNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, owners, forbiddenOwners).stream()
+                    .filter(forbiddenNodeDescriptionPredicate).toList();
             this.reusedNodeDescriptionInOwners(sharedCompartmentDescription, ownerNodeDescriptions);
         });
         return sharedCompartmentDescription;
@@ -1202,7 +1285,7 @@ public abstract class AbstractRepresentationDescriptionBuilder {
 
         NodeDescription createNodeDescriptionInCompartmentDescription = this.newNodeBuilder(domainType, DiagramFactory.eINSTANCE.createIconLabelNodeStyleDescription())//
                 .name(nodeDescriptionName) //
-                .layoutStrategyDescription(DiagramFactory.eINSTANCE.createListLayoutStrategyDescription())//
+                .layoutStrategyDescription(this.createListLayoutStrategy(true))//
                 .semanticCandidateExpression(semanticQuery)//
                 .synchronizationPolicy(SynchronizationPolicy.UNSYNCHRONIZED)//
                 .labelEditTool(this.getViewBuilder().createDirectEditTool(domainType.getName()))//
@@ -1229,6 +1312,32 @@ public abstract class AbstractRepresentationDescriptionBuilder {
                 forbiddenNodeDescriptionPredicate);
 
         return createNodeDescriptionInCompartmentDescription;
+    }
+
+    /**
+     * This create a Layout Strategy and set child nodes as not draggable.
+     *
+     * @return the list ListLayoutStrategyDescription {@link ListLayoutStrategyDescription}
+     */
+    protected ListLayoutStrategyDescription createListLayoutStrategy() {
+        ListLayoutStrategyDescription llsd = DiagramFactory.eINSTANCE.createListLayoutStrategyDescription();
+        llsd.setAreChildNodesDraggableExpression(CHILD_NOT_DRAGGABLE_EXPRESSION);
+        return llsd;
+    }
+
+    /**
+     * This create a Layout Strategy and set child nodes as not draggable.
+     *
+     * @return the list ListLayoutStrategyDescription {@link ListLayoutStrategyDescription}
+     */
+    protected ListLayoutStrategyDescription createListLayoutStrategy(boolean areChildDraggable) {
+        ListLayoutStrategyDescription llsd = DiagramFactory.eINSTANCE.createListLayoutStrategyDescription();
+        if (areChildDraggable) {
+            llsd.setAreChildNodesDraggableExpression(CHILD_DRAGGABLE_EXPRESSION);
+        } else {
+            llsd.setAreChildNodesDraggableExpression(CHILD_NOT_DRAGGABLE_EXPRESSION);
+        }
+        return llsd;
     }
 
     /**
@@ -1270,12 +1379,34 @@ public abstract class AbstractRepresentationDescriptionBuilder {
      * @param owners
      * @param forbiddenOwners
      * @param compartmentName
+     * @param filter
+     *            predicate on the {@link NodeDescription} to exclude
      */
-    public void createSymbolSharedNodeDescription(DiagramDescription dd, NodeDescription shared, List<EClass> owners, List<EClass> forbiddenOwners, String compartmentName) {
+    public NodeDescription createSymbolSharedNodeDescription(DiagramDescription dd, List<EClass> owners, List<EClass> forbiddenOwners, String compartmentName, Predicate<NodeDescription> filter) {
         NodeDescription nd = this.getViewBuilder().createSymbolNodeDescription();
         nd.setName(this.getIdBuilder().getSpecializedCompartmentDomainNodeName(this.pack.getElement(), compartmentName, SHARED_SUFFIX));
-        shared.getChildrenDescriptions().add(nd);
-        this.reuseNode(nd, dd, owners, forbiddenOwners);
+        nd.setUserResizable(UserResizableDirection.VERTICAL);
+        nd.setKeepAspectRatio(true);
+        this.reuseNodeWithoutContent(nd, dd, owners, forbiddenOwners, filter);
+        return nd;
+    }
+
+    /**
+     * Create a Symbol NodeDescription and add it to the the SharedNodeDescription.
+     *
+     * @param dd
+     * @param shared
+     * @param owners
+     * @param forbiddenOwners
+     * @param compartmentName
+     */
+    public NodeDescription createSymbolSharedNodeDescription(DiagramDescription dd, List<EClass> owners, List<EClass> forbiddenOwners, String compartmentName) {
+        NodeDescription nd = this.getViewBuilder().createSymbolNodeDescription();
+        nd.setName(this.getIdBuilder().getSpecializedCompartmentDomainNodeName(this.pack.getElement(), compartmentName, SHARED_SUFFIX));
+        nd.setUserResizable(UserResizableDirection.VERTICAL);
+        nd.setKeepAspectRatio(true);
+        this.reuseNodeWithoutContent(nd, dd, owners, forbiddenOwners);
+        return nd;
     }
 
     /**
@@ -1340,6 +1471,76 @@ public abstract class AbstractRepresentationDescriptionBuilder {
         createElement.setExpression("aql:diagramServices.reveal(diagramContext.getAllNonSymbol(editingContext))");
         nodeTool.getBody().add(createElement);
         this.addDiagramToolInToolSection(diagramDescription, nodeTool, toolSectionName);
+    }
+
+    /**
+     * This is used to add the FreeFormLayout Content inside a List Holder and define its properties.
+     *
+     * @param holderNodeDescription
+     * @param contentNodeDescription
+     */
+    protected void addContent(EClass eClass, Boolean isShared, NodeDescription holderNodeDescription,
+            NodeDescription contentNodeDescription, NodeDescription symbolNodeDescription) {
+        String suffix = HOLDER_SUFFIX;
+        if (isShared) {
+            suffix = SHARED_SUFFIX + UNDERSCORE + HOLDER_SUFFIX;
+        }
+        holderNodeDescription.setName(this.getIdBuilder().getSpecializedDomainNodeName(eClass, suffix));
+        this.copyDimension(holderNodeDescription, contentNodeDescription);
+        ListLayoutStrategyDescription llsd = this.createListLayoutStrategy();
+        holderNodeDescription.setChildrenLayoutStrategy(llsd);
+        llsd.setAreChildNodesDraggableExpression(CHILD_NOT_DRAGGABLE_EXPRESSION);
+        llsd.getGrowableNodes().add(contentNodeDescription);
+        llsd.getGrowableNodes().add(symbolNodeDescription);
+        holderNodeDescription.getChildrenDescriptions().add(contentNodeDescription);
+        this.createDefaultToolSectionsInNodeDescription(holderNodeDescription);
+        this.createDefaultToolSectionsInNodeDescription(contentNodeDescription);
+
+    }
+
+    protected void addToolSections(NodeDescription parentNodeDescription, String... toolSectionNames) {
+        for (String toolSectionName : toolSectionNames) {
+            NodeToolSection toolSection = this.getViewBuilder().createNodeToolSection(toolSectionName);
+            parentNodeDescription.getPalette().getToolSections().add(toolSection);
+        }
+    }
+
+    /**
+     * This is used to create the FreeFormLayout Content inside a List Holder in order to have the symbol has a second
+     * compartment after the content.
+     *
+     * @param eClass
+     * @param suffix
+     * @return
+     */
+    protected NodeDescription createContentNodeDescription(EClass eClass, Boolean isShared) {
+        String suffix = CONTENT_SUFFIX;
+        if (isShared) {
+            suffix = SHARED_SUFFIX + UNDERSCORE + CONTENT_SUFFIX;
+        }
+        NodeDescription contentNodeDescription = this.newNodeBuilder(eClass, this.getViewBuilder().createRectangularNodeStyle())//
+                .name(this.getIdBuilder().getSpecializedDomainNodeName(eClass, suffix)) //
+                .semanticCandidateExpression(this.getQueryBuilder().querySelf())//
+                .deleteTool(this.getViewBuilder().createNodeDeleteTool(eClass.getName())) //
+                .labelEditTool(this.getViewBuilder().createDirectEditTool(eClass.getName())) //
+                .synchronizationPolicy(SynchronizationPolicy.SYNCHRONIZED)//
+                .layoutStrategyDescription(DiagramFactory.eINSTANCE.createFreeFormLayoutStrategyDescription())//
+                .build();
+        return contentNodeDescription;
+    }
+
+    protected void copyDimension(NodeDescription holder, NodeDescription content) {
+        content.setDefaultHeightExpression(holder.getDefaultHeightExpression());
+        content.setDefaultWidthExpression(holder.getDefaultWidthExpression());
+        content.getStyle().setBorderRadius(holder.getStyle().getBorderRadius());
+    }
+
+    protected void allowSymbol(NodeDescription symbolOwnerDescription) {
+        if (symbolOwnerDescription.getInsideLabel() == null || symbolOwnerDescription.getInsideLabel().getStyle() == null) {
+            symbolOwnerDescription.setInsideLabel(this.getViewBuilder().createDefaultInsideLabelDescription(true, true));
+        }
+        symbolOwnerDescription.getInsideLabel().getStyle().setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.IF_CHILDREN);
+        symbolOwnerDescription.setChildrenLayoutStrategy(DiagramFactory.eINSTANCE.createListLayoutStrategyDescription());
     }
 
 }

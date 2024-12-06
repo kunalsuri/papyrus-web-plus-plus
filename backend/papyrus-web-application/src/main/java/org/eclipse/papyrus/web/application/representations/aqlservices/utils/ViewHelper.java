@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 190
+ *  Aurelien Didier (Artal Technologies) - Issue 190, 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.utils;
 
@@ -81,6 +81,20 @@ public class ViewHelper implements IViewHelper {
 
     private final Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions;
 
+    /**
+     * Instantiates a new view helper.
+     *
+     * @param objectService
+     *            the object service
+     * @param diagramOperationsService
+     *            the diagram operations service
+     * @param diagramContext
+     *            the diagram context
+     * @param diagramDescription
+     *            the diagram description
+     * @param capturedNodeDescriptions
+     *            the captured node descriptions
+     */
     public ViewHelper(IObjectService objectService, IDiagramOperationsService diagramOperationsService, IDiagramContext diagramContext, DiagramDescription diagramDescription,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         super();
@@ -120,11 +134,31 @@ public class ViewHelper implements IViewHelper {
 
     }
 
+    /**
+     * Creates the child view.
+     *
+     * @param self
+     *            the self
+     * @param selectedNode
+     *            the selected node
+     * @return true, if successful
+     */
     @Override
     public boolean createChildView(EObject self, org.eclipse.sirius.components.diagrams.Node selectedNode) {
         return this.createChildView(self, selectedNode, null);
     }
 
+    /**
+     * Creates the child view.
+     *
+     * @param self
+     *            the self
+     * @param selectedNode
+     *            the selected node
+     * @param mappingName
+     *            the mapping name
+     * @return true, if successful
+     */
     @Override
     public boolean createChildView(EObject self, Node selectedNode, String mappingName) {
         boolean result = false;
@@ -155,6 +189,17 @@ public class ViewHelper implements IViewHelper {
         return result;
     }
 
+    /**
+     * Creates the child view.
+     *
+     * @param self
+     *            the self
+     * @param possibleParent
+     *            the possible parent
+     * @param mappingName
+     *            the mapping name
+     * @return true, if successful
+     */
     @Override
     public boolean createChildView(EObject self, List<Node> possibleParent, String mappingName) {
         boolean result = false;
@@ -206,11 +251,27 @@ public class ViewHelper implements IViewHelper {
         return false;
     }
 
+    /**
+     * Creates the root view.
+     *
+     * @param self
+     *            the self
+     * @return true, if successful
+     */
     @Override
     public boolean createRootView(EObject self) {
         return this.createRootView(self, null);
     }
 
+    /**
+     * Creates the root view.
+     *
+     * @param self
+     *            the self
+     * @param mappingName
+     *            the mapping name
+     * @return true, if successful
+     */
     @Override
     public boolean createRootView(EObject self, String mappingName) {
         boolean result = false;
@@ -229,6 +290,17 @@ public class ViewHelper implements IViewHelper {
         return result;
     }
 
+    /**
+     * Creates the view.
+     *
+     * @param semanticElement
+     *            the semantic element
+     * @param selectedNode
+     *            the selected node
+     * @param newViewDescription
+     *            the new view description
+     * @return true, if successful
+     */
     @Override
     public boolean createView(EObject semanticElement, Node selectedNode, org.eclipse.sirius.components.view.diagram.NodeDescription newViewDescription) {
         if (newViewDescription != null) {
@@ -262,12 +334,28 @@ public class ViewHelper implements IViewHelper {
         return false;
     }
 
+    /**
+     * Delete the view.
+     *
+     * @param droppedNode
+     *            the dropped node
+     * @return true, if successful
+     */
     @Override
     public boolean deleteView(Node droppedNode) {
         this.diagramOperationsService.deleteView(this.diagramContext, droppedNode);
         return true;
     }
 
+    /**
+     * Creates the fake nodes.
+     *
+     * @param semanticElement
+     *            the semantic element
+     * @param selectedNode
+     *            the selected node
+     * @return the list
+     */
     @Override
     public List<Node> createFakeNodes(EObject semanticElement, Node selectedNode) {
         List<Node> fakeNodes = new ArrayList<>();
@@ -358,6 +446,32 @@ public class ViewHelper implements IViewHelper {
         return parentCheck && searchedSemanticElementID.equals(inspectedNode.getTargetObjectId()) && inspectedNode.getDescriptionId().equals(searchNodeDescription);
     }
 
+    /**
+     * Gets all the nodes.
+     *
+     * @param diagram
+     *            the diagram
+     * @return the list of all nodes
+     */
+    public static List<Node> getAllNodes(Diagram diagram) {
+        Set<Node> visitedNode = new HashSet<>();
+        List<Node> nodes = new ArrayList<>();
+        for (Node c : diagram.getNodes()) {
+            getAllNode(null, c, visitedNode, nodes);
+        }
+
+        return nodes;
+    }
+
+    private static void getAllNode(Node parent, Node node, Set<Node> visitedNode, List<Node> collector) {
+        if (!visitedNode.contains(node)) {
+            collector.add(node);
+            for (Node child : node.getChildNodes()) {
+                getAllNode(node, child, visitedNode, collector);
+            }
+        }
+    }
+
     private List<Node> getAllNode(Diagram diagram, BiPredicate<Node, Node> filter) {
         Set<Node> visitedNode = new HashSet<>();
         List<Node> nodes = new ArrayList<>();
@@ -410,12 +524,12 @@ public class ViewHelper implements IViewHelper {
             } else {
                 byDefault = candidates.get(0);
             }
-            if (candidates.size() > 1) {
+            if (candidates.size() > 1 && perfectCandidate.isEmpty()) {
                 LOGGER.info(
-                        MessageFormat.format("More than one candidate for children of type {0} on {1}. By default use the more specific type {2}", eClass.getName(), parentName, byDefault.getName()));
+                        MessageFormat.format("More than one candidate for children of type {0} on {1}. By default use the first one {2}", eClass.getName(), parentName,
+                                byDefault.getName()));
             }
             return byDefault;
-
         }
     }
 

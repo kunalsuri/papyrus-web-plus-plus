@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.communication;
 
@@ -28,6 +29,7 @@ import org.eclipse.papyrus.web.tools.test.EdgeDeletionTest;
 import org.eclipse.papyrus.web.tools.utils.CreationTool;
 import org.eclipse.papyrus.web.tools.utils.ToolSections;
 import org.eclipse.sirius.components.diagrams.Edge;
+import org.eclipse.sirius.components.diagrams.Node;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,7 +63,8 @@ public class CODSubNodeEdgeSemanticDeletionTest extends EdgeDeletionTest {
     @BeforeEach
     public void setUp() {
         this.setUpWithIntermediateRoot(ROOT_INTERACTION, UML.getInteraction());
-        this.createSourceAndTargetNodes(this.getDiagram().getNodes().get(0).getId(), new CreationTool(ToolSections.NODES, UML.getLifeline()));
+        Node rootContent = (Node) this.findGraphicalElementContentByLabel(ROOT_INTERACTION);
+        this.createSourceAndTargetNodes(rootContent.getId(), new CreationTool(ToolSections.NODES, UML.getLifeline()));
     }
 
     @Override

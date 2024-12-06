@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.profile;
 
@@ -19,6 +20,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.PRDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationSemanticChecker;
 import org.eclipse.papyrus.web.tools.profile.checker.PRDClassifierCreationGraphicalChecker;
@@ -131,11 +133,16 @@ public class PRDSubNodeCreationTest extends NodeCreationTest {
         NodeCreationGraphicalChecker graphicalChecker;
 
         if (UML.getEnumeration().isSuperTypeOf(expectedType)) {
-            graphicalChecker = new PRDEnumerationCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new PRDEnumerationCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
         } else if (UML.getClassifier().isSuperTypeOf(expectedType) && !UML.getPrimitiveType().isSuperTypeOf(expectedType)) {
-            graphicalChecker = new PRDClassifierCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new PRDClassifierCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        } else if (UML.getProfile().isSuperTypeOf(expectedType) || UML.getPackage().isSuperTypeOf(expectedType)) {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
         } else {
-            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
         }
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), expectedContainmentReference);
@@ -149,11 +156,13 @@ public class PRDSubNodeCreationTest extends NodeCreationTest {
         NodeCreationGraphicalChecker graphicalChecker;
 
         if (UML.getEnumeration().isSuperTypeOf(expectedType)) {
-            graphicalChecker = new PRDEnumerationCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PROFILE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new PRDEnumerationCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROFILE_CONTAINER), mappingType, this.getCapturedNodes());
         } else if (UML.getClassifier().isSuperTypeOf(expectedType) && !UML.getPrimitiveType().isSuperTypeOf(expectedType)) {
-            graphicalChecker = new PRDClassifierCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PROFILE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new PRDClassifierCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROFILE_CONTAINER), mappingType, this.getCapturedNodes());
+        } else if (UML.getProfile().isSuperTypeOf(expectedType) || UML.getPackage().isSuperTypeOf(expectedType)) {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROFILE_CONTAINER), mappingType, this.getCapturedNodes());
         } else {
-            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PROFILE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROFILE_CONTAINER), mappingType, this.getCapturedNodes());
         }
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PROFILE_CONTAINER), expectedContainmentReference);

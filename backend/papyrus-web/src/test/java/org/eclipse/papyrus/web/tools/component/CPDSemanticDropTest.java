@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.component;
 
@@ -20,6 +21,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.CPDDiagramDescriptionBuilder;
+import org.eclipse.papyrus.web.tools.checker.HolderCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.component.checker.CPDInterfaceCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.component.utils.CPDMappingTypes;
@@ -139,11 +141,21 @@ public class CPDSemanticDropTest extends SemanticDropTest {
         EObject parentElement = this.findSemanticElementByName(COMPONENT_CONTAINER);
         EObject elementToDrop = this.createSemanticElement(parentElement, containmentReference, elementType,
                 elementType.getName() + DROP_SUFFIX);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(COMPONENT_CONTAINER),
-                CPDMappingTypes.getMappingTypeAsSubNode(elementType),
-                this.getCapturedNodes());
-        this.semanticDropOnContainer(COMPONENT_CONTAINER, this.getObjectService().getId(elementToDrop),
-                graphicalChecker);
+        NodeCreationGraphicalChecker graphicalChecker;
+
+        if (UML.getPort().isSuperTypeOf(elementType)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER),
+                    CPDMappingTypes.getMappingTypeAsSubNode(elementType),
+                    this.getCapturedNodes());
+            this.semanticDropOnHolder(COMPONENT_CONTAINER, this.getObjectService().getId(elementToDrop),
+                    graphicalChecker);
+        } else {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER),
+                    CPDMappingTypes.getMappingTypeAsSubNode(elementType),
+                    this.getCapturedNodes());
+            this.semanticDropOnContent(COMPONENT_CONTAINER, this.getObjectService().getId(elementToDrop),
+                    graphicalChecker);
+        }
     }
 
     @ParameterizedTest
@@ -155,8 +167,11 @@ public class CPDSemanticDropTest extends SemanticDropTest {
         if (UML.getInterface().isSuperTypeOf(elementType)) {
             graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, null,
                     CPDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
-        } else {
+        } else if (UML.getComment().isSuperTypeOf(elementType) || UML.getConstraint().isSuperTypeOf(elementType)) {
             graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, null,
+                    CPDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
+        } else {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, null,
                     CPDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
         }
         this.semanticDropOnDiagram(this.getObjectService().getId(elementToDrop), graphicalChecker);
@@ -180,7 +195,7 @@ public class CPDSemanticDropTest extends SemanticDropTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.getSubNode(INTERFACE_CONTAINER, compartmentName),
                 CPDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
-        this.semanticDropOnContainerCompartment(INTERFACE_CONTAINER, compartmentName, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContentCompartment(INTERFACE_CONTAINER, compartmentName, this.getObjectService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -194,13 +209,17 @@ public class CPDSemanticDropTest extends SemanticDropTest {
                 elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker;
         if (UML.getInterface().isSuperTypeOf(elementType)) {
-            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(MODEL_CONTAINER),
+            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER),
+                    CPDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
+        } else if (UML.getComment().isSuperTypeOf(elementType) || UML.getConstraint().isSuperTypeOf(elementType)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER),
                     CPDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
         } else {
-            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(MODEL_CONTAINER), CPDMappingTypes.getMappingTypeAsSubNode(elementType),
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER),
+                    CPDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         }
-        this.semanticDropOnContainer(MODEL_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(MODEL_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -214,13 +233,17 @@ public class CPDSemanticDropTest extends SemanticDropTest {
                 elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker;
         if (UML.getInterface().isSuperTypeOf(elementType)) {
-            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER),
+            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER),
+                    CPDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
+        } else if (UML.getComment().isSuperTypeOf(elementType) || UML.getConstraint().isSuperTypeOf(elementType)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER),
                     CPDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
         } else {
-            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER), CPDMappingTypes.getMappingTypeAsSubNode(elementType),
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER),
+                    CPDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         }
-        this.semanticDropOnContainer(PACKAGE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest

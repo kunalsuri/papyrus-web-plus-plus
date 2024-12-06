@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,8 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *******************************************************************************/
+ *  Aurelien Didier (Artal Technologies) - Issue 229
+ *****************************************************************************/
 package org.eclipse.papyrus.web.utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -78,15 +79,30 @@ public final class SynchronizedFeatureEdgeTestHelper {
         }
     }
 
+    /**
+     * Update the diagram by creating source and target.
+     *
+     * @return the synchronized feature edge test helper
+     */
     public SynchronizedFeatureEdgeTestHelper updateDiagram() {
-        this.sourceNodeId = this.representationHelper.createNodeInDiagram(this.getSourceNodeDescriptionName(), this.source).getId();
-        this.targetNodeId = this.representationHelper.createNodeInDiagram(this.getTargetNodeDescriptionName(), this.target).getId();
-
+        if (this.representationHelper.getOptionalNodeDescriptionByName(this.getSourceNodeDescriptionName()).isPresent()) {
+            this.sourceNodeId = this.representationHelper.createNodeInDiagram(this.getSourceNodeDescriptionName(), this.source).getId();
+        } else {
+            this.sourceNodeId = this.representationHelper.createNodeInDiagram(this.getSourceNodeDescriptionName() + "_Holder", this.source).getId();
+        }
+        if (this.representationHelper.getOptionalNodeDescriptionByName(this.getTargetNodeDescriptionName()).isPresent()) {
+            this.targetNodeId = this.representationHelper.createNodeInDiagram(this.getTargetNodeDescriptionName(), this.target).getId();
+        } else {
+            this.targetNodeId = this.representationHelper.createNodeInDiagram(this.getTargetNodeDescriptionName() + "_Holder", this.target).getId();
+        }
         this.representationHelper.refresh();
 
         return this;
     }
 
+    /**
+     * Assert edge displayed on diagram.
+     */
     public void assertEdgeDisplayedOnDiagram() {
 
         Objects.requireNonNull(this.sourceNodeId, "No source node found. Did you update the diagram before assert");

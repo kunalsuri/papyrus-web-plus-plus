@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.profile;
 
@@ -20,6 +21,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.PRDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
 import org.eclipse.papyrus.web.tools.checker.DeletionGraphicalChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeGraphicalDeletionSemanticChecker;
 import org.eclipse.papyrus.web.tools.profile.checker.PRDClassifierDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.profile.checker.PRDEnumerationDeletionGraphicalChecker;
@@ -128,11 +130,18 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
         this.createOperationAndProperty(dataTypeContainer, DATA_TYPE_SUB_NODE_SUFFIX);
         Node enumerationContainer = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getEnumeration()), ENUMERATION_CONTAINER);
         this.createNodeWithLabel(enumerationContainer.getId(), new CreationTool(ToolSections.NODES, UML.getEnumerationLiteral()), ENUMERATION_LITERAL_SUB_NODE);
-        Node packageContainer = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getPackage()), PACKAGE_CONTAINER);
-        this.createPackageAndProfileSubNodes(packageContainer, PACKAGE_SUB_NODE_SUFFIX);
-        Node profileContainer = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getProfile()), PROFILE_CONTAINER);
-        this.createPackageAndProfileSubNodes(profileContainer, PROFILE_SUB_NODE_SUFFIX);
+
+        this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getPackage()), PACKAGE_CONTAINER);
+        Node packageContent = (Node) this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER);
+
+        this.createPackageAndProfileSubNodes(packageContent, PACKAGE_SUB_NODE_SUFFIX);
+
+        this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getProfile()), PROFILE_CONTAINER);
+        Node profileContent = (Node) this.findGraphicalElementContentByLabel(PROFILE_CONTAINER);
+
+        this.createPackageAndProfileSubNodes(profileContent, PROFILE_SUB_NODE_SUFFIX);
         Node stereotypeContainer = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getStereotype()), STEREOTYPE_CONTAINER);
+
         this.createOperationAndProperty(stereotypeContainer, STEREOTYPE_SUB_NODE_SUFFIX);
     }
 
@@ -165,11 +174,13 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
     public void testDeleteGraphicalNodeInPackage(EClass elementType, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker;
         if (UML.getEnumeration().isSuperTypeOf(elementType)) {
-            graphicalChecker = new PRDEnumerationDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER));
+            graphicalChecker = new PRDEnumerationDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PACKAGE_CONTAINER));
         } else if (UML.getClassifier().isSuperTypeOf(elementType) && !UML.getPrimitiveType().isSuperTypeOf(elementType)) {
-            graphicalChecker = new PRDClassifierDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER));
+            graphicalChecker = new PRDClassifierDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PACKAGE_CONTAINER));
+        } else if (UML.getProfile().isSuperTypeOf(elementType) || UML.getPackage().isSuperTypeOf(elementType)) {
+            graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PACKAGE_CONTAINER));
         } else {
-            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER));
+            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PACKAGE_CONTAINER));
         }
         NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), containmentReference);
@@ -181,11 +192,13 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
     public void testDeleteGraphicalNodeInProfile(EClass elementType, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker;
         if (UML.getEnumeration().isSuperTypeOf(elementType)) {
-            graphicalChecker = new PRDEnumerationDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PROFILE_CONTAINER));
+            graphicalChecker = new PRDEnumerationDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PROFILE_CONTAINER));
         } else if (UML.getClassifier().isSuperTypeOf(elementType) && !UML.getPrimitiveType().isSuperTypeOf(elementType)) {
-            graphicalChecker = new PRDClassifierDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PROFILE_CONTAINER));
+            graphicalChecker = new PRDClassifierDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PROFILE_CONTAINER));
+        } else if (UML.getPackage().isSuperTypeOf(elementType)) {
+            graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PROFILE_CONTAINER));
         } else {
-            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PROFILE_CONTAINER));
+            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PROFILE_CONTAINER));
         }
         NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PROFILE_CONTAINER), containmentReference);

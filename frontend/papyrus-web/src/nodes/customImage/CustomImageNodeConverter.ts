@@ -12,13 +12,14 @@
  *  Obeo - Initial API and implementation
  *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 218
  *****************************************************************************/
-
+//insipired by: sirius-web/packages/diagrams/frontend/sirius-components-diagrams/src/converter/ImageNodeConverter.ts
 import {
   BorderNodePosition,
   ConnectionHandle,
   GQLDiagram,
   GQLDiagramDescription,
   GQLEdge,
+  GQLHandleLayoutData,
   GQLNode,
   GQLNodeDescription,
   GQLNodeLayoutData,
@@ -59,7 +60,11 @@ const toCustomImageNode = (
     labelEditable,
   } = gqlNode;
 
-  const connectionHandles: ConnectionHandle[] = convertHandles(gqlNode, gqlEdges);
+  const handleLayoutData: GQLHandleLayoutData[] = gqlDiagram.layoutData.nodeLayoutData
+    .filter((nodeLayoutData) => nodeLayoutData.id === id)
+    .flatMap((nodeLayoutData) => nodeLayoutData.handleLayoutData);
+
+  const connectionHandles: ConnectionHandle[] = convertHandles(gqlNode.id, gqlEdges, handleLayoutData);
   const gqlNodeLayoutData: GQLNodeLayoutData | undefined = gqlDiagram.layoutData.nodeLayoutData.find(
     (nodeLayoutData) => nodeLayoutData.id === id
   );
@@ -91,6 +96,9 @@ const toCustomImageNode = (
     labelEditable,
     isNew,
     resizedByUser,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
+    borderBottomWidth: 5,
     isListChild: isListLayoutStrategy(gqlParentNode?.childrenLayoutStrategy),
     isDropNodeTarget: false,
     isDropNodeCandidate: false,
@@ -101,7 +109,8 @@ const toCustomImageNode = (
   data.insideLabel = convertInsideLabel(
     insideLabel,
     data,
-    `${style.borderSize}px ${style.borderStyle} ${style.borderColor}`
+    `${style.borderSize}px ${style.borderStyle} ${style.borderColor}`,
+    gqlNode.childNodes?.some((child) => child.state !== GQLViewModifier.Hidden)
   );
 
   const node: Node<CustomImageNodeData> = {
@@ -130,6 +139,9 @@ const toCustomImageNode = (
       width: `${node.width}px`,
       height: `${node.height}px`,
     };
+  } else {
+    node.height = data.defaultHeight;
+    node.width = data.defaultWidth;
   }
 
   return node;

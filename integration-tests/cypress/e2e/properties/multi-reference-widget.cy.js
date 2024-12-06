@@ -112,7 +112,7 @@ describe('Multi-valued reference widget tests', () => {
     // check instance is properly created
     cy.checkChildren('Activity', ['UseCase1']);
     // clear reference content
-    cy.getByTestId('Use case-clear').should('be.visible').click();
+    cy.getByTestId('Use case-clear').scrollIntoView().should('be.visible').click();
     // check reference no longer contains previous content
     cy.getByTestId('reference-value-UseCase1').should('not.exist');
     // check instance has not been removed

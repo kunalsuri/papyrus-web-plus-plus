@@ -71,6 +71,8 @@ public class Services {
 
     public static final String CREATE_SERVICE = "create";
 
+    public static final String CREATE_IN_HOLDER_SERVICE = "createInHolder";
+
     public static final String IS_NOT_VISUAL_DESCENDANT = "isNotVisualDescendant";
 
     public static final String REMOVE_VALUE_FROM = "removeValueFrom";

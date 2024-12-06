@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.deployment;
 
@@ -19,6 +20,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.DDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationSemanticChecker;
 import org.eclipse.papyrus.web.tools.deployment.utils.DDMappingTypes;
@@ -37,6 +39,8 @@ import org.junit.jupiter.params.provider.MethodSource;
  * @author <a href="mailto:gwendal.daniel@obeosoft.com">Gwendal Daniel</a>
  */
 public class DDSubNodeCreationTest extends NodeCreationTest {
+
+    private static final String DEPLOYMENT_SPECIFICATION = "DeploymentSpecification";
 
     private static final EReference PACKAGED_ELEMENT = UML.getPackage_PackagedElement();
 
@@ -121,8 +125,14 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
     @MethodSource("artifactChildrenParameters")
     public void testCreateNodeInArtifact(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = DDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(ARTIFACT_CONTAINER), mappingType,
-                this.getCapturedNodes());
+        NodeCreationGraphicalChecker graphicalChecker;
+        if (expectedType.isSuperTypeOf(UML.getArtifact())) {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ARTIFACT_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        } else {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ARTIFACT_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        }
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(ARTIFACT_CONTAINER), expectedContainmentReference);
         this.createSubNode(ARTIFACT_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
@@ -132,8 +142,15 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
     @MethodSource("deviceChildrenParameters")
     public void testCreateNodeInDevice(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = DDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(DEVICE_CONTAINER), mappingType,
-                this.getCapturedNodes());
+        NodeCreationGraphicalChecker graphicalChecker;
+        if (expectedType.isSuperTypeOf(UML.getDeploymentSpecification())) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(DEVICE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        } else {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(DEVICE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        }
+
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(DEVICE_CONTAINER), expectedContainmentReference);
         this.createSubNode(DEVICE_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
@@ -143,8 +160,15 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
     @MethodSource("executionEnvironmentChildrenParameters")
     public void testCreateNodeInExecutionEnvironment(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = DDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(EXECUTION_ENVIRONMENT_CONTAINER), mappingType,
-                this.getCapturedNodes());
+        NodeCreationGraphicalChecker graphicalChecker;
+        if (expectedType.getName().equals(DEPLOYMENT_SPECIFICATION)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(EXECUTION_ENVIRONMENT_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        } else {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(EXECUTION_ENVIRONMENT_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        }
+
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(EXECUTION_ENVIRONMENT_CONTAINER), expectedContainmentReference);
         this.createSubNode(EXECUTION_ENVIRONMENT_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
@@ -154,8 +178,13 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
     @MethodSource("modelAndPackageChildrenParameters")
     public void testCreateNodeInModel(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = DDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(MODEL_CONTAINER), mappingType,
-                this.getCapturedNodes());
+        NodeCreationGraphicalChecker graphicalChecker = switch (expectedType.getName()) {
+            case "Comment", "Constraint", DEPLOYMENT_SPECIFICATION -> new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+            default -> new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        };
+
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(MODEL_CONTAINER), expectedContainmentReference);
         this.createSubNode(MODEL_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
@@ -165,8 +194,16 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
     @MethodSource("nodeChildrenParameters")
     public void testCreateNodeInNode(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = DDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(NODE_CONTAINER), mappingType,
-                this.getCapturedNodes());
+
+        NodeCreationGraphicalChecker graphicalChecker;
+        if (expectedType.getName().equals(DEPLOYMENT_SPECIFICATION)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(NODE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        } else {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(NODE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        }
+
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(NODE_CONTAINER), expectedContainmentReference);
         this.createSubNode(NODE_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
@@ -176,8 +213,14 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
     @MethodSource("modelAndPackageChildrenParameters")
     public void testCreateNodeInPackage(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = DDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER), mappingType,
-                this.getCapturedNodes());
+
+        NodeCreationGraphicalChecker graphicalChecker = switch (expectedType.getName()) {
+            case "Comment", "Constraint", DEPLOYMENT_SPECIFICATION -> new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+            default -> new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        };
+
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), expectedContainmentReference);
         this.createSubNode(PACKAGE_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));

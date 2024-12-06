@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,8 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *******************************************************************************/
+ *  Aurelien Didier (Artal Technologies) - Issue 229
+ *****************************************************************************/
 package org.eclipse.papyrus.web.utils;
 
 import static java.util.stream.Collectors.joining;
@@ -240,6 +241,18 @@ public class DiagramTestHelper {
         Predicate<Node> parentNodePredicate = this.buildParentNodePredicate(navigator, parent.orElse(null));
         return this.getUniqueMatch(navigator, isMatchingSemantic, nodeDescriptionPredicate.and(parentNodePredicate));
 
+    }
+
+    /**
+     * Find a NodeDescription if it exists.
+     *
+     * @param nodeDescriptionName
+     *            the name of the description
+     * @return the NodeDescription as optional
+     */
+    public Optional<NodeDescription> getOptionalNodeDescriptionByName(String nodeDescriptionName) {
+        return this.viewDiagramDescriptionService.getNodeDescriptionByName(this.diagramDescription, nodeDescriptionName)//
+                .map(this::getConvertedNodeDescription);
     }
 
     private NodeDescription getNodeDescriptionByName(String nodeDescriptionName) {

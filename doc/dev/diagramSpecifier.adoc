@@ -56,6 +56,45 @@ Diagrams need to contain tool to allow the user to interact with them. A diagram
 
 In the following we detail how to create these tools in your diagram description.
 
+==== Symbol nodes
+
+Symbol can be displayed as a compartment on almost all nodes of Papyrus-web. For node that use a List layout strategy such as Class in class diagram, there is no need to adapt them, whereas, node using FreeForm layout strategy need to be splitted using the following architecture.
+
+
+image::symbol_on_class.png[Symbol on class, align="center"]
+image::symbol_on_model.png[Symbol on model, align="center"]
+
+===== Adding symbol
+
+====== On leaf nodes (nodes without other children than symbol)
+
+To add symbol on leaf nodes, simply call the allowSymbol(nodeDescription) on this node, this will initialize a label, with a style and the good LayoutStrategy and HeaderSeparatorDisplayMode.
+
+====== On list layout
+
+To add symbol on Node that already use a ListLayout strategy such as Class on class diagram. It is only needed to use the createSymbolSharedNodeDescription with the eClass contains is the symbolOwners list as follow: 
+[source, java]
+--
+List<EClass> symbolOwners = List.of(this.pack.getClass_());
+this.createSymbolSharedNodeDescription(diagramDescription, symbolOwners, forbiddenOwners, SYMBOLS_COMPARTMENT_SUFFIX);
+--
+
+====== On Freefrom layout strategy
+
+When the Node description use Freeform strategy, to add symbol on it, we must split it in two nodes.
+An Holder node description that has a child ListLayoutStrategyDescription strategy, and a Content. Then both content and symbol need to be added has child of the Holder. The Content node description should use Freeform strategy.
+
+[TIP]
+To simplify both holder and content node description naming, it is simplier to call the
+createContentNodeDescription, addContent and copyDimension define in AbstractRepresentationDescriptionBuilder.
+
+[source, java]
+--
+NodeDescription padModelContentTopNodeDescription = this.createContentNodeDescription(eClass, isShared);
+this.addContent(eClass, isShared, holderDescription, contentDescription, this.symbolNodeDescription);
+this.copyDimension(holderDescription, contentDescription);
+--
+
 ==== Creation tools
 
 The `ViewBuilder` class provides an utility method `createCreationTool` to create a Node creation tool. This method can either call the default creation process, or call a specific service if needed (e.g. if the creation is complex and requires some additional processing).

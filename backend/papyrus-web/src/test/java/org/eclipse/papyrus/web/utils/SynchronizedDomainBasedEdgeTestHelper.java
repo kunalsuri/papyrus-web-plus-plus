@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technolgies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,8 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *******************************************************************************/
+ *  Aurelien Didier (Artal Technologies) - Issue 229
+ *****************************************************************************/
 package org.eclipse.papyrus.web.utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -69,18 +70,24 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
 
     private String getSourceNodeDescriptionName() {
         if (this.sourceNodeDescriptionName == null) {
-            return this.idBuilder.getDomainNodeName(this.source.eClass());
-        } else {
-            return this.sourceNodeDescriptionName;
+            String sourceName = this.idBuilder.getDomainNodeName(this.source.eClass());
+            if (this.representationHelper.getOptionalNodeDescriptionByName(sourceName).isEmpty()) {
+                sourceName = this.idBuilder.getSpecializedDomainNodeName(this.source.eClass(), "Holder");
+            }
+            return sourceName;
         }
+        return this.sourceNodeDescriptionName;
     }
 
     private String getTargetNodeDescriptionName() {
         if (this.targetNodeDescriptionName == null) {
-            return this.idBuilder.getDomainNodeName(this.target.eClass());
-        } else {
-            return this.targetNodeDescriptionName;
+            String targetName = this.idBuilder.getDomainNodeName(this.target.eClass());
+            if (this.representationHelper.getOptionalNodeDescriptionByName(targetName).isEmpty()) {
+                targetName = this.idBuilder.getSpecializedDomainNodeName(this.target.eClass(), "Holder");
+            }
+            return targetName;
         }
+        return this.targetNodeDescriptionName;
     }
 
     private String getDomainBasedEdgeDescriptionName() {
@@ -91,6 +98,11 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
         }
     }
 
+    /**
+     * Update the diagram.
+     *
+     * @return the synchronized domain based edge test helper
+     */
     public SynchronizedDomainBasedEdgeTestHelper updateDiagram() {
         if (this.sourceNodeId == null) {
             this.sourceNodeId = this.representationHelper.createNodeInDiagram(this.getSourceNodeDescriptionName(), this.source).getId();
@@ -104,6 +116,11 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
         return this;
     }
 
+    /**
+     * Assert that the edge is displayed on diagram.
+     *
+     * @return the edge
+     */
     public Edge assertDisplayedOnDiagram() {
         Objects.requireNonNull(this.sourceNodeId, "No source node found. Did you update the diagram before assert");
         Objects.requireNonNull(this.targetNodeId, "No target node found. Did you update the diagram before assert");
@@ -116,6 +133,11 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
         return edge;
     }
 
+    /**
+     * Builder.
+     *
+     * @return the builder
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -147,16 +169,37 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
         private Builder() {
         }
 
+        /**
+         * Builder with id builder.
+         *
+         * @param idBuilder
+         *            the id builder
+         * @return the builder
+         */
         public Builder withIdBuilder(IdBuilder idBuilder) {
             this.idBuilder = idBuilder;
             return this;
         }
 
+        /**
+         * Builder with representation helper.
+         *
+         * @param representationHelper
+         *            the representation helper
+         * @return the builder
+         */
         public Builder withRepresentationHelper(DiagramTestHelper representationHelper) {
             this.representationHelper = representationHelper;
             return this;
         }
 
+        /**
+         * Builder with object service.
+         *
+         * @param objectService
+         *            the object service
+         * @return the builder
+         */
         public Builder withObjectService(IObjectService objectService) {
             this.objectService = objectService;
             return this;
@@ -212,16 +255,35 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
             return this;
         }
 
+        /**
+         * Builder for domain based edge.
+         *
+         * @param domainBasedEdge
+         *            the domain based edge
+         * @return the builder
+         */
         public Builder withDomainBasedEdge(EObject domainBasedEdge) {
             this.domainBasedEdge = domainBasedEdge;
             return this;
         }
 
+        /**
+         * Builder for domain based edge description name.
+         *
+         * @param domainBasedEdgeDescriptionName
+         *            the domain based edge description name
+         * @return the builder
+         */
         public Builder withDomainBasedEdgeDescriptionName(String domainBasedEdgeDescriptionName) {
             this.domainBasedEdgeDescriptionName = domainBasedEdgeDescriptionName;
             return this;
         }
 
+        /**
+         * Builds the test helper.
+         *
+         * @return the synchronized domain based edge test helper
+         */
         public SynchronizedDomainBasedEdgeTestHelper build() {
             Objects.requireNonNull(this.domainBasedEdge);
             Objects.requireNonNull(this.source);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,8 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *******************************************************************************/
+ *  Aurelien Didier (Artal Technologies) - Issue 229
+ *****************************************************************************/
 package org.eclipse.papyrus.web.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,10 +28,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.aqlservices.AbstractDiagramService;
 import org.eclipse.papyrus.web.application.representations.view.IdBuilder;
+import org.eclipse.papyrus.web.sirius.contributions.ViewDiagramDescriptionService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IObjectService;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.Node;
+import org.eclipse.sirius.components.diagrams.description.NodeDescription;
 
 /**
  * Test helper for domain base edge creation service.
@@ -114,21 +117,8 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
     }
 
     public SynchronizedDomainBasedEdgeCreationTestHelper emulateCreationTool() {
-        Node sourceNode;
-        if (this.sourceNodeId == null) {
-            sourceNode = this.representationHelper.createNodeInDiagram(this.getSourceNodeDescriptionName(), this.source);
-            this.sourceNodeId = sourceNode.getId();
-        } else {
-            sourceNode = this.representationHelper.assertUniqueNodeById(this.sourceNodeId);
-        }
-
-        Node targetNode;
-        if (this.targetNodeId == null) {
-            targetNode = this.representationHelper.createNodeInDiagram(this.getTargetNodeDescriptionName(), this.target);
-            this.targetNodeId = targetNode.getId();
-        } else {
-            targetNode = this.representationHelper.assertUniqueNodeById(this.targetNodeId);
-        }
+        Node sourceNode = this.getSourceNode();
+        Node targetNode = this.getTargetNode();
 
         Optional<Object> optSemanticSource = this.objectService.getObject(this.editingContext, sourceNode.getTargetObjectId());
         if (optSemanticSource.isEmpty()) {
@@ -154,6 +144,43 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
         });
 
         return this;
+    }
+
+    private Node getSourceNode() {
+        // Prevent calling creatIn in NodeDescription is not found first because is name is suffixed with Holder
+        Node sourceNode = null;
+        Optional<NodeDescription> optSourceNodeDescription;
+        if (this.sourceNodeId == null) {
+            optSourceNodeDescription = this.representationHelper.getOptionalNodeDescriptionByName(this.getSourceNodeDescriptionName());
+            if (optSourceNodeDescription.isPresent()) {
+                sourceNode = this.representationHelper.createNodeInDiagram(this.getSourceNodeDescriptionName(), this.source);
+
+            } else {
+                sourceNode = this.representationHelper.createNodeInDiagram(this.getSourceNodeDescriptionName() + "_Holder", this.source);
+            }
+        } else {
+            sourceNode = this.representationHelper.assertUniqueNodeById(this.sourceNodeId);
+        }
+        this.sourceNodeId = sourceNode.getId();
+        return sourceNode;
+    }
+
+    private Node getTargetNode() {
+        Node targetNode = null;
+        Optional<NodeDescription> optTargetNodeDescription;
+        // Prevent calling creatIn in NodeDescription is not found first because is name is suffixed with Holder
+        if (this.targetNodeId == null) {
+            optTargetNodeDescription = this.representationHelper.getOptionalNodeDescriptionByName(this.getTargetNodeDescriptionName());
+            if (optTargetNodeDescription.isPresent()) {
+                targetNode = this.representationHelper.createNodeInDiagram(this.getTargetNodeDescriptionName(), this.target);
+            } else {
+                targetNode = this.representationHelper.createNodeInDiagram(this.getTargetNodeDescriptionName() + "_Holder", this.target);
+            }
+        } else {
+            targetNode = this.representationHelper.assertUniqueNodeById(this.targetNodeId);
+        }
+        this.targetNodeId = targetNode.getId();
+        return targetNode;
     }
 
     public Edge assertEdgeCreation() {
@@ -183,6 +210,9 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
 
     // CHECKSTYLE:OFF Builder pattern
     public static final class Builder {
+
+        private ViewDiagramDescriptionService viewDiagramDescriptionService;
+
         private IdBuilder idBuilder;
 
         private DiagramTestHelper representationHelper;

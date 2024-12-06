@@ -110,7 +110,6 @@ export const NoteNode = memo(({ data, id, selected, dragging }: NodeProps<Node<N
   useRefreshConnectionHandles(id, data.connectionHandles);
 
   const borderOffset = data.style.borderWidth ? parseInt(data.style.borderWidth.toString()) / 2 : 0;
-
   return (
     <>
       {data.nodeDescription?.userResizable !== 'NONE' && !readOnly ? (

@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.test;
 
@@ -35,7 +36,7 @@ import org.eclipse.sirius.components.diagrams.Node;
  * Utility class to help the definition of semantic drop tool tests.
  * <p>
  * Concrete semantic drop tool tests can extend this class and reuse
- * {@link #semanticDropOnContainer(String, String, Checker)} to invoke the semantic drop tool and check the result.
+ * {@link #semanticDropOnContent(String, String, Checker)} to invoke the semantic drop tool and check the result.
  * </p>
  *
  * @author <a href="mailto:gwendal.daniel@obeosoft.com">Gwendal Daniel</a>
@@ -56,6 +57,8 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
      * The container label used to specify that an element is contained in the diagram.
      */
     protected static final String DIAGRAM_LABEL = "Diagram";
+
+    private static final String PARENT_ELEMENT_LABEL_CANNOT_BE_NULL = "parentElementLabel cannot be null";
 
     private static final String DROPPED_ELEMENT_IS_NULL_ERROR = "droppedElementId cannot be null";
 
@@ -150,7 +153,7 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
      *            the label of the container of the {@link Edge}
      * @param expectedMappingType
      *            the expected mapping type of the dropped {@link Edge}
-     * 
+     *
      * @see #edgeSemanticDropOnDiagram(CreationTool, CreationTool, CreationTool, String) to test the semantic drag &
      *      drop of an edge on the diagram
      */
@@ -162,8 +165,8 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
         this.createNodeInParentWithLabel(sourceContainerLabel, sourceCreationTool, sourceLabel);
         this.createNodeInParentWithLabel(targetContainerLabel, targetCreationTool, targetLabel);
         EdgeCreationGraphicalChecker edgeChecker = new EdgeCreationGraphicalChecker(this::getDiagram, null, expectedMappingType, this.getCapturedEdges());
-        EdgeSourceGraphicalChecker sourceChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementByLabel(sourceLabel));
-        EdgeTargetGraphicalChecker targetChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(targetLabel));
+        EdgeSourceGraphicalChecker sourceChecker = new EdgeSourceGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(sourceLabel));
+        EdgeTargetGraphicalChecker targetChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(targetLabel));
         Checker combinedChecker = new CombinedChecker(edgeChecker, sourceChecker, targetChecker);
 
         this.createEdge(sourceLabel, targetLabel, edgeCreationTool);
@@ -171,8 +174,8 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
         int initialNumberOfChildrenInSourceContainer = this.getChildCount(sourceContainerLabel);
         int initialNumberOfChildrenInTargetContainer = this.getChildCount(targetContainerLabel);
         Edge edge = this.getDiagram().getEdges().get(0);
-        Node sourceNode = (Node) this.findGraphicalElementByLabel(sourceLabel);
-        Node targetNode = (Node) this.findGraphicalElementByLabel(targetLabel);
+        Node sourceNode = (Node) this.findGraphicalElementExcludingContentByLabel(sourceLabel);
+        Node targetNode = (Node) this.findGraphicalElementExcludingContentByLabel(targetLabel);
         this.applyNodeGraphicalDeletionTool(sourceNode.getId());
         this.applyNodeGraphicalDeletionTool(targetNode.getId());
         // Ensure the nodes and the edge have been removed from the diagram
@@ -189,7 +192,7 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
         if (DIAGRAM_LABEL.equals(edgeContainerLabel)) {
             edgeContainerId = this.representationId;
         } else {
-            Node edgeContainer = (Node) this.findGraphicalElementByLabel(edgeContainerLabel);
+            Node edgeContainer = (Node) this.findGraphicalContentIfExistByLabel(edgeContainerLabel);
             edgeContainerId = edgeContainer.getId();
         }
 
@@ -207,7 +210,7 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
         if (DIAGRAM_LABEL.equals(parentLabel)) {
             this.createNodeWithLabel(this.representationId, nodeCreationTool, nodeLabel);
         } else {
-            Node sourceContainerNode = (Node) this.findGraphicalElementByLabel(parentLabel);
+            Node sourceContainerNode = (Node) this.findGraphicalContentIfExistByLabel(parentLabel);
             this.createNodeWithLabel(sourceContainerNode.getId(), nodeCreationTool, nodeLabel);
         }
     }
@@ -227,8 +230,9 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
         if (DIAGRAM_LABEL.equals(label)) {
             return this.getDiagram().getNodes().size();
         } else {
-            Node node = (Node) this.findGraphicalElementByLabel(label);
-            return node.getChildNodes().size() + node.getBorderNodes().size();
+            Node nodeHolder = (Node) this.findGraphicalElementExcludingContentByLabel(label);
+            Node nodeContent = (Node) this.findGraphicalElementContentByLabel(label);
+            return nodeContent.getChildNodes().size() + nodeHolder.getBorderNodes().size();
         }
     }
 
@@ -242,22 +246,64 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
      * @param checker
      *            the {@link Checker} to use to validate the operation
      */
-    protected void semanticDropOnContainer(String parentElementLabel, String droppedElementId, Checker checker) {
-        assertThat(parentElementLabel).as("parentElementLabel cannot be null").isNotNull();
+    protected void semanticDropOnContent(String parentElementLabel, String droppedElementId, Checker checker) {
+        assertThat(parentElementLabel).as(PARENT_ELEMENT_LABEL_CANNOT_BE_NULL).isNotNull();
         assertThat(droppedElementId).as(DROPPED_ELEMENT_IS_NULL_ERROR).isNotNull();
         assertThat(checker).as(CHECKER_IS_NULL_ERROR).isNotNull();
-        Node parentGraphicalElement = (Node) this.findGraphicalElementByLabel(parentElementLabel);
-        String targetElementId = parentGraphicalElement.getId();
-        int parentChildCount = parentGraphicalElement.getChildNodes().size();
+        Node parentGraphicalElement = (Node) this.findGraphicalElementExcludingContentByLabel(parentElementLabel);
+        Node parentContentGraphicalElement = (Node) this.findGraphicalElementContentByLabel(parentElementLabel);
         int parentBorderNodeCount = parentGraphicalElement.getBorderNodes().size();
+        if (parentContentGraphicalElement == null) {
+            parentContentGraphicalElement = parentGraphicalElement;
+        }
+        String targetElementId = parentContentGraphicalElement.getId();
+        int parentChildCount = parentContentGraphicalElement.getChildNodes().size();
         List<String> droppedElementUUIDs = List.of(droppedElementId);
+
         this.applyDropOnDiagramTool(targetElementId, droppedElementUUIDs);
-        Node parentNode = (Node) this.findGraphicalElementByLabel(parentElementLabel);
+        Node parentNode = (Node) this.findGraphicalElementExcludingContentByLabel(parentElementLabel);
+        Node parentContentNode = (Node) this.findGraphicalElementContentByLabel(parentElementLabel);
+        if (parentContentNode == null) {
+            parentContentNode = parentNode;
+        }
         Node createdNode = null;
-        if (parentNode.getChildNodes().size() > parentChildCount) {
-            createdNode = parentNode.getChildNodes().get(parentChildCount);
+        if (parentContentNode.getChildNodes().size() > parentChildCount) {
+            createdNode = parentContentNode.getChildNodes().get(parentChildCount);
         } else if (parentNode.getBorderNodes().size() > parentBorderNodeCount) {
             createdNode = parentNode.getBorderNodes().get(parentBorderNodeCount);
+        } else {
+            fail(MessageFormat.format("Cannot find the created node after the semantic drag & drop of {0} in {1}", droppedElementId, parentElementLabel));
+        }
+        checker.validateRepresentationElement(createdNode);
+    }
+
+    /**
+     * Drops the provided {@code droppedElementId} on the provided {@code parentElementLabel}.
+     *
+     * @param parentElementLabel
+     *            the label of the graphical element to drop onto
+     * @param droppedElementId
+     *            the semantic identifier of the element to drop
+     * @param checker
+     *            the {@link Checker} to use to validate the operation
+     */
+    protected void semanticDropOnHolder(String parentElementLabel, String droppedElementId, Checker checker) {
+        assertThat(parentElementLabel).as(PARENT_ELEMENT_LABEL_CANNOT_BE_NULL).isNotNull();
+        assertThat(droppedElementId).as(DROPPED_ELEMENT_IS_NULL_ERROR).isNotNull();
+        assertThat(checker).as(CHECKER_IS_NULL_ERROR).isNotNull();
+        Node parentHolderGraphicalElement = (Node) this.findGraphicalElementExcludingContentByLabel(parentElementLabel);
+        int parentBorderNodeCount = parentHolderGraphicalElement.getBorderNodes().size();
+        String targetElementId = parentHolderGraphicalElement.getId();
+        int parentChildCount = parentHolderGraphicalElement.getChildNodes().size();
+        List<String> droppedElementUUIDs = List.of(droppedElementId);
+        this.applyDropOnDiagramTool(targetElementId, droppedElementUUIDs);
+        Node parentHolderNode = (Node) this.findGraphicalElementExcludingContentByLabel(parentElementLabel);
+
+        Node createdNode = null;
+        if (parentHolderNode.getChildNodes().size() > parentChildCount) {
+            createdNode = parentHolderNode.getChildNodes().get(parentChildCount);
+        } else if (parentHolderNode.getBorderNodes().size() > parentBorderNodeCount) {
+            createdNode = parentHolderNode.getBorderNodes().get(parentBorderNodeCount);
         } else {
             fail(MessageFormat.format("Cannot find the created node after the semantic drag & drop of {0} in {1}", droppedElementId, parentElementLabel));
         }
@@ -277,8 +323,8 @@ public class SemanticDropTest extends AbstractPapyrusWebTest {
      * @param checker
      *            the {@link Checker} to use to validate the operation
      */
-    protected void semanticDropOnContainerCompartment(String parentElementLabel, String compartmentMapping, String droppedElementId, Checker checker) {
-        assertThat(parentElementLabel).as("parentElementLabel cannot be null").isNotNull();
+    protected void semanticDropOnContentCompartment(String parentElementLabel, String compartmentMapping, String droppedElementId, Checker checker) {
+        assertThat(parentElementLabel).as(PARENT_ELEMENT_LABEL_CANNOT_BE_NULL).isNotNull();
         assertThat(droppedElementId).as(DROPPED_ELEMENT_IS_NULL_ERROR).isNotNull();
         assertThat(checker).as(CHECKER_IS_NULL_ERROR).isNotNull();
         Node parentCompartmentNode = this.getSubNode(parentElementLabel, compartmentMapping);

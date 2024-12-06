@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.profile;
 
@@ -106,11 +107,11 @@ public class PRDEditLabelTest extends EditLabelTest {
     public void setUp() {
         super.setUp();
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getClass_()));
-        Node classNode = (Node) this.findGraphicalElementByLabel(CLASS);
+        Node classNode = (Node) this.findGraphicalElementExcludingContentByLabel(CLASS);
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getConstraint()));
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getDataType()));
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getEnumeration()));
-        Node enumerationNode = (Node) this.findGraphicalElementByLabel(ENUMERATION);
+        Node enumerationNode = (Node) this.findGraphicalElementExcludingContentByLabel(ENUMERATION);
         this.applyNodeCreationTool(enumerationNode.getId(), new CreationTool(ToolSections.NODES, UML.getEnumerationLiteral()));
         this.applyNodeCreationTool(classNode.getId(), new CreationTool(ToolSections.NODES, UML.getOperation()));
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getPackage()));

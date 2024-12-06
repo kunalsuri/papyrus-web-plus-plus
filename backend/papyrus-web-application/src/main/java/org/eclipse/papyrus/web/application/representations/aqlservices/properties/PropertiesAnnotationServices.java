@@ -10,25 +10,23 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 210, 218, 219, 227
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issues 210, 218, 219, 227, 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.properties;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.papyrus.web.application.representations.aqlservices.utils.ViewHelper;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.services.ObjectService;
-import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.ListLayoutStrategy;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.view.diagram.NodeDescription;
@@ -46,17 +44,34 @@ public class PropertiesAnnotationServices {
 
     private static final String SYMBOL = "Symbol";
 
+    private static final String CONTENT = "Content";
+
     private static final String SRC_PAPYRUS = "org.eclipse.papyrus";
 
     private final IViewDiagramDescriptionSearchService viewDiagramDescriptionSearchService;
 
     private final ObjectService objectService;
 
+    /**
+     * Instantiates a new properties annotation services.
+     *
+     * @param viewDiagramDescriptionSearchService
+     *            the view diagram description search service
+     * @param objectService
+     *            the object service
+     */
     public PropertiesAnnotationServices(IViewDiagramDescriptionSearchService viewDiagramDescriptionSearchService, ObjectService objectService) {
         this.viewDiagramDescriptionSearchService = Objects.requireNonNull(viewDiagramDescriptionSearchService);
         this.objectService = Objects.requireNonNull(objectService);
     }
 
+    /**
+     * Gets the symbol value.
+     *
+     * @param element
+     *            the element
+     * @return the symbol value
+     */
     public String getSymbolValue(Element element) {
         EAnnotation annotation = element.getEAnnotation(SRC_PAPYRUS);
         if (annotation != null) {
@@ -68,6 +83,15 @@ public class PropertiesAnnotationServices {
         return "";
     }
 
+    /**
+     * Creates or update the annotation.
+     *
+     * @param element
+     *            the element
+     * @param newUuid
+     *            the new uuid
+     * @return the object
+     */
     public EObject createOrUpdateAnnotation(Element element, String newUuid) {
         EAnnotation annotation = element.getEAnnotation(SRC_PAPYRUS);
         if (annotation == null) {
@@ -80,15 +104,24 @@ public class PropertiesAnnotationServices {
 
     }
 
+    /**
+     * Allow to select on which element we add the Symbol page.
+     *
+     * @param element
+     *            the element
+     * @return true if we want to display the page
+     */
     public boolean shouldDisplaySymbolPage(Element element) {
-
-        // Allowed owners
-
-        // Forbidden owners
-
         return true;
     }
 
+    /**
+     * Removes the symbol from annotation.
+     *
+     * @param element
+     *            the element
+     * @return the object
+     */
     public EObject removeSymbolFromAnnotation(Element element) {
         EAnnotation annotation = element.getEAnnotation(SRC_PAPYRUS);
         if (annotation != null) {
@@ -101,27 +134,17 @@ public class PropertiesAnnotationServices {
         return element;
     }
 
-    public List<Node> getAllNodes(Diagram diagram) {
-        Set<Node> visitedNode = new HashSet<>();
-        List<Node> nodes = new ArrayList<>();
-        for (Node c : diagram.getNodes()) {
-            this.getAllNode(null, c, visitedNode, nodes);
-        }
-
-        return nodes;
-    }
-
-    private void getAllNode(Node parent, Node node, Set<Node> visitedNode, List<Node> collector) {
-        if (!visitedNode.contains(node)) {
-            collector.add(node);
-            for (Node child : node.getChildNodes()) {
-                this.getAllNode(node, child, visitedNode, collector);
-            }
-        }
-    }
-
+    /**
+     * Gets the all the symbol nodes.
+     *
+     * @param diagramContext
+     *            the diagram context
+     * @param editionContext
+     *            the edition context
+     * @return the list of nodes that are symbol
+     */
     public List<Node> getAllSymbol(IDiagramContext diagramContext, IEditingContext editionContext) {
-        List<Node> nodes = this.getAllNodes(diagramContext.getDiagram());
+        List<Node> nodes = ViewHelper.getAllNodes(diagramContext.getDiagram());
         List<Node> result = new ArrayList<>();
 
         for (Node node : nodes) {
@@ -137,8 +160,17 @@ public class PropertiesAnnotationServices {
         return result;
     }
 
+    /**
+     * Gets all the nodes which are not symbol.
+     *
+     * @param diagramContext
+     *            the diagram context
+     * @param editionContext
+     *            the edition context
+     * @return the list of nodes that are not symbol
+     */
     public List<Node> getAllNonSymbol(IDiagramContext diagramContext, IEditingContext editionContext) {
-        List<Node> nodes = this.getAllNodes(diagramContext.getDiagram());
+        List<Node> nodes = ViewHelper.getAllNodes(diagramContext.getDiagram());
         List<Node> result = new ArrayList<>();
 
         for (Node node : nodes) {
@@ -151,7 +183,7 @@ public class PropertiesAnnotationServices {
 
                         Optional<Object> optSemanticElement = this.objectService.getObject(editionContext, semanticElementId);
                         if (optSemanticElement.get() instanceof Element elem) {
-                            if (!this.getSymbolValue(elem).equals("") && !childNodeDesc.getName().contains(SYMBOL)) {
+                            if (!this.getSymbolValue(elem).equals("") && !childNodeDesc.getName().contains(SYMBOL) && !childNodeDesc.getName().contains(CONTENT)) {
                                 result.add(child);
                             }
                         }
@@ -159,7 +191,6 @@ public class PropertiesAnnotationServices {
                 }
             }
         }
-
         return result;
     }
 }

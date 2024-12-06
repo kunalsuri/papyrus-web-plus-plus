@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.component;
 
@@ -99,12 +100,12 @@ public class CPDEditLabelTest extends EditLabelTest {
     public void setUp() {
         super.setUp();
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getComponent()));
-        Node componentNode = (Node) this.findGraphicalElementByLabel(COMPONENT);
+        Node componentNode = (Node) this.findGraphicalElementContentByLabel(COMPONENT);
         this.componentNodeId = componentNode.getId();
         this.applyNodeCreationTool(this.componentNodeId, new CreationTool(ToolSections.NODES, UML.getPort()));
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getConstraint()));
         this.applyNodeCreationTool(this.representationId, new CreationTool(ToolSections.NODES, UML.getInterface()));
-        Node interfaceNode = (Node) this.findGraphicalElementByLabel(INTERFACE);
+        Node interfaceNode = (Node) this.findGraphicalElementExcludingContentByLabel(INTERFACE);
         this.interfaceNodeId = interfaceNode.getId();
         this.applyNodeCreationTool(this.interfaceNodeId, new CreationTool(ToolSections.NODES, UML.getOperation()));
         this.applyNodeCreationTool(this.interfaceNodeId, new CreationTool(ToolSections.NODES, UML.getReception()));

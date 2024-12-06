@@ -21,6 +21,7 @@ import {
   GQLDiagram,
   GQLDiagramDescription,
   GQLEdge,
+  GQLHandleLayoutData,
   GQLNode,
   GQLNodeDescription,
   GQLNodeLayoutData,
@@ -30,13 +31,15 @@ import {
   INodeConverter,
   isListLayoutStrategy,
   NodeData,
+  defaultHeight,
+  defaultWidth,
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { Node, XYPosition } from '@xyflow/react';
 import { GQLPackageNodeStyle, PackageNodeListData } from './PackageNode.types';
 
 const defaultPosition: XYPosition = { x: 0, y: 0 };
 
-const toPackageListNode = (
+const toListNode = (
   gqlDiagram: GQLDiagram,
   gqlNode: GQLNode<GQLPackageNodeStyle>,
   gqlParentNode: GQLNode<GQLNodeStyle> | null,
@@ -58,7 +61,11 @@ const toPackageListNode = (
     labelEditable,
   } = gqlNode;
 
-  const connectionHandles: ConnectionHandle[] = convertHandles(gqlNode, gqlEdges);
+  const handleLayoutData: GQLHandleLayoutData[] = gqlDiagram.layoutData.nodeLayoutData
+    .filter((nodeLayoutData) => nodeLayoutData.id === id)
+    .flatMap((nodeLayoutData) => nodeLayoutData.handleLayoutData);
+
+  const connectionHandles: ConnectionHandle[] = convertHandles(gqlNode.id, gqlEdges, handleLayoutData);
   const gqlNodeLayoutData: GQLNodeLayoutData | undefined = gqlDiagram.layoutData.nodeLayoutData.find(
     (nodeLayoutData) => nodeLayoutData.id === id
   );
@@ -97,8 +104,11 @@ const toPackageListNode = (
     areChildNodesDraggable: isListLayoutStrategy(gqlNode.childrenLayoutStrategy)
       ? gqlNode.childrenLayoutStrategy.areChildNodesDraggable
       : true,
-    topGap: isListLayoutStrategy(gqlNode.childrenLayoutStrategy) ? gqlNode.childrenLayoutStrategy.topGap : 0,
-    bottomGap: isListLayoutStrategy(gqlNode.childrenLayoutStrategy) ? gqlNode.childrenLayoutStrategy.bottomGap : 0,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 10,
+    topGap: isListLayoutStrategy(gqlNode.childrenLayoutStrategy) ? gqlNode.childrenLayoutStrategy.topGap : 1,
+    bottomGap: isListLayoutStrategy(gqlNode.childrenLayoutStrategy) ? gqlNode.childrenLayoutStrategy.bottomGap : 1,
     isListChild: isListLayoutStrategy(gqlParentNode?.childrenLayoutStrategy),
     resizedByUser,
     growableNodeIds: isListLayoutStrategy(gqlNode.childrenLayoutStrategy)
@@ -112,13 +122,9 @@ const toPackageListNode = (
   data.insideLabel = convertInsideLabel(
     insideLabel,
     data,
-    `${style.borderSize}px ${style.borderStyle} ${style.borderColor}`
+    `${style.borderSize}px ${style.borderStyle} ${style.borderColor}`,
+    gqlNode.childNodes?.some((child) => child.state !== GQLViewModifier.Hidden)
   );
-
-  if (data.insideLabel) {
-    data.insideLabel.isHeader = true;
-    data.insideLabel.headerPosition = 'TOP';
-  }
 
   const node: Node<PackageNodeListData> = {
     id,
@@ -147,14 +153,14 @@ const toPackageListNode = (
       height: `${node.height}px`,
     };
   } else {
-    node.height = data.defaultHeight ?? 150;
-    node.width = data.defaultWidth ?? 70;
+    node.height = data.defaultHeight ?? defaultHeight;
+    node.width = data.defaultWidth ?? defaultWidth;
   }
 
   return node;
 };
 
-const adaptChildrenBorderNodes = (nodes: Node[], gqlChildrenNodes: GQLNode<GQLNodeStyle>[]): void => {
+const adaptChildrenBorderNodes = (nodes: Node<NodeData>[], gqlChildrenNodes: GQLNode<GQLNodeStyle>[]): void => {
   const visibleChildrenNodes = nodes
     .filter(
       (child) =>
@@ -174,7 +180,7 @@ const adaptChildrenBorderNodes = (nodes: Node[], gqlChildrenNodes: GQLNode<GQLNo
     if (index === visibleChildrenNodes.length - 1) {
       child.style = {
         ...child.style,
-        borderBottomWidth: '0',
+        borderBottomWidth: '10',
       };
     }
   });
@@ -192,13 +198,13 @@ export class PackageNodeListConverter implements INodeConverter {
     gqlEdges: GQLEdge[],
     parentNode: GQLNode<GQLNodeStyle> | null,
     isBorderNode: boolean,
-    nodes: Node[],
+    nodes: Node<NodeData>[],
     diagramDescription: GQLDiagramDescription,
     nodeDescriptions: GQLNodeDescription[]
   ) {
     const nodeDescription = nodeDescriptions.find((description) => description.id === gqlNode.descriptionId);
     if (nodeDescription) {
-      nodes.push(toPackageListNode(gqlDiagram, gqlNode, parentNode, nodeDescription, isBorderNode, gqlEdges));
+      nodes.push(toListNode(gqlDiagram, gqlNode, parentNode, nodeDescription, isBorderNode, gqlEdges));
     }
 
     const borderNodeDescriptions: GQLNodeDescription[] = (nodeDescription?.borderNodeDescriptionIds ?? []).flatMap(

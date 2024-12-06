@@ -31,7 +31,7 @@ describe('Custom Image tests', () => {
   });
 
   const testNoImage = () => {
-    cy.getByTestId(`custom-image-widget-no-image`).should('be.visible');
+    cy.getByTestId(`custom-image-widget-no-image`).scrollIntoView().should('be.visible');
   };
 
   it('Custom Image custom widget tests', () => {
@@ -46,7 +46,7 @@ describe('Custom Image tests', () => {
     // Select Symbol page
     cy.getByTestId('FunctionBehavior').should('be.visible').click();
     cy.getByTestId(`page-tab-Symbol`).click();
-    cy.getByTestId(`page-tab-Symbol`).should('have.class', 'Mui-selected');
+    cy.getByTestId(`page-tab-Symbol`).scrollIntoView().should('have.class', 'Mui-selected');
     // Upload the image
     testNoImage();
     cy.getByTestId('custom-image-widget-add').should('be.visible').click();
@@ -67,9 +67,9 @@ describe('Custom Image tests', () => {
     cy.getByTestId('FunctionBehavior').should('be.visible').click();
     cy.wait(250); // Make sure that the pages updates properly following the previous click
     cy.getByTestId(`page-tab-Symbol`).click();
-    cy.getByTestId(`page-tab-Symbol`).should('have.class', 'Mui-selected');
+    cy.getByTestId(`page-tab-Symbol`).scrollIntoView().should('have.class', 'Mui-selected');
     // Remove the image
-    cy.getByTestId('custom-image-widget-remove').should('be.visible').click();
+    cy.getByTestId('custom-image-widget-remove').scrollIntoView().should('be.visible').click();
     testNoImage();
     cy.getByTestId('org.eclipse.papyrus').should('not.exist');
   });

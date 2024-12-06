@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 210
+ *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 210, 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices;
 
@@ -625,6 +625,29 @@ public abstract class AbstractDiagramService {
     }
 
     /**
+     * Creates a new semantic element, initialize and create a view in the parent (supposed to be the holder).
+     *
+     * @param parent
+     *            the semantic parent
+     * @param type
+     *            the type of element to create
+     * @param referenceName
+     *            the name of the containment reference
+     * @param targetView
+     *            the view on which the creation has been requested (<code>null</code> if request on the diagram root)
+     * @param diagramContext
+     *            the {@link IDiagramContext}
+     * @param capturedNodeDescriptions
+     *            a map of all converted node descriptions of the current diagram description (
+     *            {@link org.eclipse.sirius.components.view.NodeDescription} -> {@link NodeDescription})
+     * @return a new instance or <code>null</code> if the creation failed
+     */
+    public EObject createInHolder(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
+            Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
+        return this.create(parent, type, referenceName, this.getParentNode(targetView, diagramContext.getDiagram()), diagramContext, capturedNodeDescriptions);
+    }
+
+    /**
      * Creates a new semantic element inside compartment, initialize and create a view.
      *
      * @param parent
@@ -995,8 +1018,8 @@ public abstract class AbstractDiagramService {
     public List<Node> getAllSymbol(DiagramContext diagramContext) {
         return diagramContext.getDiagram().getNodes();
     }
-    
-    /**   
+
+    /**
      * Create an {@link EAnnotation} and add it to the context.
      *
      * @param context
@@ -1023,4 +1046,21 @@ public abstract class AbstractDiagramService {
         return context;
     }
 
+    /**
+     * Get the parent node of the current one (or the diagram if no parent where found).
+     *
+     * @param current
+     *            the selected node
+     * @param diagram
+     *            the current diagram
+     * @return the parent node
+     */
+    public Node getParentNode(Node current, Diagram diagram) {
+        Optional<Node> oNode = ViewHelper.getAllNodes(diagram).stream().filter(t -> t.getChildNodes().contains(current)).findFirst();
+        if (oNode.isPresent()) {
+            return oNode.get();
+        } else {
+            return null;
+        }
+    }
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technolgies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -51,7 +52,7 @@ public class RepresentationValidatorTests {
 
         DiagramDescriptionDescriptionValidator validator = this.buildeDefaultValidator();
 
-        Predicate<DiagramElementDescription> isNotActivityRoot = p -> !p.getName().equals("AD_Activity");
+        Predicate<DiagramElementDescription> isNotActivityRoot = p -> !p.getName().equals("AD_Activity_Holder") || p.getName().equals("AD_Activity_Content");
         Predicate<DiagramElementDescription> isNotDecisionNodeNote = p -> !p.getName().equals("AD_DecisionNode_Note_SHARED");
         validator.excludeFromDeleteToolValidation(isNotActivityRoot.and(isNotDecisionNodeNote));
         validator.excludeFromDirectEditValidation(isNotDecisionNodeNote);
@@ -87,8 +88,10 @@ public class RepresentationValidatorTests {
 
         DiagramDescriptionDescriptionValidator validator = this.buildeDefaultValidator();
 
-        Predicate<DiagramElementDescription> isNotInteractionRoot = p -> !p.getName().equals("COD_Interaction");
+        Predicate<DiagramElementDescription> isNotInteractionRoot = p -> !p.getName().equals("COD_Interaction_Holder");
         validator.excludeFromDeleteToolValidation(isNotInteractionRoot);
+        validator.excludeFromDeleteToolValidation(isNotInteractionRoot);
+
         List<Status> validations = validator.validate(diagram);
 
         List<Status> errors = validations.stream().filter(v -> !v.isValid()).toList();
@@ -162,8 +165,9 @@ public class RepresentationValidatorTests {
 
     @Test
     public void validateProfileDiagram() {
-        Predicate<DiagramElementDescription> isNotMetaclassAndNotCompartment = p -> !p.getName().equals(PRDDiagramDescriptionBuilder.PRD_METACLASS)
-                && !p.getName().equals(PRDDiagramDescriptionBuilder.PRD_SHARED_METACLASS) && !p.getName().contains(IdBuilder.COMPARTMENT_NODE_SUFFIX);
+        Predicate<DiagramElementDescription> isNotMetaclassAndNotCompartment = p -> !p.getName()
+                .contains(PRDDiagramDescriptionBuilder.PRD_METACLASS)
+                && !p.getName().contains(IdBuilder.COMPARTMENT_NODE_SUFFIX);
         DiagramDescription diagram = new PRDDiagramDescriptionBuilder().createDiagramDescription(ViewFactory.eINSTANCE.createView());
 
         DiagramDescriptionDescriptionValidator validator = new DiagramDescriptionDescriptionValidator();

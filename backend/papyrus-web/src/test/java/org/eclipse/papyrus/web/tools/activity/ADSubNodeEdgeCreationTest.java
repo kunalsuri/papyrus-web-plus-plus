@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.activity;
 
@@ -162,19 +163,19 @@ public class ADSubNodeEdgeCreationTest extends EdgeCreationTest {
     @BeforeEach
     public void setUp() {
         this.setUpWithIntermediateRoot(ROOT_ACTIVITY, UML.getActivity());
-        String rootActivityId = this.getDiagram().getNodes().get(0).getId();
+        String rootActivityId = this.findGraphicalElementContentByLabel(ROOT_ACTIVITY).getId();
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getActivityFinalNode()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.NODES, UML.getActivityParameterNode()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.INVOCATION_ACTION, UML.getCallBehaviorAction()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getDecisionNode()));
         this.createNodeWithLabel(rootActivityId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionRegion()), EXPANSION_REGION_CONTAINER);
-        String expansionRegionContainerId = this.findGraphicalElementByLabel(EXPANSION_REGION_CONTAINER).getId();
+        String expansionRegionContainerId = this.findGraphicalElementContentByLabel(EXPANSION_REGION_CONTAINER).getId();
         this.createSourceAndTargetNodes(expansionRegionContainerId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionNode()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getFlowFinalNode()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getForkNode()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getInitialNode()));
         this.createNodeWithLabel(rootActivityId, new ADCreationTool(ADToolSections.EXECUTABLE_NODE, UML.getOpaqueAction()), OPAQUE_ACTION_CONTAINER);
-        String opaqueActionContainerId = this.findGraphicalElementByLabel(OPAQUE_ACTION_CONTAINER).getId();
+        String opaqueActionContainerId = this.findGraphicalElementExcludingContentByLabel(OPAQUE_ACTION_CONTAINER).getId();
         this.createSourceAndTargetNodes(opaqueActionContainerId, new ADCreationTool(ADToolSections.PIN, UML.getInputPin()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getJoinNode()));
         this.createSourceAndTargetNodes(rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getMergeNode()));
@@ -196,7 +197,7 @@ public class ADSubNodeEdgeCreationTest extends EdgeCreationTest {
     private void setIsControlType(List<String> elementLabels) {
         EditingContext editingContext = (EditingContext) this.getEditingContext();
         for (String elementLabel : elementLabels) {
-            String semanticTargetId = ((Node) this.findGraphicalElementByLabel(elementLabel)).getTargetObjectId();
+            String semanticTargetId = ((Node) this.findGraphicalElementExcludingContentByLabel(elementLabel)).getTargetObjectId();
             ObjectNode objectNode = (ObjectNode) this.getObjectService().getObject(editingContext, semanticTargetId).get();
             objectNode.setIsControlType(true);
         }
@@ -225,7 +226,6 @@ public class ADSubNodeEdgeCreationTest extends EdgeCreationTest {
             semanticChecker = new EdgeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, UML.getControlFlow(), expectedSemanticOwnerSupplier, UML.getActivity_Edge());
         }
         this.createEdge(sourceElementLabel, targetElementLabel, new ADCreationTool(ADToolSections.EDGES, UML.getControlFlow()), new CombinedChecker(graphicalChecker, semanticChecker));
-
     }
 
     @ParameterizedTest

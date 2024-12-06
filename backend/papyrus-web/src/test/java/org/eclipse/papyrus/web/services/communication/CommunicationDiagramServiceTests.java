@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.communication;
 
@@ -54,6 +55,12 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @WebAppConfiguration
 public class CommunicationDiagramServiceTests extends AbstractDiagramTest {
+    /**
+     *
+     */
+    private static final String HOLDER_SUFFIX = "_Holder";
+
+    private static final String CONTENT_SUFFIX = "_Content";
 
     private static final IdBuilder ID_BUILDER = new IdBuilder(CODDiagramDescriptionBuilder.COD_PREFIX, new UMLMetamodelHelper());
 
@@ -219,7 +226,7 @@ public class CommunicationDiagramServiceTests extends AbstractDiagramTest {
         this.init();
 
         // check that the Interaction node is created
-        Node interactionNode = this.getDiagramHelper().assertGetUniqueMatchingNode(COD_INTERACTION_NODE_NAME, this.interaction);
+        Node interactionNode = this.getDiagramHelper().assertGetUniqueMatchingNode(COD_INTERACTION_NODE_NAME + HOLDER_SUFFIX, this.interaction);
         assertNotNull("The Interaction node should be created at the diagram refresh because it is synchronized", interactionNode);
 
     }
@@ -233,12 +240,13 @@ public class CommunicationDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateMessage() {
         this.init();
-        Node rootInteractionNode = this.getDiagramHelper().assertGetUniqueMatchingNode(COD_INTERACTION_NODE_NAME, this.interaction);
+        this.getDiagramHelper().assertGetUniqueMatchingNode(COD_INTERACTION_NODE_NAME + HOLDER_SUFFIX, this.interaction);
+        Node rootInteractionNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(COD_INTERACTION_NODE_NAME + CONTENT_SUFFIX, this.interaction);
 
         Lifeline sourceLifeline = this.createIn(Lifeline.class, this.interaction);
         Lifeline targetLifeline = this.createIn(Lifeline.class, this.interaction);
-        Node sourceLifelineNode = this.getDiagramHelper().createNodeInParent(COD_LIFELINE, sourceLifeline, rootInteractionNode);
-        Node targetLifelineNode = this.getDiagramHelper().createNodeInParent(COD_LIFELINE, targetLifeline, rootInteractionNode);
+        Node sourceLifelineNode = this.getDiagramHelper().createNodeInParent(COD_LIFELINE, sourceLifeline, rootInteractionNodeContent);
+        Node targetLifelineNode = this.getDiagramHelper().createNodeInParent(COD_LIFELINE, targetLifeline, rootInteractionNodeContent);
 
         this.getServiceTester().buildSynchronizedDomainBasedEdgeCreationTestHelper(ID_BUILDER);
 

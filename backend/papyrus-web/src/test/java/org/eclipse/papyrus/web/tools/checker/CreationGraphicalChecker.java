@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.checker;
 
@@ -37,6 +38,16 @@ import org.eclipse.sirius.components.diagrams.Node;
  */
 public abstract class CreationGraphicalChecker implements Checker {
 
+    /**
+     *
+     */
+    private static final String GRAPHICAL_OWNER_ERROR_MSG = "Graphical owner doesn't contain element ";
+
+    /**
+     *
+     */
+    private static final String MORE_ELEMENT = " more element";
+
     protected Supplier<Diagram> diagramSupplier;
 
     protected Supplier<IDiagramElement> graphicalOwnerSupplier;
@@ -48,6 +59,8 @@ public abstract class CreationGraphicalChecker implements Checker {
     protected int diagramDirectChildCount;
 
     protected int graphicalOwnerChildCount;
+
+    protected int graphicalParentBorderedChildCount;
 
     /**
      * Initializes the checker with the provided parameters.
@@ -67,6 +80,7 @@ public abstract class CreationGraphicalChecker implements Checker {
         this.diagramAllChildCount = this.getDiagramSize(diagram);
         this.diagramDirectChildCount = diagram.getNodes().size() + diagram.getEdges().size();
         this.graphicalOwnerChildCount = this.getGraphicalElementChildCount(graphicalOwnerSupplier).orElse(this.diagramDirectChildCount);
+        this.graphicalParentBorderedChildCount = this.getGraphicalParentBorderedCount(graphicalOwnerSupplier).orElse(0);
     }
 
     @Override
@@ -90,17 +104,43 @@ public abstract class CreationGraphicalChecker implements Checker {
     protected void checkNumberOfCreatedElement(final IDiagramElement element) {
         Diagram diagram = this.diagramSupplier.get();
         int newDiagramAllNodesCount = this.getDiagramSize(diagram);
-        assertThat(newDiagramAllNodesCount).as("The diagram should contain " + this.getExpectedNumberOfCreatedElements() + " more element")
+        // count diagram elements
+        assertThat(newDiagramAllNodesCount).as("The diagram should contain " + this.getExpectedNumberOfCreatedElements() + MORE_ELEMENT)
                 .isEqualTo(this.diagramAllChildCount + this.getExpectedNumberOfCreatedElements());
 
         int newGraphicalOwnerChildCount = this.getGraphicalElementChildCount(this.graphicalOwnerSupplier)
                 .orElse(this.diagramSupplier.get().getNodes().size() + this.diagramSupplier.get().getEdges().size());
-        assertThat(newGraphicalOwnerChildCount).as("The graphical container should contain " + this.getExpectedNumberOfCreatedElements() + " more element")
-                .isEqualTo(this.graphicalOwnerChildCount + this.getExpectedNumberOfGraphicalOwnerDirectChildren());
 
+        int newHolderBorderedNodeCount = this.getGraphicalParentBorderedCount(this.graphicalOwnerSupplier).orElse(0);
+        // count nodes child
+        if (element instanceof Node && ((Node) element).isBorderNode()) {
+            // when there is no Holder, it doesn't work.
+            assertThat(newHolderBorderedNodeCount).as("The graphical container should contain " + this.getExpectedNumberOfCreatedElements() + MORE_ELEMENT)
+                    .isEqualTo(this.graphicalParentBorderedChildCount + this.getExpectedNumberOfGraphicalOwnerDirectChildren());
+        } else {
+            assertThat(newGraphicalOwnerChildCount + newHolderBorderedNodeCount).as("The graphical container should contain " + this.getExpectedNumberOfCreatedElements() + MORE_ELEMENT)
+                    .isEqualTo(this.graphicalOwnerChildCount
+                            // + this.graphicalParentBorderedChildCount
+                            + this.getExpectedNumberOfGraphicalOwnerDirectChildren());
+        }
         if (element instanceof Node node) {
             List<Node> graphicalOwnerChildren = this.getGraphicalElementChildNodes(this.graphicalOwnerSupplier).orElse(this.diagramSupplier.get().getNodes());
-            assertThat(graphicalOwnerChildren.stream().map(Node::getId)).as("Graphical owner doesn't contain element " + element.getId()).anyMatch(childId -> Objects.equals(childId, element.getId()));
+            // if (((Node) element).isBorderNode()) {
+            // List<Node> graphicalParentBorderedNode =
+            // this.getGraphicalParentBorderedNodes(this.graphicalOwnerSupplier).orElse(this.diagramSupplier.get().getNodes());
+            // assertThat(graphicalParentBorderedNode.stream().map(Node::getId)).as(GRAPHICAL_OWNER_ERROR_MSG +
+            // element.getId())
+            // .anyMatch(childId -> Objects.equals(childId, element.getId()));
+            // } else
+            if (graphicalOwnerChildren.isEmpty()) {
+                List<Node> graphicalParentBorderedNode = this.getGraphicalParentBorderedNodes(this.graphicalOwnerSupplier).orElse(this.diagramSupplier.get().getNodes());
+                assertThat(graphicalParentBorderedNode.stream().map(Node::getId)).as(GRAPHICAL_OWNER_ERROR_MSG + element.getId())
+                        .anyMatch(childId -> Objects.equals(childId, element.getId()));
+
+            } else {
+                assertThat(graphicalOwnerChildren.stream().map(Node::getId)).as(GRAPHICAL_OWNER_ERROR_MSG + element.getId())
+                        .anyMatch(childId -> Objects.equals(childId, element.getId()));
+            }
         } else if (element instanceof Edge edge) {
             List<Edge> edges = this.diagramSupplier.get().getEdges();
             assertThat(edges.stream().map(Edge::getId)).as("Diagram owner doesn't contain element " + element.getId()).anyMatch(edgeId -> Objects.equals(edgeId, element.getId()));
@@ -186,7 +226,26 @@ public abstract class CreationGraphicalChecker implements Checker {
      * @return the number of direct children of the provided {@code elementSupplier}
      */
     private Optional<Integer> getGraphicalElementChildCount(Supplier<IDiagramElement> elementSupplier) {
-        return this.getGraphicalElementChildNodes(elementSupplier).map(List::size).map(Optional::of).orElse(Optional.empty());
+        Optional<Integer> result = Optional.empty();
+        if (elementSupplier != null && elementSupplier.get() instanceof Node graphicalElement) {
+            result = Optional.of(graphicalElement.getChildNodes().size() + graphicalElement.getBorderNodes().size());
+        }
+        return result;
+    }
+
+    /**
+     * Counts the number of direct children of the provided {@code elementSupplier}.
+     * <p>
+     * This method gets the {@link IDiagramElement} from the provided supplier every time it is called. This ensures
+     * that the latest version of the {@link IDiagramElement} is manipulated. This is specially useful for graphical
+     * elements that are updated by the test, and need to be reloaded to check their new state.
+     *
+     * @param elementSupplier
+     *            the supplier of {@link IDiagramElement}
+     * @return the number of direct children of the provided {@code elementSupplier}
+     */
+    private Optional<Integer> getGraphicalParentBorderedCount(Supplier<IDiagramElement> elementSupplier) {
+        return this.getGraphicalParentBorderedNodes(elementSupplier).map(List::size).map(Optional::of).orElse(Optional.empty());
     }
 
     /**
@@ -206,6 +265,53 @@ public abstract class CreationGraphicalChecker implements Checker {
             List<Node> allChilds = new ArrayList<>(graphicalElement.getChildNodes());
             allChilds.addAll(graphicalElement.getBorderNodes());
             result = Optional.of(allChilds);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the direct child nodes of the provided {@code elementSupplier}.
+     * <p>
+     * This method gets the {@link IDiagramElement} from the provided supplier every time is it called. This ensures
+     * that the latest version of the {@link IDiagramElement} is manipulated. This is specially useful for graphical
+     * elements that are updated by the test, and need to be reloaded to check their new state.
+     *
+     * @param elementSupplier
+     *            the supplier of {@link IDiagramElement}
+     * @return the direct child nodes of the provided {@code elementSupplier}
+     */
+    private Optional<List<Node>> getGraphicalParentBorderedNodes(Supplier<IDiagramElement> elementSupplier) {
+        Optional<List<Node>> result = Optional.empty();
+        Diagram diagram = this.diagramSupplier.get();
+        if (elementSupplier != null && elementSupplier.get() instanceof Node graphicalElement) {
+            Optional<Node> parent = this.getAllNodeAndSubNodes(diagram).stream().filter(node -> node.getTargetObjectId().equals(graphicalElement.getTargetObjectId())).findFirst();
+            if (parent.isPresent()) {
+                List<Node> allBorderedNodes = new ArrayList<>(parent.get().getBorderNodes());
+                result = Optional.of(allBorderedNodes);
+            }
+        }
+        return result;
+    }
+
+    private List<Node> getAllNodeAndSubNodes(Diagram diagram) {
+        return this.getSubNodes(diagram.getNodes());
+    }
+
+    /**
+     * @param nodes
+     * @return
+     */
+    private List<Node> getSubNodes(List<Node> nodes) {
+        List<Node> result = new ArrayList<>(nodes);
+        for (Node node : nodes) {
+            for (Node child : node.getChildNodes()) {
+                // result.add(child);
+                result.addAll(this.getSubNodes(List.of(child)));
+            }
+            for (Node child : node.getBorderNodes()) {
+                // result.add(child);
+                result.addAll(this.getSubNodes(List.of(child)));
+            }
         }
         return result;
     }

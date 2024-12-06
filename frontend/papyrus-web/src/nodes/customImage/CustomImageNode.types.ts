@@ -13,6 +13,8 @@
  *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 218
  *****************************************************************************/
 import { GQLNodeStyle, NodeData } from '@eclipse-sirius/sirius-components-diagrams';
+import { Node, NodeProps } from '@xyflow/react';
+import { FC } from 'react';
 
 export interface CustomImageNodeData extends NodeData {
   shape: string;
@@ -25,3 +27,11 @@ export interface GQLCustomImageNodeStyle extends GQLNodeStyle {
   borderStyle: string;
   borderSize: string;
 }
+
+export interface NodeDataMap {
+  customImageNode: CustomImageNodeData;
+}
+
+export type NodeComponentsMap = {
+  [K in keyof NodeDataMap]: FC<NodeProps<Node<NodeDataMap[K], K>>>;
+};

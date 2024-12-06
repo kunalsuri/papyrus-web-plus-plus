@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.activity;
 
@@ -24,8 +25,8 @@ import org.eclipse.papyrus.web.tools.activity.utils.ADCreationTool;
 import org.eclipse.papyrus.web.tools.activity.utils.ADMappingTypes;
 import org.eclipse.papyrus.web.tools.activity.utils.ADToolSections;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderNodeGraphicalDnDGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationSemanticChecker;
-import org.eclipse.papyrus.web.tools.checker.NodeGraphicalDnDGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeSemanticDeletionSemanticChecker;
 import org.eclipse.papyrus.web.tools.test.GraphicalDropTest;
 import org.eclipse.papyrus.web.tools.utils.CreationTool;
@@ -368,7 +369,7 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @BeforeEach
     public void setUp() {
         this.setUpWithIntermediateRoot(ROOT_ACTIVITY, UML.getActivity());
-        this.rootActivityId = this.getDiagram().getNodes().get(0).getId();
+        this.rootActivityId = this.findGraphicalElementContentByLabel(ROOT_ACTIVITY).getId();
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivity()), ACTIVITY_LABEL);
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivityPartition()), ACTIVITY_PARTITION_LABEL);
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getConditionalNode()), CONDITIONAL_NODE_LABEL);
@@ -399,7 +400,7 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         } else {
             nodeToDrop = this.createNodeWithLabel(this.rootActivityId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
         }
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(ACTIVITY_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ACTIVITY_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(ACTIVITY_LABEL), containmentReference);
@@ -413,10 +414,13 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("activityPartitionDropParameters")
     public void testDropOnActivityPartition(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node parentActivityPartitionNode = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivityPartition()),
+        this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivityPartition()),
                 ACTIVITY_PARTITION_SOURCE_LABEL);
+        Node parentActivityPartitionNode = (Node) this.findGraphicalElementContentByLabel(ACTIVITY_PARTITION_SOURCE_LABEL);
+
         Node nodeToDrop = this.createNodeWithLabel(parentActivityPartitionNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(ACTIVITY_PARTITION_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
+                () -> this.findGraphicalElementContentByLabel(ACTIVITY_PARTITION_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
 
         final String semanticOwnerLabel;
@@ -436,10 +440,13 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("conditionalNodeDropParameters")
     public void testDropOnConditionalNode(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node parentConditionalNode = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getConditionalNode()),
+        this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getConditionalNode()),
                 CONDITIONAL_NODE_SOURCE_LABEL);
+        Node parentConditionalNode = (Node) this.findGraphicalElementContentByLabel(CONDITIONAL_NODE_SOURCE_LABEL);
+
         Node nodeToDrop = this.createNodeWithLabel(parentConditionalNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(CONDITIONAL_NODE_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
+                () -> this.findGraphicalElementContentByLabel(CONDITIONAL_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(CONDITIONAL_NODE_LABEL), containmentReference);
@@ -452,10 +459,13 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("expansionRegionDropParameters")
     public void testDropOnExpansionRegion(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node parentExpansionRegionNode = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionRegion()),
+        this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionRegion()),
                 EXPANSION_REGION_SOURCE_LABEL);
+        Node parentExpansionRegionNode = (Node) this.findGraphicalElementContentByLabel(EXPANSION_REGION_SOURCE_LABEL);
+
         Node nodeToDrop = this.createNodeWithLabel(parentExpansionRegionNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(EXPANSION_REGION_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
+                () -> this.findGraphicalElementContentByLabel(EXPANSION_REGION_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(EXPANSION_REGION_LABEL), containmentReference);
@@ -468,13 +478,16 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("interruptibleActivityRegionDropParameters")
     public void testDropOnInterruptibleActivityRegion(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node parentInterruptibleActivityRegionNode = this.createNode(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getInterruptibleActivityRegion()));
+        Node parentInterruptibleActivityRegionNodeHolder = this.createNode(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getInterruptibleActivityRegion()));
+        Node parentInterruptibleActivityRegionNode = this.getSubNode(parentInterruptibleActivityRegionNodeHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getInterruptibleActivityRegion()));
+
         Object parentObject = this.getObjectService().getObject(this.getEditingContext(), parentInterruptibleActivityRegionNode.getTargetObjectId()).orElse(null);
         if (parentObject instanceof InterruptibleActivityRegion parentInterruptibleActivityRegion) {
             parentInterruptibleActivityRegion.setName(INTERRUPTIBLE_ACTIVITY_REGION_SOURCE_LABEL);
         }
         Node nodeToDrop = this.createNodeWithLabel(parentInterruptibleActivityRegionNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(INTERRUPTIBLE_ACTIVITY_REGION_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
+                () -> this.findGraphicalElementContentByLabel(INTERRUPTIBLE_ACTIVITY_REGION_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
 
         final String semanticOwnerLabel;
@@ -494,10 +507,12 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("loopNodeAndStructuredActivityNodeDropParameters")
     public void testDropOnLoopNode(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node parentLoopNode = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getLoopNode()),
+        this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getLoopNode()),
                 LOOP_NODE_SOURCE_LABEL);
+        Node parentLoopNode = (Node) this.findGraphicalElementContentByLabel(LOOP_NODE_SOURCE_LABEL);
+
         Node nodeToDrop = this.createNodeWithLabel(parentLoopNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(LOOP_NODE_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(LOOP_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(LOOP_NODE_LABEL), containmentReference);
@@ -510,10 +525,13 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("sequenceNodeDropParameters")
     public void testDropOnSequenceNode(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node parentSequenceNode = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getSequenceNode()),
+        this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getSequenceNode()),
                 SEQUENCE_NODE_SOURCE_LABEL);
+        Node parentSequenceNode = (Node) this.findGraphicalElementContentByLabel(SEQUENCE_NODE_SOURCE_LABEL);
+
         Node nodeToDrop = this.createNodeWithLabel(parentSequenceNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(SEQUENCE_NODE_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
+                () -> this.findGraphicalElementContentByLabel(SEQUENCE_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(SEQUENCE_NODE_LABEL), containmentReference);
@@ -526,10 +544,12 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
     @ParameterizedTest
     @MethodSource("loopNodeAndStructuredActivityNodeDropParameters")
     public void testDropOnStructuredActivityNode(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node parentLoopNode = this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getStructuredActivityNode()),
+        this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getStructuredActivityNode()),
                 STRUCTURED_ACTIVITY_NODE_SOURCE_LABEL);
+        Node parentLoopNode = (Node) this.findGraphicalElementContentByLabel(STRUCTURED_ACTIVITY_NODE_SOURCE_LABEL);
         Node nodeToDrop = this.createNodeWithLabel(parentLoopNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
-        NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(STRUCTURED_ACTIVITY_NODE_LABEL),
+        HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
+                () -> this.findGraphicalElementContentByLabel(STRUCTURED_ACTIVITY_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
         NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(STRUCTURED_ACTIVITY_NODE_LABEL), containmentReference);
@@ -548,7 +568,7 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         } else {
             createdNodeLabel = creationTool.getToolEClass().getName() + "1";
         }
-        Node createdNode = (Node) this.findGraphicalElementByLabel(createdNodeLabel);
+        Node createdNode = (Node) this.findGraphicalElementExcludingContentByLabel(createdNodeLabel);
         if (createdNode.getInsideLabel() != null) {
             this.applyEditLabelTool(createdNode.getInsideLabel().getId(), label);
         } else if (createdNode.getOutsideLabels() != null && !createdNode.getOutsideLabels().isEmpty()) {

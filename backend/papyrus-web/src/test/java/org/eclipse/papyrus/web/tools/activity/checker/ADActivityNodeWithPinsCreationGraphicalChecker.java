@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.activity.checker;
 
@@ -32,18 +33,18 @@ import org.eclipse.uml2.uml.ActivityNode;
  */
 public class ADActivityNodeWithPinsCreationGraphicalChecker extends NodeCreationGraphicalChecker {
 
-    private int expectedPincount;
+    private int expectedNumberOfCreatedElement;
 
     public ADActivityNodeWithPinsCreationGraphicalChecker(Supplier<Diagram> diagramSupplier, Supplier<IDiagramElement> graphicalOwnerSupplier, String mappingType,
-            Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes, int expectedPinCount) {
+            Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes, int expectedNumberOfCreatedElement) {
         super(diagramSupplier, graphicalOwnerSupplier, mappingType, convertedNodes);
-        this.expectedPincount = expectedPinCount;
+        this.expectedNumberOfCreatedElement = expectedNumberOfCreatedElement;
     }
 
     @Override
     protected int getExpectedNumberOfCreatedElements() {
         // The number of pins + the created ActivityNode
-        return this.expectedPincount + 1;
+        return this.expectedNumberOfCreatedElement;
     }
 
     @Override

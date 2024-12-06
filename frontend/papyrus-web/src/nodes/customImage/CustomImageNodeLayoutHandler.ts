@@ -11,8 +11,8 @@
  * Contributors:
  *  Obeo - Initial API and implementation
  *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 218
+ *  Aurelien Didier (Artal Technologies) - Issue 218
  *****************************************************************************/
-
 import {
   Diagram,
   DiagramNodeType,
@@ -20,12 +20,7 @@ import {
   ILayoutEngine,
   INodeLayoutHandler,
   NodeData,
-  applyRatioOnNewNodeSizeValue,
   computePreviousSize,
-  findNodeIndex,
-  getDefaultOrMinHeight,
-  getDefaultOrMinWidth,
-  getHeaderHeightFootprint,
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { Node } from '@xyflow/react';
 import { CustomImageNodeData } from './CustomImageNode.types';
@@ -42,43 +37,17 @@ export class CustomImageNodeLayoutHandler implements INodeLayoutHandler<NodeData
     visibleNodes: Node<NodeData, DiagramNodeType>[],
     _directChildren: Node<NodeData, DiagramNodeType>[],
     _newlyAddedNode: Node<NodeData, DiagramNodeType> | undefined,
-    forceWidth?: ForcedDimensions
+    forceDimensions?: ForcedDimensions
   ) {
-    const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const nodeElement = document.getElementById(`${node.id}-noteNode-${nodeIndex}`)?.children[0];
-    const borderWidth = nodeElement ? parseFloat(window.getComputedStyle(nodeElement).borderWidth) : 1;
-
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-
-    const labelWidth = (labelElement?.getBoundingClientRect().width ?? 0) + borderWidth * 2 + 8 + 20;
-    const labelHeight = getHeaderHeightFootprint(labelElement, node.data.insideLabel, 'TOP');
-
-    const nodeMinComputeWidth = labelWidth;
-    const nodeMinComputeHeight = labelHeight + borderWidth * 2;
-
-    const nodeWith = forceWidth?.width ?? getDefaultOrMinWidth(nodeMinComputeWidth, node);
-    const nodeHeight = getDefaultOrMinHeight(nodeMinComputeHeight, node);
-
     const previousNode = (previousDiagram?.nodes ?? []).find((previouseNode) => previouseNode.id === node.id);
     const previousDimensions = computePreviousSize(previousNode, node);
-    if (node.data.resizedByUser) {
-      if (nodeMinComputeWidth > previousDimensions.width) {
-        node.width = nodeMinComputeWidth;
-      } else {
-        node.width = previousDimensions.width;
-      }
-      if (nodeMinComputeHeight > previousDimensions.height) {
-        node.height = nodeMinComputeHeight;
-      } else {
-        node.height = previousDimensions.height;
-      }
-    } else {
-      node.width = nodeWith;
-      node.height = nodeHeight;
-    }
 
-    if (node.data.nodeDescription?.keepAspectRatio) {
-      applyRatioOnNewNodeSizeValue(node);
+    node.width = forceDimensions?.width ?? previousDimensions.width;
+    const nodeHeight = forceDimensions?.height ?? previousDimensions.height;
+    if (nodeHeight > previousDimensions.height) {
+      node.height = nodeHeight;
+    } else {
+      node.height = previousDimensions.height;
     }
   }
 }

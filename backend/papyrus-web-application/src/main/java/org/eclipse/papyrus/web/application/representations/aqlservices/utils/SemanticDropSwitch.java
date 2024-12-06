@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.utils;
 
@@ -45,6 +46,8 @@ import org.eclipse.uml2.uml.InterruptibleActivityRegion;
 import org.eclipse.uml2.uml.Message;
 import org.eclipse.uml2.uml.NamedElement;
 import org.eclipse.uml2.uml.PackageableElement;
+import org.eclipse.uml2.uml.Pin;
+import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Relationship;
 import org.eclipse.uml2.uml.Transition;
 
@@ -207,7 +210,8 @@ public final class SemanticDropSwitch extends AbstractDropSwitch {
             }
         } else {
             // default case when no dropChecker neither dropProvider are defined
-            // ex. : org.eclipse.papyrus.web.application.representations.aqlservices.utils.GenericWebExternalDropBehaviorProvider
+            // ex. :
+            // org.eclipse.papyrus.web.application.representations.aqlservices.utils.GenericWebExternalDropBehaviorProvider
             isDragAndDropValid = this.createDefaultView(elementImport);
         }
         return isDragAndDropValid;
@@ -227,7 +231,8 @@ public final class SemanticDropSwitch extends AbstractDropSwitch {
             }
         } else {
             // default case when no dropChecker neither dropProvider are defined
-            // ex. : org.eclipse.papyrus.web.application.representations.aqlservices.utils.GenericWebExternalDropBehaviorProvider
+            // ex. :
+            // org.eclipse.papyrus.web.application.representations.aqlservices.utils.GenericWebExternalDropBehaviorProvider
             isDragAndDropValid = this.createDefaultView(object);
         }
         return isDragAndDropValid;
@@ -456,7 +461,7 @@ public final class SemanticDropSwitch extends AbstractDropSwitch {
             } else {
                 Node node = this.getNodeFromDiagramAndItsChildren(semanticEndContainer);
                 if (node != null) {
-                    success = this.viewHelper.createChildView(semanticEnd, node);
+                    success = this.createInHolderOrContent(semanticEnd, semanticEndContainer, success, node);
                 } else {
                     String errorMessage = "Cannot create view for " + this.getLabel(semanticEnd) + " because its parent node " + this.getLabel(semanticEndContainer) + " is not displayed";
                     LOGGER.warn(errorMessage);
@@ -465,6 +470,34 @@ public final class SemanticDropSwitch extends AbstractDropSwitch {
             }
         }
         return success;
+    }
+
+    /**
+     * @param semanticEnd
+     * @param semanticEndContainer
+     * @param success
+     * @param node
+     * @return
+     */
+    private Boolean createInHolderOrContent(EObject semanticEnd, EObject semanticEndContainer, Boolean success, Node node) {
+        Node nodeContent = this.getNodeFromParentNodeAndItsChildren(node, semanticEndContainer);
+        Boolean isCreated = false;
+        if (semanticEnd instanceof Port || semanticEnd instanceof Pin) {
+            if (!success) {
+                isCreated = this.viewHelper.createChildView(semanticEnd, node);
+            }
+            if (!success && nodeContent != null) {
+                isCreated = this.viewHelper.createChildView(semanticEnd, nodeContent);
+            }
+        } else {
+            if (!success && nodeContent != null) {
+                isCreated = this.viewHelper.createChildView(semanticEnd, nodeContent);
+            }
+            if (!isCreated) {
+                isCreated = this.viewHelper.createChildView(semanticEnd, node);
+            }
+        }
+        return success || isCreated;
     }
 
     /**

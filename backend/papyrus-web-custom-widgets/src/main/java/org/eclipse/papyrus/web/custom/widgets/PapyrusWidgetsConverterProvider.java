@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.ContainmentReferenceWidgetDescription;
+import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.CustomImageWidgetDescription;
 import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.LanguageExpressionWidgetDescription;
 import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.MonoReferenceWidgetDescription;
 import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.MultiReferenceWidgetDescription;
@@ -68,7 +69,7 @@ public class PapyrusWidgetsConverterProvider implements IWidgetDescriptionConver
         canConvert = canConvert || viewWidgetDescription instanceof LanguageExpressionWidgetDescription
                 || viewWidgetDescription instanceof PrimitiveListWidgetDescription
                 || viewWidgetDescription instanceof PrimitiveRadioWidgetDescription;
-
+        canConvert = canConvert || viewWidgetDescription instanceof CustomImageWidgetDescription;
         return canConvert;
     }
 
@@ -90,8 +91,9 @@ public class PapyrusWidgetsConverterProvider implements IWidgetDescriptionConver
             result = papyrusWidgetsConverterSwitch.casePrimitiveListWidgetDescription(primitiveListWidgetDescription);
         } else if (viewWidgetDescription instanceof PrimitiveRadioWidgetDescription primitiveRadioWidgetDescription) {
             result = papyrusWidgetsConverterSwitch.casePrimitiveRadioWidgetDescription(primitiveRadioWidgetDescription);
+        } else if (viewWidgetDescription instanceof CustomImageWidgetDescription customImageWidgetDescription) {
+            result = papyrusWidgetsConverterSwitch.caseCustomImageWidgetDescription(customImageWidgetDescription);
         }
-
         return result;
     }
 }

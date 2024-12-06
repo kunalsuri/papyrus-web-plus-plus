@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -11,31 +11,20 @@
  * Contributors:
  *  Obeo - Initial API and implementation
  *  Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 218
+ *  Aurelien Didier (Artal Technologies) - Issue 218
  *****************************************************************************/
-
 import { getCSSColor, ServerContext, ServerContextValue, useMultiToast } from '@eclipse-sirius/sirius-components-core';
-import {
-  DiagramContext,
-  DiagramContextValue,
-  useConnectorNodeStyle,
-  useDropNodeStyle,
-} from '@eclipse-sirius/sirius-components-diagrams';
+import { DiagramContext, DiagramContextValue } from '@eclipse-sirius/sirius-components-diagrams';
 import { Theme, useTheme } from '@mui/material/styles';
+import { ResizeControlVariant } from '@xyflow/system';
 import Typography from '@mui/material/Typography';
-import { Node, NodeProps, NodeResizer } from '@xyflow/react';
+import { Edge, Node, NodeProps, useStoreApi, NodeResizeControl } from '@xyflow/react';
 import { memo, useContext, useEffect, useState } from 'react';
-import { CustomImageNodeData } from './CustomImageNode.types';
+import { CustomImageNodeData, NodeComponentsMap } from './CustomImageNode.types';
+import { EdgeData, NodeData } from '@eclipse-sirius/sirius-components-diagrams';
 
-const resizeLineStyle = (theme: Theme): React.CSSProperties => {
-  return { borderWidth: theme.spacing(0.15) };
-};
-
-const resizeHandleStyle = (theme: Theme): React.CSSProperties => {
-  return {
-    width: theme.spacing(1),
-    height: theme.spacing(1),
-    borderRadius: '100%',
-  };
+const resizeControlLineStyle = (theme: Theme): React.CSSProperties => {
+  return { borderColor: 'transparent', borderWidth: theme.spacing(0.25) };
 };
 
 const defaultErrorMessage = 'The provided shape for this node is not a valid image';
@@ -65,63 +54,81 @@ const customImageNodeStyle = (
     justifyContent: 'center',
   };
 
-  if (selected || hovered) {
+  if (!!selected || hovered) {
     customImageNodeStyle.outline = `${theme.palette.selected} solid 1px`;
   }
-
   return customImageNodeStyle;
 };
 
-export const CustomImageNode = memo(({ data, id, selected, dragging }: NodeProps<Node<CustomImageNodeData>>) => {
-  const { readOnly } = useContext<DiagramContextValue>(DiagramContext);
-  const theme = useTheme();
-  const { addErrorMessage } = useMultiToast();
-  const { style: connectionFeedbackStyle } = useConnectorNodeStyle(id, data.nodeDescription.id);
-  const { style: dropFeedbackStyle } = useDropNodeStyle(data.isDropNodeTarget, data.isDropNodeCandidate, dragging);
-  const { httpOrigin } = useContext<ServerContextValue>(ServerContext);
-  const [state, setState] = useState<CustomImageNodeState>({
-    url: data.shape && data.shape !== '' ? httpOrigin + data.shape : '',
-    validImage: data.shape !== undefined && data.shape !== '',
-  });
-
-  const onErrorLoadingImage = () => {
-    setState((prevState) => ({ ...prevState, validImage: false }));
-    addErrorMessage(defaultErrorMessage);
-  };
-
-  useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
+export const CustomImageNode: NodeComponentsMap['customImageNode'] = memo(
+  ({ data, id, selected, dragging }: NodeProps<Node<CustomImageNodeData>>) => {
+    const { readOnly } = useContext<DiagramContextValue>(DiagramContext);
+    const theme = useTheme();
+    const { addErrorMessage } = useMultiToast();
+    const { httpOrigin } = useContext<ServerContextValue>(ServerContext);
+    const [state, setState] = useState<CustomImageNodeState>({
       url: data.shape && data.shape !== '' ? httpOrigin + data.shape : '',
       validImage: data.shape !== undefined && data.shape !== '',
-    }));
-  }, [data.shape]);
+    });
 
-  return (
-    <>
-      {data.nodeDescription?.userResizable && !readOnly ? (
-        <NodeResizer
-          handleStyle={{ ...resizeHandleStyle(theme) }}
-          lineStyle={{ ...resizeLineStyle(theme) }}
-          color={theme.palette.selected}
-          isVisible={selected}
-          keepAspectRatio={data.nodeDescription?.keepAspectRatio}
-        />
-      ) : null}
-      <div
-        style={{
-          ...customImageNodeStyle(theme, data.style, selected, data.isHovered, data.faded),
-          ...connectionFeedbackStyle,
-          ...dropFeedbackStyle,
-        }}>
-        {state.validImage ? (
-          <img id={id} src={state.url} height="100%" onError={onErrorLoadingImage} />
-        ) : (
-          <Typography data-testid="custom-image-node-no-image" variant="caption">
-            No image
-          </Typography>
-        )}
-      </div>
-    </>
-  );
-});
+    const onErrorLoadingImage = () => {
+      setState((prevState) => ({ ...prevState, validImage: false }));
+      addErrorMessage(defaultErrorMessage);
+    };
+
+    const storeApi = useStoreApi<Node<NodeData>, Edge<EdgeData>>();
+    const getNodeById = (id: string) => storeApi.getState().nodeLookup.get(id);
+    const node = getNodeById(id);
+
+    useEffect(() => {
+      setState((prevState) => ({
+        ...prevState,
+        url: data.shape && data.shape !== '' ? httpOrigin + data.shape : '',
+        validImage: data.shape !== undefined && data.shape !== '',
+      }));
+    }, [data.shape]);
+
+    return (
+      <>
+        {data.nodeDescription?.userResizable && !readOnly ? (
+          <>
+            <NodeResizeControl
+              variant={ResizeControlVariant.Line}
+              position={'top'}
+              style={{ ...resizeControlLineStyle(theme) }}
+            />
+            <NodeResizeControl
+              variant={ResizeControlVariant.Line}
+              position={'bottom'}
+              style={{ ...resizeControlLineStyle(theme) }}
+            />
+          </>
+        ) : null}
+        <div
+          style={{
+            ...customImageNodeStyle(theme, data.style, selected, data.isHovered, data.faded),
+          }}>
+          {state.validImage ? (
+            <img
+              id={id}
+              src={state.url}
+              width={node.width - 5}
+              height={node.height - 5}
+              draggable={false}
+              onError={onErrorLoadingImage}
+              style={{
+                objectFit: 'contain',
+                display: 'block',
+                margin: 'auto',
+              }}
+            />
+          ) : (
+            <Typography data-testid="custom-image-node-no-image" variant="caption">
+              No image
+            </Typography>
+          )}
+        </div>
+      </>
+    );
+  }
+);

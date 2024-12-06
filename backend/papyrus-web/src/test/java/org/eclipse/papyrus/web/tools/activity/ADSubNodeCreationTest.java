@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,28 +10,9 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.activity;
-
-import static org.eclipse.uml2.uml.UMLPackage.ACCEPT_CALL_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.ADD_STRUCTURAL_FEATURE_VALUE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CALL_OPERATION_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CLEAR_ASSOCIATION_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CLEAR_STRUCTURAL_FEATURE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.CREATE_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.DESTROY_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_EXTENT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_IS_CLASSIFIED_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_SELF_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.READ_STRUCTURAL_FEATURE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.RECLASSIFY_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.REDUCE_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.SEND_OBJECT_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.SEND_SIGNAL_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.START_CLASSIFIER_BEHAVIOR_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.START_OBJECT_BEHAVIOR_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.TEST_IDENTITY_ACTION;
-import static org.eclipse.uml2.uml.UMLPackage.VALUE_SPECIFICATION_ACTION;
 
 import java.util.stream.Stream;
 
@@ -132,10 +113,14 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
 
     private static Stream<Arguments> activityChildrenParameters() {
         return Stream.of(//
-                Arguments.of(new ADCreationTool(ADToolSections.ACCEPT_EVENT_ACTION, UML.getAcceptCallAction()), UML.getAcceptCallAction(), ACTIVITY_OWNED_NODE),
-                Arguments.of(new ADCreationTool(ADToolSections.ACCEPT_EVENT_ACTION, UML.getAcceptEventAction()), UML.getAcceptEventAction(), ACTIVITY_OWNED_NODE),
-                Arguments.of(new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getActivityFinalNode()), UML.getActivityFinalNode(), ACTIVITY_OWNED_NODE),
-                Arguments.of(new ADCreationTool(ADToolSections.NODES, UML.getActivityParameterNode()), UML.getActivityParameterNode(), ACTIVITY_OWNED_NODE),
+                Arguments.of(new ADCreationTool(ADToolSections.ACCEPT_EVENT_ACTION, UML.getAcceptCallAction()),
+                        UML.getAcceptCallAction(), ACTIVITY_OWNED_NODE),
+                Arguments.of(new ADCreationTool(ADToolSections.ACCEPT_EVENT_ACTION, UML.getAcceptEventAction()),
+                        UML.getAcceptEventAction(), ACTIVITY_OWNED_NODE),
+                Arguments.of(new ADCreationTool(ADToolSections.ACTIVITY_NODE, UML.getActivityFinalNode()),
+                        UML.getActivityFinalNode(), ACTIVITY_OWNED_NODE),
+                Arguments.of(new ADCreationTool(ADToolSections.NODES, UML.getActivityParameterNode()),
+                        UML.getActivityParameterNode(), ACTIVITY_OWNED_NODE),
                 Arguments.of(new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getActivityPartition()), UML.getActivityPartition(), ACTIVITY_OWNED_GROUP),
                 Arguments.of(new ADCreationTool(ADToolSections.STRUCTURAL_FEATURE, UML.getAddStructuralFeatureValueAction()), UML.getAddStructuralFeatureValueAction(), ACTIVITY_OWNED_NODE),
                 Arguments.of(new ADCreationTool(ADToolSections.INVOCATION_ACTION, UML.getBroadcastSignalAction()), UML.getBroadcastSignalAction(), ACTIVITY_OWNED_NODE),
@@ -475,7 +460,7 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
     @BeforeEach
     public void setUp() {
         this.setUpWithIntermediateRoot(ROOT_ACTIVITY, UML.getActivity());
-        this.rootActivityId = this.getDiagram().getNodes().get(0).getId();
+        this.rootActivityId = this.findGraphicalElementContentByLabel(ROOT_ACTIVITY).getId();
         // We can't create other container elements because they would clash with the graphical checks performed on the
         // root activity children.
     }
@@ -615,35 +600,12 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
     }
 
     private NodeCreationGraphicalChecker getGraphicalCheckerFor(EClass expectedType, String mappingType, String graphicalContainerLabel) {
-        int expectedNumberOfPins = switch (expectedType.getClassifierID()) {
-            case ACCEPT_CALL_ACTION, //
-                    CALL_OPERATION_ACTION, //
-                    CLEAR_ASSOCIATION_ACTION, //
-                    CREATE_OBJECT_ACTION, //
-                    DESTROY_OBJECT_ACTION, //
-                    READ_EXTENT_ACTION, //
-                    READ_SELF_ACTION, //
-                    RECLASSIFY_OBJECT_ACTION, //
-                    SEND_SIGNAL_ACTION, //
-                    START_CLASSIFIER_BEHAVIOR_ACTION, //
-                    START_OBJECT_BEHAVIOR_ACTION, //
-                    VALUE_SPECIFICATION_ACTION -> 1;
-            case CLEAR_STRUCTURAL_FEATURE_ACTION, //
-                    READ_IS_CLASSIFIED_OBJECT_ACTION, //
-                    READ_STRUCTURAL_FEATURE_ACTION, //
-                    REDUCE_ACTION, //
-                    SEND_OBJECT_ACTION -> 2;
-            case TEST_IDENTITY_ACTION -> 3;
-            case ADD_STRUCTURAL_FEATURE_VALUE_ACTION -> 4;
-            default -> 0;
-        };
+        int expectedNumberOfElement = ADMappingTypes.getExpectedNumberOfCreatedElement(expectedType);
         NodeCreationGraphicalChecker checker;
-        if (expectedNumberOfPins == 0) {
-            checker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(graphicalContainerLabel), mappingType, this.getCapturedNodes());
-        } else {
-            checker = new ADActivityNodeWithPinsCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(graphicalContainerLabel), mappingType, this.getCapturedNodes(),
-                    expectedNumberOfPins);
-        }
+        checker = new ADActivityNodeWithPinsCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(graphicalContainerLabel), mappingType,
+                this.getCapturedNodes(),
+                expectedNumberOfElement);
         return checker;
     }
+
 }

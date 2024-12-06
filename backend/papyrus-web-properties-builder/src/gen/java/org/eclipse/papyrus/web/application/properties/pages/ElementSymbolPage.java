@@ -30,12 +30,25 @@ public class ElementSymbolPage {
 
     protected final ColorRegistry colorRegistry;
 
+    /**
+     * Instantiates a new element symbol page.
+     *
+     * @param viewElementFactory
+     *            the view element factory
+     * @param colorRegistry
+     *            the color registry
+     */
     public ElementSymbolPage(ViewElementsFactory viewElementFactory, ColorRegistry colorRegistry) {
         super();
         this.viewElementFactory = viewElementFactory;
         this.colorRegistry = colorRegistry;
     }
 
+    /**
+     * Creates the page description
+     *
+     * @return the page description
+     */
     public PageDescription create() {
 
         PageDescription page = this.createPage();

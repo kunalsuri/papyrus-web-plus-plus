@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.component;
 
@@ -20,6 +21,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.CPDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationSemanticChecker;
 import org.eclipse.papyrus.web.tools.component.checker.CPDInterfaceCreationGraphicalChecker;
@@ -118,9 +120,11 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
         NodeCreationGraphicalChecker graphicalChecker;
 
         if (UML.getInterface().isSuperTypeOf(expectedType)) {
-            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
+        } else if (UML.getComment().isSuperTypeOf(expectedType) || UML.getConstraint().isSuperTypeOf(expectedType)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
         } else {
-            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
         }
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), expectedContainmentReference);
@@ -132,11 +136,12 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
     public void testCreateNodeInModel(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = CPDMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker;
-
         if (UML.getInterface().isSuperTypeOf(expectedType)) {
-            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(MODEL_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new CPDInterfaceCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER), mappingType, this.getCapturedNodes());
+        } else if (UML.getComment().isSuperTypeOf(expectedType) || UML.getConstraint().isSuperTypeOf(expectedType)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER), mappingType, this.getCapturedNodes());
         } else {
-            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(MODEL_CONTAINER), mappingType, this.getCapturedNodes());
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER), mappingType, this.getCapturedNodes());
         }
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(MODEL_CONTAINER), expectedContainmentReference);
@@ -147,8 +152,16 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
     @MethodSource("componentChildrenParameters")
     public void testCreateNodeInComponent(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = CPDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(COMPONENT_CONTAINER), mappingType,
-                this.getCapturedNodes());
+
+        NodeCreationGraphicalChecker graphicalChecker;
+        if (UML.getPort().isSuperTypeOf(expectedType)) {
+            graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        } else {
+            graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER), mappingType,
+                    this.getCapturedNodes());
+        }
+
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(COMPONENT_CONTAINER), expectedContainmentReference);
         this.createSubNode(COMPONENT_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
@@ -192,17 +205,17 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
 
         // create Property container typed with COMPONENT_TYPE
         Node componentTypeNode = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getComponent()), COMPONENT_TYPE);
-        String componentContainerId = this.findGraphicalElementByLabel(COMPONENT_CONTAINER).getId();
-        Node propertyContainerNode = this.createNodeWithLabel(componentContainerId, new CreationTool(ToolSections.NODES, expectedType), PROPERTY_CONTAINER);
+        String componentContentId = this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER).getId();
+        Node propertyContainerNode = this.createNodeWithLabel(componentContentId, new CreationTool(ToolSections.NODES, expectedType), PROPERTY_CONTAINER);
         // type the property container
         IEMFEditingContext editingContext = (IEMFEditingContext) this.getEditingContext();
         Optional<Object> propertyContainerOptional = this.getObjectService().getObject(editingContext, propertyContainerNode.getTargetObjectId());
         Optional<Object> componentTypeOptional = this.getObjectService().getObject(editingContext, componentTypeNode.getTargetObjectId());
         Property propertyContainer = (Property) propertyContainerOptional.get();
         propertyContainer.setType((Component) componentTypeOptional.get());
-
         String mappingType = CPDMappingTypes.getMappingTypeAsSubNode(UML.getProperty());
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PROPERTY_CONTAINER), mappingType,
+
+        NodeCreationGraphicalChecker graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROPERTY_CONTAINER), mappingType,
                 this.getCapturedNodes());
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(COMPONENT_TYPE), expectedContainmentReference);

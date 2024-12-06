@@ -75,7 +75,7 @@ describe('Applied Comments tests', () => {
     cy.get('@uml').findByTestId('Annotated element').find('.MuiChip-root').should('have.length', 1);
     cy.get('@uml').findByTestId('Annotated element').findByTestId('reference-value-Class').should('be.visible');
     // remove Class element from annotatedElement
-    cy.get('@uml').findByTestId('Annotated element-clear').should('be.visible').click();
+    cy.get('@uml').findByTestId('Annotated element-clear').scrollIntoView().should('be.visible').click();
     // check that class has no longer Comment in appliedComments
     cy.getByTestId('Class').should('be.visible').click();
     // wait the class is properly loaded

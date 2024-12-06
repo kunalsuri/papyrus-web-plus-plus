@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.profile;
 
@@ -86,7 +87,7 @@ public class PRDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectAssociationTarget(EClass newTargetType) {
         String associationId = this.createEdge(CLASS_EDGE_SOURCE, CLASS_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getAssociation()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(associationId, newTargetLabel, graphicalChecker);
     }
 
@@ -95,7 +96,7 @@ public class PRDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectGeneralizationSource(EClass newTargetType) {
         String generalizationId = this.createEdge(CLASS_EDGE_SOURCE, CLASS_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getGeneralization()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(generalizationId, newTargetLabel, graphicalChecker);
     }
 
@@ -104,7 +105,7 @@ public class PRDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectExtensionSource(EClass newTargetType) {
         String extensionId = this.createEdge(STEREOTYPE_EDGE_SOURCE, STEREOTYPE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getExtension()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(extensionId, newTargetLabel, graphicalChecker);
     }
 }

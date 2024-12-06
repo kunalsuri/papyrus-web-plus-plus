@@ -29,7 +29,7 @@ import org.eclipse.sirius.components.graphql.api.IExceptionWrapper;
 import graphql.schema.DataFetchingEnvironment;
 
 /**
- * The data fetcher used to change the image in a custom image.
+ * The data fetcher used to change the uuid in a custom image.
  *
  * @author tiboue
  */

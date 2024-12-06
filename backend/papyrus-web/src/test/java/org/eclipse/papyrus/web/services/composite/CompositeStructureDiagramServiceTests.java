@@ -14,6 +14,8 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.composite;
 
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.CONTENT_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.HOLDER_SUFFIX;
 import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.SHARED_SUFFIX;
 import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.UNDERSCORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,13 +55,17 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
 
+    private static final String U_HOLDER_SUFFIX = UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String U_CONTENT_SUFFIX = UNDERSCORE + CONTENT_SUFFIX;
+
     private static final IdBuilder ID_BUILDER = new IdBuilder(CSDDiagramDescriptionBuilder.CSD_PREFIX, new UMLMetamodelHelper());
 
     private static final String CSD_COMMENT_SHARED = ID_BUILDER.getSpecializedDomainNodeName(UML.getComment(), SHARED_SUFFIX);
 
     private static final String CSD_CLASSIFIER_SHARED = ID_BUILDER.getSpecializedDomainNodeName(UML.getClass_(), SHARED_SUFFIX);
 
-    private static final String CSD_CLASSIFIER = ID_BUILDER.getDomainNodeName(UML.getClassifier());
+    private static final String CSD_CLASSIFIER = ID_BUILDER.getDomainNodeName(UML.getClass_());
 
     private static final String CSD_CONNECTOR = ID_BUILDER.getDomainBaseEdgeId(UML.getConnector());
 
@@ -82,14 +88,14 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Package pack = this.init();
 
         Class clazz = this.createIn(Class.class, pack);
-        Node classNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, clazz);
+        Node classNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, clazz);
 
         LabelStyleCheck.build(classNode).assertIsNotItalic().assertIsNotUnderline();
 
         clazz.setIsAbstract(true);
 
         this.getDiagramHelper().refresh();
-        classNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER, clazz);
+        classNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_HOLDER_SUFFIX, clazz);
 
         LabelStyleCheck.build(classNode).assertIsItalic().assertIsNotUnderline();
     }
@@ -99,16 +105,19 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Package pack = this.init();
 
         Class clazz = this.createIn(Class.class, pack);
-        Node classNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, clazz);
+        this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, clazz);
+        Node classNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, clazz);
         Property property = this.createIn(Property.class, clazz);
-        Node propertyNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, property, classNode);
 
-        LabelStyleCheck.build(propertyNode).assertIsNotItalic().assertIsNotUnderline();
+        Node propHolder = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, property, classNode);
+        Node propertyNode = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_PROPERTY_ON_CLASSIFIER + U_CONTENT_SUFFIX, propHolder, property);
+
+        LabelStyleCheck.build(propHolder).assertIsNotItalic().assertIsNotUnderline();
 
         property.setIsStatic(true);
 
         this.getDiagramHelper().refresh();
-        propertyNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_PROPERTY_ON_CLASSIFIER, property);
+        propertyNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, property);
 
         LabelStyleCheck.build(propertyNode).assertIsNotItalic().assertIsUnderline();
     }
@@ -123,14 +132,18 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Class propertyType = this.createIn(Class.class, pack);
         property.setType(propertyType);
 
-        Node classNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, clazz);
-        Node propertyNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, property, classNode);
+        this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, clazz);
+        Node classNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, clazz);
+
+        Node propertyHolderNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, property, classNode);
+        Node propertyNode = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_PROPERTY_ON_CLASSIFIER + U_CONTENT_SUFFIX, propertyHolderNode, property);
 
         // Port
-        this.getServiceTester().assertChildCreation(propertyNode, propertyType, UML.getPort(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PORT_ON_PROPERTY, propertyType);
+        this.getServiceTester().assertChildCreation(propertyHolderNode, propertyType, UML.getPort(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PORT_ON_PROPERTY, propertyType);
 
         // Property
-        this.getServiceTester().assertChildCreation(propertyNode, propertyType, UML.getProperty(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PROPERTY_ON_PROPERTY, propertyType);
+        this.getServiceTester().assertChildCreation(propertyNode, propertyType, UML.getProperty(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PROPERTY_ON_PROPERTY + U_HOLDER_SUFFIX,
+                propertyType);
 
         // Comment
         this.getServiceTester().assertChildCreation(propertyNode, UML.getComment(), UML.getElement_OwnedComment(), CSD_COMMENT_SHARED, property);
@@ -150,8 +163,11 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Property property = this.createIn(Property.class, clazz);
 
         this.getDiagramHelper().init(clazz, CSDDiagramDescriptionBuilder.CSD_REP_NAME);
-        Node classNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, clazz);
-        Node propertyNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, property, classNode);
+        this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, clazz);
+        Node classNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, clazz);
+
+        Node propertyHolderNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, property, classNode);
+        Node propertyNode = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_PROPERTY_ON_CLASSIFIER + U_CONTENT_SUFFIX, propertyHolderNode, property);
 
         this.getDiagramHelper().modify(diagramContext -> {
             EObject creation = this.getDiagramService().create(property, UML.getPort().getName(), UML.getStructuredClassifier_OwnedAttribute().getName(), propertyNode, diagramContext,
@@ -166,23 +182,26 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Package pack = this.init();
 
         Class parent = this.createIn(Class.class, pack);
-        Node parentNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, parent);
+        Node parentNodeHolder = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, parent);
+        Node parentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, parent);
 
         // Property in Class
-        this.getServiceTester().assertChildCreation(parentNode, UML.getProperty(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PROPERTY_ON_CLASSIFIER, parent);
+        this.getServiceTester().assertChildCreation(parentNodeContent, UML.getProperty(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, parent);
 
         // Port in Class
-        this.getServiceTester().assertChildCreation(parentNode, UML.getPort(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PORT_ON_CLASSIFIER, parent);
+        this.getServiceTester().assertChildCreation(parentNodeHolder, UML.getPort(), UML.getStructuredClassifier_OwnedAttribute(), CSD_PORT_ON_CLASSIFIER, parent);
 
         // Comment in Package
-        this.getServiceTester().assertChildCreation(parentNode, UML.getComment(), UML.getElement_OwnedComment(), CSD_COMMENT_SHARED, parent);
+        this.getServiceTester().assertChildCreation(parentNodeContent, UML.getComment(), UML.getElement_OwnedComment(), CSD_COMMENT_SHARED, parent);
 
         // Class in Class
-        Node nestedClassNode = this.getServiceTester().assertChildCreation(parentNode, UML.getClass_(), UML.getClass_NestedClassifier(), CSD_CLASSIFIER_SHARED, parent);
+        Class nested = this.createIn(Class.class, parent);
+        Node nestedClassNodeHolder = this.getDiagramHelper().createNodeInParent(CSD_CLASSIFIER_SHARED + U_HOLDER_SUFFIX, nested, parentNodeContent);
+        Node nestedClassNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_CLASSIFIER_SHARED + U_CONTENT_SUFFIX, nestedClassNodeHolder, nested);
 
         // Test Class in Class recursion
-        this.getServiceTester().assertChildCreation(nestedClassNode, UML.getClass_(), UML.getClass_NestedClassifier(), CSD_CLASSIFIER_SHARED,
-                (EObject) this.getObjectService().getObject(this.getEditingContext(), nestedClassNode.getTargetObjectId()).get());
+        this.getServiceTester().assertChildCreation(nestedClassNodeContent, UML.getClass_(), UML.getClass_NestedClassifier(), CSD_CLASSIFIER_SHARED + U_HOLDER_SUFFIX,
+                (EObject) this.getObjectService().getObject(this.getEditingContext(), nestedClassNodeContent.getTargetObjectId()).get());
     }
 
     /**
@@ -191,7 +210,7 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void checkRootClassCreation() {
         this.init();
-        this.getServiceTester().assertRootCreation(UML.getClass_(), UML.getPackage_PackagedElement(), CSD_CLASSIFIER);
+        this.getServiceTester().assertRootCreation(UML.getClass_(), UML.getPackage_PackagedElement(), CSD_CLASSIFIER + U_HOLDER_SUFFIX);
     }
 
     /**
@@ -200,7 +219,7 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void checkRootComponentCreation() {
         this.init();
-        this.getServiceTester().assertRootCreation(UML.getComponent(), UML.getPackage_PackagedElement(), CSD_CLASSIFIER);
+        this.getServiceTester().assertRootCreation(UML.getComponent(), UML.getPackage_PackagedElement(), CSD_CLASSIFIER + U_HOLDER_SUFFIX);
 
     }
 
@@ -218,10 +237,10 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Property targetProp = this.createIn(Property.class, rootClass);
         targetProp.setType(type2);
 
-        Node rootClassNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, rootClass);
-
-        Node sourcePropNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, sourceProp, rootClassNode);
-        Node targetPropNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, targetProp, rootClassNode);
+        this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, rootClass);
+        Node rootClassContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, rootClass);
+        Node sourcePropNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, sourceProp, rootClassContent);
+        Node targetPropNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, targetProp, rootClassContent);
 
         this.checkConnectorEdge(sourceProp, sourcePropNode.getId(), targetProp, targetPropNode.getId(), rootClass);
 
@@ -252,10 +271,10 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Property targetProp = this.createIn(Property.class, rootClass);
         targetProp.setType(type2);
 
-        Node rootClassNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, rootClass);
-
-        Node sourceNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, sourceProp, rootClassNode);
-        Node targetNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, targetProp, rootClassNode);
+        Node rootClassNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, rootClass);
+        Node rootClassContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, rootClass);
+        Node sourceNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, sourceProp, rootClassContent);
+        Node targetNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, targetProp, rootClassContent);
 
         Connector connector = this.createIn(Connector.class, rootClass);
         this.createIn(ConnectorEnd.class, connector).setRole(sourceProp);
@@ -291,13 +310,16 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         targetProp.setType(type2);
         Port targetPort = this.createIn(Port.class, type2);
 
-        Node rootClassNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, rootClass);
+        this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, rootClass);
+        Node rootClassNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, rootClass);
 
-        Node prop1Node = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, sourceProp, rootClassNode);
-        Node sourceNode = this.getDiagramHelper().createNodeInParent(CSD_PORT_ON_PROPERTY, sourcePort, prop1Node);
+        Node holder1 = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, sourceProp, rootClassNode);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_PROPERTY_ON_CLASSIFIER + U_CONTENT_SUFFIX, holder1, sourceProp);
+        Node sourceNode = this.getDiagramHelper().createNodeInParent(CSD_PORT_ON_PROPERTY, sourcePort, holder1);
 
-        Node prop2Node = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, targetProp, rootClassNode);
-        Node targetNode = this.getDiagramHelper().createNodeInParent(CSD_PORT_ON_PROPERTY, targetPort, prop2Node);
+        Node prop2Holder = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, targetProp, rootClassNode);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_PROPERTY_ON_CLASSIFIER + U_CONTENT_SUFFIX, prop2Holder, targetProp);
+        Node targetNode = this.getDiagramHelper().createNodeInParent(CSD_PORT_ON_PROPERTY, targetPort, prop2Holder);
 
         this.checkConnectorEdge(sourcePort, sourceProp, sourceNode.getId(), targetPort, targetProp, targetNode.getId(), rootClass);
 
@@ -339,10 +361,11 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         var pack = this.init();
         var car = this.createIn(Class.class, pack);
 
-        var carNode = this.getServiceTester().assertSemanticDrop(car, null, CSD_CLASSIFIER);
+        var carNodeHolder = this.getServiceTester().assertSemanticDrop(car, null, CSD_CLASSIFIER + U_HOLDER_SUFFIX);
+        var carNode = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_CLASSIFIER + U_CONTENT_SUFFIX, carNodeHolder, car);
 
         var wheel = this.createIn(Class.class, pack);
-        var wheelNode = this.getServiceTester().assertSemanticDrop(wheel, null, CSD_CLASSIFIER);
+        var wheelNode = this.getServiceTester().assertSemanticDrop(wheel, null, CSD_CLASSIFIER + U_HOLDER_SUFFIX);
 
         var port1 = this.createIn(Port.class, wheel);
         // Needs to display this port so we can check there is no edge starting or ending on this node
@@ -350,22 +373,22 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
 
         var frontLeft = this.createIn(Property.class, car);
         frontLeft.setType(wheel);
-        var frontLeftNode = this.getServiceTester().assertSemanticDrop(frontLeft, carNode, CSD_PROPERTY_ON_CLASSIFIER);
+        var frontLeftNode = this.getServiceTester().assertSemanticDrop(frontLeft, carNode, CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX);
         var portOnFrontLeft = this.getServiceTester().assertSemanticDrop(port1, frontLeftNode, CSD_PORT_ON_PROPERTY);
 
         var frontRight = this.createIn(Property.class, car);
         frontRight.setType(wheel);
-        var frontRightNode = this.getServiceTester().assertSemanticDrop(frontRight, carNode, CSD_PROPERTY_ON_CLASSIFIER);
+        var frontRightNode = this.getServiceTester().assertSemanticDrop(frontRight, carNode, CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX);
         var portOnFrontRight = this.getServiceTester().assertSemanticDrop(port1, frontRightNode, CSD_PORT_ON_PROPERTY);
 
         var backLeft = this.createIn(Property.class, car);
         backLeft.setType(wheel);
-        var backLeftNode = this.getServiceTester().assertSemanticDrop(backLeft, carNode, CSD_PROPERTY_ON_CLASSIFIER);
+        var backLeftNode = this.getServiceTester().assertSemanticDrop(backLeft, carNode, CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX);
         var portOnBackLeft = this.getServiceTester().assertSemanticDrop(port1, backLeftNode, CSD_PORT_ON_PROPERTY);
 
         var backRight = this.createIn(Property.class, car);
         backRight.setType(wheel);
-        var backRightNode = this.getServiceTester().assertSemanticDrop(backRight, carNode, CSD_PROPERTY_ON_CLASSIFIER);
+        var backRightNode = this.getServiceTester().assertSemanticDrop(backRight, carNode, CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX);
         var portOnBackRight = this.getServiceTester().assertSemanticDrop(port1, backRightNode, CSD_PORT_ON_PROPERTY);
 
         // Create the Front and Back Connector
@@ -418,12 +441,15 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
         Class type2 = this.createIn(Class.class, rootClass);
         Port portTarget = this.createIn(Port.class, type2);
 
-        Node rootClassNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, rootClass);
+        Node rootClassNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, rootClass);
+        Node rootClassContent = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_CLASSIFIER + U_CONTENT_SUFFIX, rootClassNode, rootClass);
 
-        Node type1Node = this.getDiagramHelper().createNodeInParent(CSD_CLASSIFIER_SHARED, type1, rootClassNode);
-        Node type2Node = this.getDiagramHelper().createNodeInParent(CSD_CLASSIFIER_SHARED, type2, rootClassNode);
+        Node type1NodeHolder = this.getDiagramHelper().createNodeInParent(CSD_CLASSIFIER_SHARED + U_HOLDER_SUFFIX, type1, rootClassContent);
+        Node type1Node = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_CLASSIFIER_SHARED + U_CONTENT_SUFFIX, type1NodeHolder, type1);
 
-        Node portSourceNode = this.getDiagramHelper().createNodeInParent(CSD_PORT_ON_CLASSIFIER, portSource, type1Node);
+        Node type2Node = this.getDiagramHelper().createNodeInParent(CSD_CLASSIFIER_SHARED + U_HOLDER_SUFFIX, type2, rootClassContent);
+
+        Node portSourceNode = this.getDiagramHelper().createNodeInParent(CSD_PORT_ON_CLASSIFIER, portSource, type1NodeHolder);
         Node portTargetNode = this.getDiagramHelper().createNodeInParent(CSD_PORT_ON_CLASSIFIER, portTarget, type2Node);
 
         this.checkConnectorEdge(portSource, portSourceNode.getId(), portTarget, portTargetNode.getId(), rootClass);
@@ -496,24 +522,32 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
 
         // In Class
         this.getDiagramHelper().init(clazz, CSDDiagramDescriptionBuilder.CSD_REP_NAME);
-        Node classNode = this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER, clazz);
+        this.getDiagramHelper().createNodeInDiagram(CSD_CLASSIFIER + U_HOLDER_SUFFIX, clazz);
+        Node classNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CSD_CLASSIFIER + U_CONTENT_SUFFIX, clazz);
+
         this.getServiceTester().assertChildCreation(classNode, UML.getComment(), UML.getElement_OwnedComment(), CSD_COMMENT_SHARED);
 
         // In Property
         Property property = this.createIn(Property.class, clazz);
-        Node propertyNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER, property, classNode);
+        Node propertyHolderNode = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_CLASSIFIER + U_HOLDER_SUFFIX, property, classNode);
+        Node propertyNode = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_PROPERTY_ON_CLASSIFIER + U_CONTENT_SUFFIX, propertyHolderNode, property);
         this.getServiceTester().assertChildCreation(propertyNode, UML.getComment(), UML.getElement_OwnedComment(), CSD_COMMENT_SHARED);
 
         // In nested class
         Class nestedClazz = this.createIn(Class.class, clazz);
-        Node nestedClassNode = this.getDiagramHelper().createNodeInParent(CSD_CLASSIFIER_SHARED, nestedClazz, classNode);
+        Node nestedClassNodeHolder = this.getDiagramHelper().createNodeInParent(CSD_CLASSIFIER_SHARED + U_HOLDER_SUFFIX, nestedClazz, classNode);
+        Node nestedClassNode = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_CLASSIFIER_SHARED + U_CONTENT_SUFFIX, nestedClassNodeHolder,
+                nestedClazz);
         this.getServiceTester().assertChildCreation(nestedClassNode, UML.getComment(), UML.getElement_OwnedComment(), CSD_COMMENT_SHARED);
 
         // Propery of Property
         Class type = this.createIn(Class.class, pack);
         property.setType(type);
         Property property2 = this.createIn(Property.class, type);
-        Node propertyOnProperty = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_PROPERTY, property2, propertyNode);
+        Node propertyOnPropertyH = this.getDiagramHelper().createNodeInParent(CSD_PROPERTY_ON_PROPERTY + U_HOLDER_SUFFIX, property2, propertyNode);
+        Node propertyOnProperty = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(CSD_PROPERTY_ON_PROPERTY + U_CONTENT_SUFFIX, propertyOnPropertyH,
+                property2);
+
         this.getServiceTester().assertChildCreation(propertyOnProperty, UML.getComment(), UML.getElement_OwnedComment(), CSD_COMMENT_SHARED);
 
     }

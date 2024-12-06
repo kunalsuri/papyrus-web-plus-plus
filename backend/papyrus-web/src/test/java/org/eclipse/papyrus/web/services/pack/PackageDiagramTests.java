@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,9 +10,14 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.pack;
 
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.CONTENT_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.HOLDER_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.SHARED_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.UNDERSCORE;
 import static org.eclipse.papyrus.web.application.representations.uml.PADDiagramDescriptionBuilder.CONTAINMENT_LINK_EDGE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.web.application.representations.aqlservices.AbstractDiagramService;
 import org.eclipse.papyrus.web.application.representations.aqlservices.pakage.PackageDiagramService;
@@ -54,6 +60,14 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 public class PackageDiagramTests extends AbstractDiagramTest {
 
+    private static final String SHARED_HOLDER_SUFFIX = UNDERSCORE + SHARED_SUFFIX + UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String SHARED_CONTENT_SUFFIX = UNDERSCORE + SHARED_SUFFIX + UNDERSCORE + CONTENT_SUFFIX;
+
+    private static final String TOP_HOLDER_SUFFIX = UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String TOP_CONTENT_SUFFIX = UNDERSCORE + CONTENT_SUFFIX;
+
     private static final IdBuilder ID_BUILDER = new IdBuilder(PADDiagramDescriptionBuilder.PAD_PREFIX, new UMLMetamodelHelper());
 
     private static final String PAD_ABSTRACTION = ID_BUILDER.getDomainBaseEdgeId(UML.getAbstraction());
@@ -64,22 +78,18 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
     private static final String PAD_PACKAGE = ID_BUILDER.getDomainNodeName(UML.getPackage());
 
-    private static final String PAD_PACKAGE_SHARED = ID_BUILDER.getSpecializedDomainNodeName(UML.getPackage(), AbstractRepresentationDescriptionBuilder.SHARED_SUFFIX);
-
     private static final String PAD_MODEL = ID_BUILDER.getDomainNodeName(UML.getModel());
-
-    private static final String PAD_MODEL_SHARED = ID_BUILDER.getSpecializedDomainNodeName(UML.getModel(), AbstractRepresentationDescriptionBuilder.SHARED_SUFFIX);
 
     @Test
     public void checkRootPackageCreation() {
         this.init();
-        this.getServiceTester().assertRootCreation(UML.getPackage(), UML.getPackage_PackagedElement(), PAD_PACKAGE);
+        this.getServiceTester().assertRootCreation(UML.getPackage(), UML.getPackage_PackagedElement(), PAD_PACKAGE + TOP_HOLDER_SUFFIX);
     }
 
     @Test
     public void checkRootModelCreation() {
         this.init();
-        this.getServiceTester().assertRootCreation(UML.getModel(), UML.getPackage_PackagedElement(), PAD_MODEL);
+        this.getServiceTester().assertRootCreation(UML.getModel(), UML.getPackage_PackagedElement(), PAD_MODEL + TOP_HOLDER_SUFFIX);
     }
 
     @Test
@@ -110,13 +120,14 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Package parentPackage = this.init();
         Package subPack = this.createIn(Package.class, parentPackage);
 
-        Node parentNode = this.getServiceTester().assertSemanticDrop(parentPackage, null, PAD_PACKAGE);
+        Node parentNodeHolder = this.getServiceTester().assertSemanticDrop(parentPackage, null, PAD_PACKAGE + TOP_HOLDER_SUFFIX);
+        Node parentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_PACKAGE + TOP_CONTENT_SUFFIX, parentPackage);
 
-        Node childNode = this.getServiceTester().assertSemanticDrop(subPack, parentNode, PAD_PACKAGE_SHARED);
-        Node siblingNode = this.getServiceTester().assertSemanticDrop(subPack, null, PAD_PACKAGE);
+        Node childNode = this.getServiceTester().assertSemanticDrop(subPack, parentNodeContent, PAD_PACKAGE + SHARED_HOLDER_SUFFIX);
+        Node siblingNode = this.getServiceTester().assertSemanticDrop(subPack, null, PAD_PACKAGE + TOP_HOLDER_SUFFIX);
 
-        this.getDiagramHelper().assertGetUniqueFeatureBasedEdge(CONTAINMENT_LINK_EDGE_ID, parentNode, siblingNode);
-        this.getDiagramHelper().assertNoFeatureBasedEdge(CONTAINMENT_LINK_EDGE_ID, parentNode, childNode);
+        this.getDiagramHelper().assertGetUniqueFeatureBasedEdge(CONTAINMENT_LINK_EDGE_ID, parentNodeHolder, siblingNode);
+        this.getDiagramHelper().assertNoFeatureBasedEdge(CONTAINMENT_LINK_EDGE_ID, parentNodeHolder, childNode);
     }
 
     private void checkPackageImportEdge(Namespace source, Package target) {
@@ -231,9 +242,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         packageMerge.setMergedPackage(packTarget);
 
         // Create the 3 required nodes
-        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource);
-        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packTarget);
-        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource2);
+        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource);
+        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packTarget);
+        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource2);
 
         // Check that the edge is created
         this.getDiagramHelper().refresh();
@@ -247,9 +258,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check source reconnection
         this.getServiceTester().assertSourceReconnection(new ElementMatcher(packageMerge, ID_BUILDER.getDomainBaseEdgeId(UML.getPackageMerge())), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE), //
-                new ElementMatcher(packTarget, PAD_PACKAGE));
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(packSource2.getPackageMerges().contains(packageMerge));
         assertEquals(packSource2, packageMerge.getReceivingPackage());
@@ -257,9 +268,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check target reconnection
         this.getServiceTester().assertTargetReconnection(new ElementMatcher(packageMerge, ID_BUILDER.getDomainBaseEdgeId(UML.getPackageMerge())), //
-                new ElementMatcher(packTarget, PAD_PACKAGE), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE));
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(packSource2.getPackageMerges().contains(packageMerge));
         assertEquals(packSource2, packageMerge.getReceivingPackage());
@@ -283,9 +294,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         dependency.getSuppliers().add(packTarget);
 
         // Create the 3 required nodes
-        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource);
-        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packTarget);
-        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource2);
+        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource);
+        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packTarget);
+        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource2);
 
         // Check that the edge is created
         this.getDiagramHelper().refresh();
@@ -299,9 +310,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check source reconnection
         this.getServiceTester().assertSourceReconnection(new ElementMatcher(dependency, ID_BUILDER.getDomainBaseEdgeId(UML.getDependency())), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE), //
-                new ElementMatcher(packTarget, PAD_PACKAGE));
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(dependency.getClients().contains(packSource2));
         assertFalse(dependency.getClients().contains(packSource));
@@ -309,9 +320,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check target reconnection
         this.getServiceTester().assertTargetReconnection(new ElementMatcher(dependency, ID_BUILDER.getDomainBaseEdgeId(UML.getDependency())), //
-                new ElementMatcher(packTarget, PAD_PACKAGE), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE));
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(dependency.getClients().contains(packSource2));
         assertTrue(dependency.getSuppliers().contains(packSource));
@@ -335,9 +346,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         abstraction.getSuppliers().add(packTarget);
 
         // Create the 3 required nodes
-        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource);
-        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packTarget);
-        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource2);
+        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource);
+        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packTarget);
+        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource2);
 
         // Check that the edge is created
         this.getDiagramHelper().refresh();
@@ -351,9 +362,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check source reconnection
         this.getServiceTester().assertSourceReconnection(new ElementMatcher(abstraction, PAD_ABSTRACTION), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE), //
-                new ElementMatcher(packTarget, PAD_PACKAGE));
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(abstraction.getClients().contains(packSource2));
         assertFalse(abstraction.getClients().contains(packSource));
@@ -361,9 +372,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check target reconnection
         this.getServiceTester().assertTargetReconnection(new ElementMatcher(abstraction, PAD_ABSTRACTION), //
-                new ElementMatcher(packTarget, PAD_PACKAGE), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE));
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(abstraction.getClients().contains(packSource2));
         assertTrue(abstraction.getSuppliers().contains(packSource));
@@ -385,9 +396,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         packageImport.setImportedPackage(packTarget);
 
         // Create the 3 required nodes
-        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource);
-        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packTarget);
-        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource2);
+        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource);
+        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packTarget);
+        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource2);
 
         // Check that the edge is created
         this.getDiagramHelper().refresh();
@@ -401,9 +412,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check source reconnection
         this.getServiceTester().assertSourceReconnection(new ElementMatcher(packageImport, ID_BUILDER.getDomainBaseEdgeId(UML.getPackageImport())), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE), //
-                new ElementMatcher(packTarget, PAD_PACKAGE));
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(packSource2.getPackageImports().contains(packageImport));
         assertEquals(packSource2, packageImport.getImportingNamespace());
@@ -411,9 +422,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
         // Check target reconnection
         this.getServiceTester().assertTargetReconnection(new ElementMatcher(packageImport, ID_BUILDER.getDomainBaseEdgeId(UML.getPackageImport())), //
-                new ElementMatcher(packTarget, PAD_PACKAGE), //
-                new ElementMatcher(packSource, PAD_PACKAGE), //
-                new ElementMatcher(packSource2, PAD_PACKAGE));
+                new ElementMatcher(packTarget, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource, PAD_PACKAGE + TOP_HOLDER_SUFFIX), //
+                new ElementMatcher(packSource2, PAD_PACKAGE + TOP_HOLDER_SUFFIX));
 
         assertTrue(packSource2.getPackageImports().contains(packageImport));
         assertEquals(packSource2, packageImport.getImportingNamespace());
@@ -430,13 +441,15 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Package pack1 = this.createIn(Package.class, pack);
 
         // In Package
-        Node packageNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, pack1);
-        this.getServiceTester().assertChildCreation(packageNode, UML.getComment(), UML.getElement_OwnedComment(), PAD_COMMENT_SHARED);
+        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, pack1);
+        Node packageNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_PACKAGE + TOP_CONTENT_SUFFIX, pack1);
+        this.getServiceTester().assertChildCreation(packageNodeContent, UML.getComment(), UML.getElement_OwnedComment(), PAD_COMMENT_SHARED);
 
         // In Model
         Model model1 = this.createIn(Model.class, pack);
-        Node modelNodeNode = this.getDiagramHelper().createNodeInDiagram(PAD_MODEL, model1);
-        this.getServiceTester().assertChildCreation(modelNodeNode, UML.getComment(), UML.getElement_OwnedComment(), PAD_COMMENT_SHARED);
+        this.getDiagramHelper().createNodeInDiagram(PAD_MODEL + TOP_HOLDER_SUFFIX, model1);
+        Node modelNodeNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_MODEL + TOP_CONTENT_SUFFIX, model1);
+        this.getServiceTester().assertChildCreation(modelNodeNodeContent, UML.getComment(), UML.getElement_OwnedComment(), PAD_COMMENT_SHARED);
 
     }
 
@@ -451,9 +464,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Package packTarget = this.createIn(Package.class, packSource);
         Package otherPackage = this.createIn(Package.class, pack);
 
-        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packSource);
-        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, packTarget);
-        Node otherNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, otherPackage);
+        Node sourceNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packSource);
+        Node targetNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, packTarget);
+        Node otherNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, otherPackage);
 
         this.getDiagramHelper().refresh();
 
@@ -480,23 +493,30 @@ public class PackageDiagramTests extends AbstractDiagramTest {
     public void checkModelChildren() {
         Package pack = this.init();
 
-        Model parent = this.createIn(Model.class, pack);
-        Node parentNode = this.getDiagramHelper().createNodeInDiagram(PAD_MODEL, parent);
+        Model model = this.createIn(Model.class, pack);
+        this.getDiagramHelper().createNodeInDiagram(PAD_MODEL + TOP_HOLDER_SUFFIX, model);
+        Node parentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_MODEL + TOP_CONTENT_SUFFIX, model);
 
-        this.checkPackageChildren(parentNode, true);
+        this.checkPackageChildren(parentNodeContent, true);
     }
 
     private void checkPackageChildren(Node parentNode, boolean recurse) {
         // Model In Model
-        Node droppedModelNode = this.getServiceTester().assertChildCreationAndDrop(parentNode, Model.class, UML.getPackage_PackagedElement(), PAD_MODEL_SHARED);
+        Node droppedModelNode = this.getServiceTester().assertChildCreationAndDrop(parentNode, Model.class, UML.getPackage_PackagedElement(), PAD_MODEL + SHARED_HOLDER_SUFFIX);
         if (recurse) {
-            this.checkPackageChildren(droppedModelNode, false);
+            EObject model = this.getDiagramHelper().getSemanticElement(droppedModelNode);
+            this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_MODEL + SHARED_HOLDER_SUFFIX, model);
+            Node contentNode = this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_MODEL + SHARED_CONTENT_SUFFIX, model);
+            this.checkPackageChildren(contentNode, false);
         }
 
         // Package in Model
-        Node droppedPackageNode = this.getServiceTester().assertChildCreationAndDrop(parentNode, Package.class, UML.getPackage_PackagedElement(), PAD_PACKAGE_SHARED);
+        Node droppedPackageNode = this.getServiceTester().assertChildCreationAndDrop(parentNode, Package.class, UML.getPackage_PackagedElement(), PAD_PACKAGE + SHARED_HOLDER_SUFFIX);
         if (recurse) {
-            this.checkPackageChildren(droppedPackageNode, false);
+            EObject pack = this.getDiagramHelper().getSemanticElement(droppedPackageNode);
+            this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_PACKAGE + SHARED_HOLDER_SUFFIX, pack);
+            Node contentNode = this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_PACKAGE + SHARED_CONTENT_SUFFIX, pack);
+            this.checkPackageChildren(contentNode, false);
         }
 
         // Comment in Model
@@ -508,9 +528,10 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Package pack = this.init();
 
         Package parent = this.createIn(Package.class, pack);
-        Node parentNode = this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE, parent);
+        this.getDiagramHelper().createNodeInDiagram(PAD_PACKAGE + TOP_HOLDER_SUFFIX, parent);
+        Node parentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(PAD_PACKAGE + TOP_CONTENT_SUFFIX, parent);
 
-        this.checkPackageChildren(parentNode, true);
+        this.checkPackageChildren(parentNodeContent, true);
     }
 
 }

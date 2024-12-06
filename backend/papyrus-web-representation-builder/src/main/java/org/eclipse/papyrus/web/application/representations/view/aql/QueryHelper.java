@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2023 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.view.aql;
 
@@ -122,12 +123,37 @@ public class QueryHelper {
         } else {
             self = seflExpression;
         }
-        return new CallQuery(self).callService(Services.CREATE_SERVICE, this.aqlString(domainType), this.aqlString(containementRef.getName()), SELECTED_NODE, DIAGRAM_CONTEXT, CONVERTED_NODES);
+        return new CallQuery(self).callService(Services.CREATE_SERVICE, this.aqlString(domainType), this.aqlString(containementRef.getName()), SELECTED_NODE, DIAGRAM_CONTEXT,
+                CONVERTED_NODES);
+    }
+
+    /**
+     * Query to create an element in the Holder (parent) insteand of the content. Typically used for BorderedNode.
+     *
+     * @param domainType
+     *            the type of the element to create
+     * @param seflExpression
+     *            the self expression
+     * @param containementRef
+     *            the containment reference which will contain the created element
+     * @return the query
+     */
+
+    public String createNodeInHolderQuery(String domainType, String seflExpression, EReference containementRef) {
+        String self;
+        if (seflExpression.startsWith(AQL_PREFIX)) {
+            self = seflExpression.substring(AQL_PREFIX.length());
+        } else {
+            self = seflExpression;
+        }
+        return new CallQuery(self).callService(Services.CREATE_IN_HOLDER_SERVICE, this.aqlString(domainType), this.aqlString(containementRef.getName()), SELECTED_NODE,
+                DIAGRAM_CONTEXT,
+                CONVERTED_NODES);
     }
 
     /**
      * Query to create an element in compartment of the given parent.
-     * 
+     *
      * @param domainType
      *            the type of the element to create
      * @param compartmentName
@@ -209,7 +235,7 @@ public class QueryHelper {
 
     /**
      * Builds the query used for domain based reconnection tool of the source.
-     * 
+     *
      * @return a query
      */
     public String queryDomainBasedSourceReconnection() {
@@ -219,7 +245,7 @@ public class QueryHelper {
 
     /**
      * Builds the query used for domain based reconnection tool of the target.
-     * 
+     *
      * @return a query
      */
     public String queryDomainBasedTargetReconnection() {
@@ -229,7 +255,7 @@ public class QueryHelper {
 
     /**
      * Builds the query used to compute the source label of a domain based edge.
-     * 
+     *
      * @return a query
      */
     public String createDomainBaseEdgeSourceLabelExpression() {
@@ -239,7 +265,7 @@ public class QueryHelper {
 
     /**
      * Builds the query used to compute the target label of a domain based edge.
-     * 
+     *
      * @return a query
      */
     public String createDomainBaseEdgeTargetLabelExpression() {

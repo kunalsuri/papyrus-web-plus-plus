@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,9 +10,13 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.deployment;
 
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.CONTENT_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.HOLDER_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.UNDERSCORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,6 +56,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @WebAppConfiguration
 public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
+
+    private static final String TOP_HOLDER_SUFFIX = UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String TOP_CONTENT_SUFFIX = UNDERSCORE + CONTENT_SUFFIX;
 
     private static final String ARTIFACT = UML.getArtifact().getName();
 
@@ -405,8 +413,8 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
         Device sourceDevice = this.createIn(Device.class, pack);
         Device targetDevice = this.createIn(Device.class, pack);
 
-        org.eclipse.sirius.components.diagrams.Node sourceDeviceNode = this.getDiagramHelper().createNodeInDiagram(DD_DEVICE_NODE_NAME, sourceDevice);
-        org.eclipse.sirius.components.diagrams.Node targetDeviceNode = this.getDiagramHelper().createNodeInDiagram(DD_DEVICE_NODE_NAME, targetDevice);
+        org.eclipse.sirius.components.diagrams.Node sourceDeviceNode = this.getDiagramHelper().createNodeInDiagram(DD_DEVICE_NODE_NAME + TOP_HOLDER_SUFFIX, sourceDevice);
+        org.eclipse.sirius.components.diagrams.Node targetDeviceNode = this.getDiagramHelper().createNodeInDiagram(DD_DEVICE_NODE_NAME + TOP_HOLDER_SUFFIX, targetDevice);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -438,8 +446,8 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
         Artifact sourceArtifact = this.createIn(Artifact.class, pack);
         Artifact targetArtifact = this.createIn(Artifact.class, pack);
 
-        org.eclipse.sirius.components.diagrams.Node sourceArtifactNode = this.getDiagramHelper().createNodeInDiagram(DD_ARTIFACT_NODE_NAME, sourceArtifact);
-        org.eclipse.sirius.components.diagrams.Node targetArtifactNode = this.getDiagramHelper().createNodeInDiagram(DD_ARTIFACT_NODE_NAME, targetArtifact);
+        org.eclipse.sirius.components.diagrams.Node sourceArtifactNode = this.getDiagramHelper().createNodeInDiagram(DD_ARTIFACT_NODE_NAME + TOP_HOLDER_SUFFIX, sourceArtifact);
+        org.eclipse.sirius.components.diagrams.Node targetArtifactNode = this.getDiagramHelper().createNodeInDiagram(DD_ARTIFACT_NODE_NAME + TOP_HOLDER_SUFFIX, targetArtifact);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
@@ -470,11 +478,12 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
         Package rootPack = this.init();
         Package childPack = this.createIn(Package.class, rootPack);
-        org.eclipse.sirius.components.diagrams.Node childPackNode = this.getDiagramHelper().createNodeInDiagram(DD_PACKAGE_NODE_NAME, childPack);
+        this.getDiagramHelper().createNodeInDiagram(DD_PACKAGE_NODE_NAME + TOP_HOLDER_SUFFIX, childPack);
+        org.eclipse.sirius.components.diagrams.Node childPackNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(DD_PACKAGE_NODE_NAME + TOP_CONTENT_SUFFIX, childPack);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createArtifactDD(childPack, ARTIFACT, childPackNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createArtifactDD(childPack, ARTIFACT, childPackNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -485,7 +494,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(childPack.getPackagedElements().contains(artifact));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_ARTIFACT_SHARED_NODE_NAME, childPackNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_ARTIFACT_SHARED_NODE_NAME + TOP_HOLDER_SUFFIX, childPackNodeContent, newElement);
     }
 
     /**
@@ -498,11 +507,12 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
         Package rootPack = this.init();
         Artifact childArtifact = this.createIn(Artifact.class, rootPack);
-        org.eclipse.sirius.components.diagrams.Node childArtifactNode = this.getDiagramHelper().createNodeInDiagram(DD_ARTIFACT_NODE_NAME, childArtifact);
+        org.eclipse.sirius.components.diagrams.Node childArtifactNodeHolder = this.getDiagramHelper().createNodeInDiagram(DD_ARTIFACT_NODE_NAME + TOP_HOLDER_SUFFIX, childArtifact);
+        org.eclipse.sirius.components.diagrams.Node childArtifactNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(DD_ARTIFACT_NODE_NAME + TOP_CONTENT_SUFFIX, childArtifact);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createArtifactDD(childArtifact, ARTIFACT, childArtifactNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createArtifactDD(childArtifact, ARTIFACT, childArtifactNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -513,7 +523,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(childArtifact.getNestedArtifacts().contains(artifact));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_ARTIFACT_SHARED_NODE_NAME, childArtifactNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_ARTIFACT_SHARED_NODE_NAME + TOP_HOLDER_SUFFIX, childArtifactNodeContent, newElement);
     }
 
     /**
@@ -526,11 +536,12 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
         Package rootPack = this.init();
         Node childNode = this.createIn(Node.class, rootPack);
-        org.eclipse.sirius.components.diagrams.Node childNodeNode = this.getDiagramHelper().createNodeInDiagram(DD_NODE_NODE_NAME, childNode);
+        this.getDiagramHelper().createNodeInDiagram(DD_NODE_NODE_NAME + TOP_HOLDER_SUFFIX, childNode);
+        org.eclipse.sirius.components.diagrams.Node childNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(DD_NODE_NODE_NAME + TOP_CONTENT_SUFFIX, childNode);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createArtifactDD(childNode, ARTIFACT, childNodeNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createArtifactDD(childNode, ARTIFACT, childNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -541,7 +552,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(childNode.getNestedClassifiers().contains(artifact));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_ARTIFACT_SHARED_NODE_NAME, childNodeNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_ARTIFACT_SHARED_NODE_NAME + TOP_HOLDER_SUFFIX, childNodeContent, newElement);
     }
 
     /**
@@ -554,11 +565,12 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
         Package rootPack = this.init();
         Package childPack = this.createIn(Package.class, rootPack);
-        org.eclipse.sirius.components.diagrams.Node childPackNode = this.getDiagramHelper().createNodeInDiagram(DD_PACKAGE_NODE_NAME, childPack);
+        this.getDiagramHelper().createNodeInDiagram(DD_PACKAGE_NODE_NAME + TOP_HOLDER_SUFFIX, childPack);
+        org.eclipse.sirius.components.diagrams.Node childPackNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(DD_PACKAGE_NODE_NAME + TOP_CONTENT_SUFFIX, childPack);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createNodeDD(childPack, NODE, childPackNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createNodeDD(childPack, NODE, childPackNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -569,7 +581,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(childPack.getPackagedElements().contains(node));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_NODE_SHARED_NODE_NAME, childPackNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_NODE_SHARED_NODE_NAME + TOP_HOLDER_SUFFIX, childPackNodeContent, newElement);
     }
 
     /**
@@ -582,11 +594,12 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
         Package rootPack = this.init();
         Device childDevice = this.createIn(Device.class, rootPack);
-        org.eclipse.sirius.components.diagrams.Node childDeviceNode = this.getDiagramHelper().createNodeInDiagram(DD_DEVICE_NODE_NAME, childDevice);
+        this.getDiagramHelper().createNodeInDiagram(DD_DEVICE_NODE_NAME + TOP_HOLDER_SUFFIX, childDevice);
+        org.eclipse.sirius.components.diagrams.Node childDeviceNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(DD_DEVICE_NODE_NAME + TOP_CONTENT_SUFFIX, childDevice);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createNodeDD(childDevice, NODE, childDeviceNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createNodeDD(childDevice, NODE, childDeviceNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -597,7 +610,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(childDevice.getNestedNodes().contains(node));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_NODE_SHARED_NODE_NAME, childDeviceNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(DD_NODE_SHARED_NODE_NAME + TOP_HOLDER_SUFFIX, childDeviceNodeContent, newElement);
     }
 
     /**

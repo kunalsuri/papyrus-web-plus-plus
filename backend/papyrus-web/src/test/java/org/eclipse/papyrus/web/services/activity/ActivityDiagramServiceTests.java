@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,10 +10,14 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.activity;
 
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.CONTENT_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.HOLDER_SUFFIX;
 import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.SHARED_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.UNDERSCORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -71,6 +75,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @WebAppConfiguration
 public class ActivityDiagramServiceTests extends AbstractDiagramTest {
+
+    private static final String TOP_HOLDER_SUFFIX = UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String TOP_CONTENT_SUFFIX = UNDERSCORE + CONTENT_SUFFIX;
 
     private static final IdBuilder ID_BUILDER = new IdBuilder(ADDiagramDescriptionBuilder.AD_PREFIX, new UMLMetamodelHelper());
 
@@ -350,11 +358,12 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateActivityNodeInActivity() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
-                    .createActivityNodeAD(activity, UML.getInitialNode().getName(), UML.getActivity_OwnedNode().getName(), activityNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createActivityNodeAD(activity, UML.getInitialNode().getName(), UML.getActivity_OwnedNode().getName(), activityNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -364,7 +373,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(activity.getOwnedNodes().contains(initialNode));
 
         // Check graphical element creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_INITIAL_NODE_NAME, activityNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_INITIAL_NODE_NAME, activityNodeContent, newElement);
     }
 
     /**
@@ -375,14 +384,17 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateActivityNodeInActivityPartition() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         ActivityPartition activityPartition = this.create(ActivityPartition.class);
         activity.getPartitions().add(activityPartition);
-        Node activityPartitionNode = this.getDiagramHelper().createNodeInParent(AD_ACTIVITY_PARTITION_NODE_NAME, activityPartition, activityNode);
+        Node activityPartitionNodeHolder = this.getDiagramHelper().createNodeInParent(AD_ACTIVITY_PARTITION_NODE_NAME + TOP_HOLDER_SUFFIX, activityPartition, activityNodeContent);
+        Node activityPartitionNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_ACTIVITY_PARTITION_NODE_NAME + TOP_CONTENT_SUFFIX, activityPartitionNodeHolder,
+                activityPartition);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
-                    .createActivityNodeAD(activityPartition, UML.getInitialNode().getName(), UML.getActivity_OwnedNode().getName(), activityPartitionNode, context,
+                    .createActivityNodeAD(activityPartition, UML.getInitialNode().getName(), UML.getActivity_OwnedNode().getName(), activityPartitionNodeContent, context,
                             this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
@@ -396,7 +408,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(activityPartition.getNodes().contains(initialNode));
 
         // Check graphical element creation. The graphical element is contained in the ActivityPartition node.
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_INITIAL_NODE_NAME, activityPartitionNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_INITIAL_NODE_NAME, activityPartitionNodeContent, newElement);
     }
 
     /**
@@ -407,10 +419,15 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateActivityNodeInInterruptibleActivityRegion() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         InterruptibleActivityRegion interruptibleActivityRegion = this.create(InterruptibleActivityRegion.class);
         activity.getOwnedGroups().add(interruptibleActivityRegion);
-        Node interruptibleActivityRegionNode = this.getDiagramHelper().createNodeInParent(AD_INTERRUPTIBLE_ACTIVITY_REGION_NODE_NAME, interruptibleActivityRegion, activityNode);
+        Node interruptibleActivityRegionNodeHolder = this.getDiagramHelper().createNodeInParent(AD_INTERRUPTIBLE_ACTIVITY_REGION_NODE_NAME + TOP_HOLDER_SUFFIX, interruptibleActivityRegion,
+                activityNodeContent);
+        Node interruptibleActivityRegionNode = this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_INTERRUPTIBLE_ACTIVITY_REGION_NODE_NAME + TOP_CONTENT_SUFFIX,
+                interruptibleActivityRegionNodeHolder,
+                interruptibleActivityRegion);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
@@ -439,14 +456,17 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateActivityNodeInStructuredActivityNode() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         StructuredActivityNode structuredActivityNode = this.create(StructuredActivityNode.class);
         activity.getStructuredNodes().add(structuredActivityNode);
-        Node structuredActivityNodeNode = this.getDiagramHelper().createNodeInParent(AD_STRUCTURED_ACTIVITY_NODE_NAME, structuredActivityNode, activityNode);
+        Node structuredActivityNodeNodeHolder = this.getDiagramHelper().createNodeInParent(AD_STRUCTURED_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, structuredActivityNode, activityNodeContent);
+        Node structuredActivityNodeNodeContent = this.getDiagramHelper().createNodeInParent(AD_STRUCTURED_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, structuredActivityNode,
+                structuredActivityNodeNodeHolder);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
-                    .createActivityNodeAD(structuredActivityNode, UML.getInitialNode().getName(), UML.getActivity_OwnedNode().getName(), structuredActivityNodeNode, context,
+                    .createActivityNodeAD(structuredActivityNode, UML.getInitialNode().getName(), UML.getActivity_OwnedNode().getName(), structuredActivityNodeNodeContent, context,
                             this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
@@ -457,7 +477,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(structuredActivityNode.getNodes().contains(initialNode));
 
         // Check graphical element creation.
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_INITIAL_NODE_NAME, structuredActivityNodeNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_INITIAL_NODE_NAME, structuredActivityNodeNodeContent, newElement);
 
     }
 
@@ -470,10 +490,11 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateActivityNodeInNonActivityNonActivityGroupNonStructuredActivityNode() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         InitialNode initialNode = this.create(InitialNode.class);
         activity.getOwnedNodes().add(initialNode);
-        Node initialNodeGraphicalNode = this.getDiagramHelper().createNodeInParent(AD_INITIAL_NODE_NAME, initialNode, activityNode);
+        Node initialNodeGraphicalNode = this.getDiagramHelper().createNodeInParent(AD_INITIAL_NODE_NAME, initialNode, activityNodeContent);
         // This produces an IllegalArgumentException because createActivityNodeAD returns null
         assertThrows(IllegalArgumentException.class, () -> {
             this.getDiagramHelper().modify(context -> {
@@ -493,14 +514,16 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateInputExpansionNodeInExpansionRegion() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         ExpansionRegion expansionRegion = this.create(ExpansionRegion.class);
         activity.getOwnedNodes().add(expansionRegion);
-        Node expansionRegionNode = this.getDiagramHelper().createNodeInParent(AD_EXPANSION_REGION_NODE_NAME, expansionRegion, activityNode);
+        Node expansionRegionNodeHolder = this.getDiagramHelper().createNodeInParent(AD_EXPANSION_REGION_NODE_NAME + TOP_HOLDER_SUFFIX, expansionRegion, activityNodeContent);
+        Node expansionRegionNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_EXPANSION_REGION_NODE_NAME + TOP_CONTENT_SUFFIX, expansionRegion);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
-                    .createExpansionNodeAD(expansionRegion, expansionRegionNode, context, this.getDiagramHelper().getConvertedNodes(), true);
+                    .createExpansionNodeAD(expansionRegion, expansionRegionNodeContent, context, this.getDiagramHelper().getConvertedNodes(), true);
             return aNewElement;
         });
 
@@ -510,7 +533,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(expansionRegion.getInputElements().contains(expansionNode));
 
         // Check graphical element creation.
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_EXPANSION_NODE_NAME, expansionRegionNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_EXPANSION_NODE_NAME, expansionRegionNodeHolder, newElement);
 
     }
 
@@ -522,14 +545,16 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateOutputExpansionNodeInExpansionRegion() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         ExpansionRegion expansionRegion = this.create(ExpansionRegion.class);
         activity.getOwnedNodes().add(expansionRegion);
-        Node expansionRegionNode = this.getDiagramHelper().createNodeInParent(AD_EXPANSION_REGION_NODE_NAME, expansionRegion, activityNode);
+        Node expansionRegionNodeHolder = this.getDiagramHelper().createNodeInParent(AD_EXPANSION_REGION_NODE_NAME + TOP_HOLDER_SUFFIX, expansionRegion, activityNodeContent);
+        Node expansionRegionNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_EXPANSION_REGION_NODE_NAME + TOP_CONTENT_SUFFIX, expansionRegion);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
-                    .createExpansionNodeAD(expansionRegion, expansionRegionNode, context, this.getDiagramHelper().getConvertedNodes(), false);
+                    .createExpansionNodeAD(expansionRegion, expansionRegionNodeContent, context, this.getDiagramHelper().getConvertedNodes(), false);
             return aNewElement;
         });
 
@@ -539,8 +564,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
         assertTrue(expansionRegion.getOutputElements().contains(expansionNode));
 
         // Check graphical element creation.
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_EXPANSION_NODE_NAME, expansionRegionNode, newElement);
-
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(AD_EXPANSION_NODE_NAME, expansionRegionNodeHolder, newElement);
     }
 
     /**
@@ -551,10 +575,11 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateActionInputPinInOpaqueAction() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         OpaqueAction opaqueAction = this.create(OpaqueAction.class);
         activity.getOwnedNodes().add(opaqueAction);
-        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNode);
+        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNodeContent);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
@@ -579,10 +604,11 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateInputPinInOpaqueAction() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         OpaqueAction opaqueAction = this.create(OpaqueAction.class);
         activity.getOwnedNodes().add(opaqueAction);
-        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNode);
+        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNodeContent);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
@@ -607,10 +633,11 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateOutputPinInOpaqueAction() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         OpaqueAction opaqueAction = this.create(OpaqueAction.class);
         activity.getOwnedNodes().add(opaqueAction);
-        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNode);
+        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNodeContent);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //
@@ -635,10 +662,11 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     @Test
     public void testCreateValuePinInOpaqueAction() {
         Activity activity = this.init();
-        Node activityNode = this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME, activity);
+        this.getDiagramHelper().createNodeInDiagram(AD_ACTIVITY_NODE_NAME + TOP_HOLDER_SUFFIX, activity);
+        Node activityNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(AD_ACTIVITY_NODE_NAME + TOP_CONTENT_SUFFIX, activity);
         OpaqueAction opaqueAction = this.create(OpaqueAction.class);
         activity.getOwnedNodes().add(opaqueAction);
-        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNode);
+        Node opaqueActionNode = this.getDiagramHelper().createNodeInParent(AD_OPAQUE_ACTION_NODE_NAME, opaqueAction, activityNodeContent);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService() //

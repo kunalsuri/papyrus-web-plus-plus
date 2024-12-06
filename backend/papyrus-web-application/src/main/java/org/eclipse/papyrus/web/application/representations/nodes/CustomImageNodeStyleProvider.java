@@ -14,12 +14,9 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.nodes;
 
-import java.util.Objects;
 import java.util.Optional;
 
-import org.eclipse.papyrus.web.custom.widgets.IAQLInterpreterProvider;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription;
-import org.eclipse.sirius.components.core.api.IEditingContextSearchService;
 import org.eclipse.sirius.components.diagrams.INodeStyle;
 import org.eclipse.sirius.components.diagrams.LineStyle;
 import org.eclipse.sirius.components.interpreter.AQLInterpreter;
@@ -28,7 +25,6 @@ import org.eclipse.sirius.components.representations.VariableManager;
 import org.eclipse.sirius.components.view.FixedColor;
 import org.eclipse.sirius.components.view.diagram.NodeStyleDescription;
 import org.eclipse.sirius.components.view.emf.diagram.INodeStyleProvider;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -40,16 +36,6 @@ import org.springframework.stereotype.Service;
 public class CustomImageNodeStyleProvider implements INodeStyleProvider {
 
     public static final String NODE_CUSTOM_IMAGE = "customnode:customimage";
-
-    private IEditingContextSearchService editingContextSearchService;
-
-    private IAQLInterpreterProvider interpreterProvider;
-
-    public CustomImageNodeStyleProvider(@Lazy IEditingContextSearchService editingContextSearchService,
-            IAQLInterpreterProvider interpreterProvider) {
-        this.editingContextSearchService = Objects.requireNonNull(editingContextSearchService);
-        this.interpreterProvider = Objects.requireNonNull(interpreterProvider);
-    }
 
     @Override
     public Optional<String> getNodeType(NodeStyleDescription nodeStyle) {
@@ -106,15 +92,7 @@ public class CustomImageNodeStyleProvider implements INodeStyleProvider {
                     .borderStyle(LineStyle.valueOf(nodeStyle.getBorderLineStyle().getLiteral()))
                     .build());
         }
-
         return iNodeStyle;
     }
-
-    /*
-     * private AQLInterpreter createInterpreter(Optional<String> optionalEditingContextId) { Optional<IEditingContext>
-     * editingContext = this.editingContextSearchService.findById(optionalEditingContextId.get()); return
-     * this.interpreterProvider.createInterpreter(org.eclipse.sirius.components.view.ViewFactory.eINSTANCE.createView(),
-     * editingContext.get()); }
-     */
 
 }

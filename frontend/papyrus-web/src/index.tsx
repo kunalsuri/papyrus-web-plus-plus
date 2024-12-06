@@ -13,7 +13,6 @@
  *******************************************************************************/
 import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { ExtensionRegistry } from '@eclipse-sirius/sirius-components-core';
-import { NodeTypeContribution, diagramPaletteToolExtensionPoint } from '@eclipse-sirius/sirius-components-diagrams';
 import {
   DiagramPaletteToolContributionProps,
   diagramPaletteToolExtensionPoint,

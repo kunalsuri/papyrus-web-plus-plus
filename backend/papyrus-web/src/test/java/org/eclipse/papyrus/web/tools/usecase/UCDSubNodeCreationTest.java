@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.usecase;
 
@@ -19,6 +20,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.UCDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeCreationSemanticChecker;
 import org.eclipse.papyrus.web.tools.test.NodeCreationTest;
@@ -100,12 +102,17 @@ public class UCDSubNodeCreationTest extends NodeCreationTest {
 
     @ParameterizedTest(name = "[{index}] Create node {1} in Package")
     @MethodSource("packageChildrenParameters")
-    public void testCreateNodeInPackage(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        String mappingType = UCDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_NAME), mappingType, this.getCapturedNodes());
+    public void testCreateNodeInDiagram(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
+        String mappingType = UCDMappingTypes.getMappingType(expectedType);
+        NodeCreationGraphicalChecker graphicalChecker = switch (expectedType.getName()) {
+            case "Activity", "Class", "Component", "Interaction", "Package", "StateMachine" -> new HolderCreationGraphicalChecker(this::getDiagram,
+                    () -> this.findGraphicalElementContentByLabel(PACKAGE_NAME), mappingType,
+                    this.getCapturedNodes());
+            default -> new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_NAME), mappingType,
+                    this.getCapturedNodes());
+        };
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_NAME), containmentReference);
-        this.createSubNode(PACKAGE_NAME, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 
     @ParameterizedTest(name = "[{index}] Create node {1} in Activity")
@@ -140,7 +147,8 @@ public class UCDSubNodeCreationTest extends NodeCreationTest {
 
     private void testCreateNodeInSubject(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference, String containerName) {
         String mappingType = UCDMappingTypes.getMappingTypeAsSubNode(expectedType);
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(containerName), mappingType, this.getCapturedNodes());
+        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(containerName), mappingType,
+                this.getCapturedNodes());
         NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(containerName), containmentReference);
         this.createSubNode(containerName, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));

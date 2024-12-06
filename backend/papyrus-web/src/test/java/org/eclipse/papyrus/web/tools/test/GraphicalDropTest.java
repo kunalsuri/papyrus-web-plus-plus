@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.test;
 
@@ -81,10 +82,10 @@ public class GraphicalDropTest extends AbstractPapyrusWebTest {
      *            the {@link Checker} to use to validate the operation
      */
     public void graphicalDropOnContainer(Node nodeToDrop, String targetNodeLabel, Checker checker) {
-        Node targetNode = (Node) this.findGraphicalElementByLabel(targetNodeLabel);
+        Node targetNode = (Node) this.findGraphicalElementContentByLabel(targetNodeLabel);
         List<String> initialTargetNodeChildrenIds = targetNode.getChildNodes().stream().map(Node::getId).toList();
         this.applyDropNodeTool(nodeToDrop.getId(), targetNode.getId());
-        Node updatedTargetNode = (Node) this.findGraphicalElementByLabel(targetNodeLabel);
+        Node updatedTargetNode = (Node) this.findGraphicalElementContentByLabel(targetNodeLabel);
         Node droppedNode = updatedTargetNode.getChildNodes().stream()
                 .filter(node -> !initialTargetNodeChildrenIds.contains(node.getId()))
                 .findFirst()
@@ -106,11 +107,11 @@ public class GraphicalDropTest extends AbstractPapyrusWebTest {
      *            the {@link Checker} to use to validate the operation
      */
     public void graphicalDropOnContainerCompartment(Node nodeToDrop, String targetNodeLabel, String compartmentName, Checker checker) {
-        Node targetNode = (Node) this.findGraphicalElementByLabel(targetNodeLabel);
+        Node targetNode = (Node) this.findGraphicalElementExcludingContentByLabel(targetNodeLabel);
         Node targetCompartmentNode = this.getSubNode(targetNode, compartmentName);
         List<String> initialTargetCompartmentNodeChildrenIds = targetCompartmentNode.getChildNodes().stream().map(Node::getId).toList();
         this.applyDropNodeTool(nodeToDrop.getId(), targetCompartmentNode.getId());
-        Node updatedTargetNode = (Node) this.findGraphicalElementByLabel(targetNodeLabel);
+        Node updatedTargetNode = (Node) this.findGraphicalElementExcludingContentByLabel(targetNodeLabel);
         Node updatedTargetCompartmentNode = this.getSubNode(updatedTargetNode, compartmentName);
         Node droppedNode = updatedTargetCompartmentNode.getChildNodes().stream()
                 .filter(node -> !initialTargetCompartmentNodeChildrenIds.contains(node.getId()))

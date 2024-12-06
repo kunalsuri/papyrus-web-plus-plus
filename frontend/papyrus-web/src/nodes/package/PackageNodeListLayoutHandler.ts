@@ -11,6 +11,8 @@
  * Contributors:
  *  Obeo - Initial API and implementation
  *****************************************************************************/
+
+//inspired by: packages/diagrams/frontend/sirius-components-diagrams/src/renderer/layout/ListNodeLayoutHandler.ts
 import {
   applyRatioOnNewNodeSizeValue,
   computeNodesBox,
@@ -30,11 +32,10 @@ import {
   INodeLayoutHandler,
   NodeData,
   setBorderNodesPosition,
+  getInsideLabelWidthConstraint,
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { Node } from '@xyflow/react';
 import { PackageNodeListData } from './PackageNode.types';
-
-const rectangularNodePadding: number = 8;
 
 export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageNodeListData> {
   public canHandle(node: Node<NodeData, DiagramNodeType>) {
@@ -51,8 +52,12 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
     forceDimensions?: ForcedDimensions
   ) {
     const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const nodeElement = document.getElementById(`${node.id}-packageNodeList-${nodeIndex}`)?.children[0];
-    const borderWidth = nodeElement ? parseFloat(window.getComputedStyle(nodeElement).borderWidth) : 0;
+    const nodeElement = document.getElementById(`${node.id}-packageNodeList-${nodeIndex}`);
+    const nodeElementChild =
+      nodeElement?.children &&
+      Array.from(nodeElement.children).filter((child) => !child.classList.contains('react-flow__resize-control'))[0];
+    const borderWidth = nodeElementChild ? parseFloat(window.getComputedStyle(nodeElementChild).borderLeftWidth) : 0;
+
     if (directChildren.length > 0) {
       this.handleParentNode(
         layoutEngine,
@@ -66,6 +71,45 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
       );
     } else {
       this.handleLeafNode(previousDiagram, node, visibleNodes, borderWidth, forceDimensions);
+    }
+  }
+
+  handleLeafNode(
+    previousDiagram: Diagram | null,
+    node: Node<PackageNodeListData, 'packageNodeList'>,
+    visibleNodes: Node<NodeData, DiagramNodeType>[],
+    borderWidth: number,
+    forceDimensions?: ForcedDimensions
+  ) {
+    const labelElement = document.getElementById(`${node.id}-label-${findNodeIndex(visibleNodes, node.id)}`);
+
+    const nodeMinComputeWidth = getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + borderWidth * 2;
+    const nodeMinComputeHeight = (labelElement?.getBoundingClientRect().height ?? 0) + borderWidth * 2;
+    const nodeWith = forceDimensions?.width ?? getDefaultOrMinWidth(nodeMinComputeWidth, node);
+    const nodeHeight = forceDimensions?.height ?? getDefaultOrMinHeight(nodeMinComputeHeight, node);
+
+    const previousNode = (previousDiagram?.nodes ?? []).find((previouseNode) => previouseNode.id === node.id);
+    const previousDimensions = computePreviousSize(previousNode, node);
+
+    const heightLostSincePrevDiagram: number =
+      previousDiagram?.nodes
+        .filter((prevNode) => prevNode.parentId === node.id && !prevNode.hidden)
+        .reduce<number>((height, node) => height + (node.height ?? 0), 0) ?? 0;
+
+    if (node.data.resizedByUser) {
+      if (nodeMinComputeWidth > previousDimensions.width) {
+        node.width = nodeMinComputeWidth;
+      } else {
+        node.width = previousDimensions.width;
+      }
+      if (nodeMinComputeHeight > previousDimensions.height) {
+        node.height = nodeMinComputeHeight;
+      } else {
+        node.height = getDefaultOrMinHeight(previousDimensions.height - heightLostSincePrevDiagram, node);
+      }
+    } else {
+      node.width = nodeWith;
+      node.height = nodeHeight;
     }
   }
 
@@ -94,6 +138,12 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
       (previouseNode) => previouseNode.id === node.id
     );
 
+    const heightLostSincePrevDiagram: number =
+      previousDiagram?.nodes
+        .filter((prevNode) => prevNode.parentId === node.id && !prevNode.hidden)
+        .filter((prevNode) => !directChildren.map((child) => child.id).includes(prevNode.id))
+        .reduce<number>((height, node) => height + (node.height ?? 0), 0) ?? 0;
+
     if (!forceDimensions) {
       let previousChildrenContentBoxWidthToConsider: number = getDefaultOrMinWidth(0, node) - borderWidth * 2;
       let previousChildrenContentBoxHeightToConsider: number = 0;
@@ -107,7 +157,7 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
       const fixedWidth: number = Math.max(
         directNodesChildren.reduce<number>(
           (widerWidth, child) => Math.max(child.width ?? 0, widerWidth),
-          labelElement?.getBoundingClientRect().width ?? 0
+          getInsideLabelWidthConstraint(node.data.insideLabel, labelElement)
         ),
         northBorderNodeFootprintWidth,
         southBorderNodeFootprintWidth,
@@ -126,6 +176,7 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
         (height, node) => height + (node.height ?? 0),
         0
       );
+      previousChildrenContentBoxHeightToConsider -= node.data.topGap + node.data.bottomGap;
 
       const growableChilds = directNodesChildren.filter(
         (child) => node.data.growableNodeIds.includes(child.data.descriptionId) && !child.data.resizedByUser
@@ -152,7 +203,7 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
 
     const childrenContentBox = computeNodesBox(visibleNodes, directNodesChildren);
 
-    const labelOnlyWidth = labelElement?.getBoundingClientRect().width ?? 0;
+    const labelOnlyWidth = getInsideLabelWidthConstraint(node.data.insideLabel, labelElement);
     const nodeMinComputeWidth = Math.max(childrenContentBox.width, labelOnlyWidth) + borderWidth * 2;
 
     const directChildrenAwareNodeHeight =
@@ -180,7 +231,7 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
       if (nodeMinComputeHeight > previousDimensions.height) {
         node.height = nodeMinComputeHeight;
       } else {
-        node.height = previousDimensions.height;
+        node.height = getDefaultOrMinHeight(previousDimensions.height - heightLostSincePrevDiagram, node);
       }
     } else {
       node.width = nodeWidth;
@@ -195,41 +246,5 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
       borderNode.extent = getBorderNodeExtent(node, borderNode);
     });
     setBorderNodesPosition(borderNodes, node, previousDiagram);
-  }
-
-  private handleLeafNode(
-    previousDiagram: Diagram | null,
-    node: Node<PackageNodeListData, 'packageNodeList'>,
-    visibleNodes: Node<NodeData, DiagramNodeType>[],
-    _borderWidth: number,
-    forceDimensions?: ForcedDimensions
-  ) {
-    const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-
-    const labelHeight =
-      rectangularNodePadding + (labelElement?.getBoundingClientRect().height ?? 0) + rectangularNodePadding;
-
-    const minNodeWith = Math.max(node.data.defaultWidth ? node.data.defaultWidth : 0);
-    const minNodeheight = Math.max(labelHeight, node.data.defaultHeight ? node.data.defaultHeight : 0);
-
-    const previousNode = (previousDiagram?.nodes ?? []).find((previouseNode) => previouseNode.id === node.id);
-    const previousDimensions = computePreviousSize(previousNode, node);
-
-    if (node.data.resizedByUser) {
-      if (minNodeWith > previousDimensions.width) {
-        node.width = minNodeWith;
-      } else {
-        node.width = previousDimensions.width;
-      }
-      if (minNodeheight > previousDimensions.height) {
-        node.height = minNodeheight;
-      } else {
-        node.height = previousDimensions.height;
-      }
-    } else {
-      node.width = minNodeWith;
-      node.height = minNodeheight;
-    }
   }
 }

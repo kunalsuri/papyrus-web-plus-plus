@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 Obeo, CEA LIST, Artal Technologies.
+ * Copyright (c) 2022, 2025 Obeo, CEA LIST, Artal Technologies.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *
  * Contributors:
  *     Obeo - initial API and implementation
- *     Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 218
  *******************************************************************************/
 package org.eclipse.papyrus.web.application.representations;
 
@@ -20,6 +19,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -30,9 +30,7 @@ import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.collaborative.diagrams.dto.DeletionPolicy;
 import org.eclipse.sirius.components.collaborative.diagrams.handlers.DeleteFromDiagramEventHandler;
-import org.eclipse.sirius.components.core.api.IEditService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
 import org.eclipse.sirius.components.core.api.IObjectService;
 import org.eclipse.sirius.components.diagrams.ArrangeLayoutDirection;
 import org.eclipse.sirius.components.diagrams.Edge;
@@ -59,6 +57,7 @@ import org.eclipse.sirius.components.diagrams.description.LabelStyleDescription;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
 import org.eclipse.sirius.components.diagrams.description.OutsideLabelDescription;
 import org.eclipse.sirius.components.diagrams.description.SynchronizationPolicy;
+import org.eclipse.sirius.components.diagrams.elements.EdgeElementProps;
 import org.eclipse.sirius.components.diagrams.elements.NodeElementProps;
 import org.eclipse.sirius.components.diagrams.renderer.DiagramRenderingCache;
 import org.eclipse.sirius.components.emf.DomainClassPredicate;
@@ -86,7 +85,7 @@ import org.eclipse.sirius.components.view.diagram.ListLayoutStrategyDescription;
 import org.eclipse.sirius.components.view.diagram.NodeStyleDescription;
 import org.eclipse.sirius.components.view.diagram.OutsideLabelStyle;
 import org.eclipse.sirius.components.view.emf.IRepresentationDescriptionConverter;
-import org.eclipse.sirius.components.view.emf.diagram.DiagramOperationInterpreter;
+import org.eclipse.sirius.components.view.emf.ViewIconURLsProvider;
 import org.eclipse.sirius.components.view.emf.diagram.IDiagramIdProvider;
 import org.eclipse.sirius.components.view.emf.diagram.INodeStyleProvider;
 import org.eclipse.sirius.components.view.emf.diagram.IViewDiagramCreationPredicate;
@@ -94,12 +93,12 @@ import org.eclipse.sirius.components.view.emf.diagram.IViewEdgeLabelEditHandler;
 import org.eclipse.sirius.components.view.emf.diagram.IViewNodeDeleteHandler;
 import org.eclipse.sirius.components.view.emf.diagram.RelationBasedSemanticElementsProvider;
 import org.eclipse.sirius.components.view.emf.diagram.StylesFactory;
-import org.eclipse.sirius.components.view.emf.diagram.TargetNodesProvider;
+import org.eclipse.sirius.components.view.emf.diagram.TargetProvider;
 import org.eclipse.sirius.components.view.emf.diagram.ToolConverter;
 import org.eclipse.sirius.components.view.emf.diagram.ToolFinder;
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverter;
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverterContext;
-import org.eclipse.sirius.components.view.emf.diagram.providers.api.IViewToolImageProvider;
+import org.eclipse.sirius.components.view.emf.diagram.tools.api.IToolExecutor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -107,22 +106,24 @@ import org.springframework.stereotype.Service;
  * This class is copied and adapted from
  * {@link org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverter}.
  *
+ * The
+ * {@link #convert(org.eclipse.sirius.components.view.diagram.NodeDescription, ViewDiagramDescriptionConverterContext, StylesFactory)}
+ * method has been modified to use an AQL string interpreter to get the path of Image for CustomImage.
+ *
  * @author tiboue
  */
 @Service
 public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescriptionConverter implements IRepresentationDescriptionConverter {
 
-    private static final String CONVERTED_NODES_VARIABLE = "convertedNodes";
+    public static final String CONVERTED_NODES_VARIABLE = "convertedNodes";
 
     private static final String DEFAULT_DIAGRAM_LABEL = "Diagram";
 
     private final IObjectService objectService;
 
-    private final IEditService editService;
+    private final IToolExecutor toolExecutor;
 
     private final IDiagramIdProvider diagramIdProvider;
-
-    private final IViewToolImageProvider viewToolImageProvider;
 
     private final Function<VariableManager, String> semanticTargetIdProvider;
 
@@ -130,19 +131,14 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private final Function<VariableManager, String> semanticTargetLabelProvider;
 
-    private final IFeedbackMessageService feedbackMessageService;
+    private final List<INodeStyleProvider> nodeStyleProviders;
 
-    private final List<INodeStyleProvider> iNodeStyleProviders;
-
-    public PapyrusViewDiagramDescriptionConverter(IObjectService objectService, IEditService editService, List<INodeStyleProvider> iNodeStyleProviders, IDiagramIdProvider diagramIdProvider,
-            IViewToolImageProvider viewToolImageProvider, IFeedbackMessageService feedbackMessageService) {
-        super(objectService, editService, iNodeStyleProviders, diagramIdProvider, viewToolImageProvider, feedbackMessageService);
+    public PapyrusViewDiagramDescriptionConverter(IObjectService objectService, IToolExecutor toolExecutor, List<INodeStyleProvider> nodeStyleProviders, IDiagramIdProvider diagramIdProvider) {
+        super(objectService, toolExecutor, nodeStyleProviders, diagramIdProvider);
         this.objectService = Objects.requireNonNull(objectService);
-        this.editService = Objects.requireNonNull(editService);
+        this.toolExecutor = Objects.requireNonNull(toolExecutor);
         this.diagramIdProvider = Objects.requireNonNull(diagramIdProvider);
-        this.viewToolImageProvider = Objects.requireNonNull(viewToolImageProvider);
-        this.iNodeStyleProviders = Objects.requireNonNull(iNodeStyleProviders);
-        this.feedbackMessageService = feedbackMessageService;
+        this.nodeStyleProviders = Objects.requireNonNull(nodeStyleProviders);
         this.semanticTargetIdProvider = variableManager -> this.self(variableManager).map(this.objectService::getId).orElse(null);
         this.semanticTargetKindProvider = variableManager -> this.self(variableManager).map(this.objectService::getKind).orElse(null);
         this.semanticTargetLabelProvider = variableManager -> this.self(variableManager).map(this.objectService::getLabel).orElse(null);
@@ -157,12 +153,21 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
     public IRepresentationDescription convert(RepresentationDescription viewRepresentationDescription, List<RepresentationDescription> allRepresentationDescriptions, AQLInterpreter interpreter) {
         final org.eclipse.sirius.components.view.diagram.DiagramDescription viewDiagramDescription = (org.eclipse.sirius.components.view.diagram.DiagramDescription) viewRepresentationDescription;
         ViewDiagramDescriptionConverterContext converterContext = new ViewDiagramDescriptionConverterContext(interpreter);
-        StylesFactory stylesFactory = new StylesFactory(Objects.requireNonNull(this.iNodeStyleProviders), this.objectService, interpreter);
+        StylesFactory stylesFactory = new StylesFactory(Objects.requireNonNull(this.nodeStyleProviders), this.objectService, interpreter);
 
         // Nodes must be fully converted first.
         List<NodeDescription> nodeDescriptions = viewDiagramDescription.getNodeDescriptions().stream().map(node -> this.convert(node, converterContext, stylesFactory)).toList();
-        List<EdgeDescription> edgeDescriptions = viewDiagramDescription.getEdgeDescriptions().stream().map(edge -> this.convert(edge, converterContext, stylesFactory)).toList();
-        var toolConverter = new ToolConverter(this.objectService, this.editService, this.viewToolImageProvider, this.feedbackMessageService, this.diagramIdProvider);
+        // Edges that have a node as source or target
+        List<org.eclipse.sirius.components.view.diagram.EdgeDescription> edgeDescriptionsWithNodesAsSourceOrTarget = viewDiagramDescription.getEdgeDescriptions().stream()
+                .filter(this::edgeDescriptionWithNodesAsSourceAndTargetToConsider).toList();
+        // Edges that have candidates edges as source or target
+        List<org.eclipse.sirius.components.view.diagram.EdgeDescription> edgeDescriptionsWithAnotherEdgeAsSourceOrTarget = viewDiagramDescription.getEdgeDescriptions().stream()
+                .filter(edgeDescription -> this.edgeDescriptionWithAnotherEdgeAsSourceOrTargetToConsider(edgeDescription, edgeDescriptionsWithNodesAsSourceOrTarget)).toList();
+        // Edges that have a node as source or target must be fully converted first
+        List<EdgeDescription> edgeDescriptions = Stream.concat(edgeDescriptionsWithNodesAsSourceOrTarget.stream(), edgeDescriptionsWithAnotherEdgeAsSourceOrTarget.stream())
+                .map(edge -> this.convert(edge, converterContext, stylesFactory)).toList();
+
+        var toolConverter = new ToolConverter(this.objectService, this.toolExecutor, this.diagramIdProvider);
 
         var builder = DiagramDescription.newDiagramDescription(this.diagramIdProvider.getId(viewDiagramDescription))
                 .label(Optional.ofNullable(viewDiagramDescription.getName()).orElse(DEFAULT_DIAGRAM_LABEL))
@@ -184,7 +189,8 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .nodeDescriptions(nodeDescriptions)
                 .edgeDescriptions(edgeDescriptions)
                 .palettes(toolConverter.createPaletteBasedToolSections(viewDiagramDescription, converterContext))
-                .dropHandler(this.createDiagramDropHandler(viewDiagramDescription, converterContext));
+                .dropHandler(this.createDiagramDropHandler(viewDiagramDescription, converterContext))
+                .iconURLsProvider(new ViewIconURLsProvider(interpreter, viewDiagramDescription.getIconExpression()));
 
         new ToolFinder().findDropNodeTool(viewDiagramDescription).ifPresent(dropNoteTool -> {
             builder.dropNodeHandler(this.createDropNodeHandler(dropNoteTool, converterContext));
@@ -193,17 +199,50 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
         return builder.build();
     }
 
+    /**
+     * Used to filter the edge descriptions that are using node descriptions as their sources and targets.
+     *
+     * @param edgeDescription
+     *            The edge description
+     * @return true if we will use the edge description, false otherwise
+     */
+    private boolean edgeDescriptionWithNodesAsSourceAndTargetToConsider(org.eclipse.sirius.components.view.diagram.EdgeDescription edgeDescription) {
+        return edgeDescription.getTargetDescriptions().stream().allMatch(org.eclipse.sirius.components.view.diagram.NodeDescription.class::isInstance)
+                && edgeDescription.getSourceDescriptions().stream().allMatch(org.eclipse.sirius.components.view.diagram.NodeDescription.class::isInstance);
+    }
+
+    /**
+     * Used to filter the edge descriptions that are supported by Sirius Web. We will only consider edge descriptions
+     * that are using node descriptions as their sources and targets or another edge that is using node descriptions as
+     * their sources and targets
+     *
+     * @param edgeDescription
+     *            The edge description
+     * @param candidateEdgeDescriptions
+     *            The edges that can be used as source or target
+     * @return true if we will use the edge description, false otherwise
+     */
+    private boolean edgeDescriptionWithAnotherEdgeAsSourceOrTargetToConsider(org.eclipse.sirius.components.view.diagram.EdgeDescription edgeDescription,
+            List<org.eclipse.sirius.components.view.diagram.EdgeDescription> candidateEdgeDescriptions) {
+        return !candidateEdgeDescriptions.contains(edgeDescription) &&
+                (edgeDescription.getTargetDescriptions().stream()
+                        .allMatch(description -> description instanceof org.eclipse.sirius.components.view.diagram.NodeDescription
+                                || (description instanceof org.eclipse.sirius.components.view.diagram.EdgeDescription && candidateEdgeDescriptions.contains(description)))
+                        && edgeDescription.getSourceDescriptions().stream()
+                                .allMatch(description -> description instanceof org.eclipse.sirius.components.view.diagram.NodeDescription
+                                        || (description instanceof org.eclipse.sirius.components.view.diagram.EdgeDescription && candidateEdgeDescriptions.contains(description))));
+    }
+
     private Function<VariableManager, IStatus> createDiagramDropHandler(org.eclipse.sirius.components.view.diagram.DiagramDescription viewDiagramDescription,
             ViewDiagramDescriptionConverterContext converterContext) {
         return variableManager -> {
             Optional<DropTool> optionalDropTool = new ToolFinder().findDropTool(viewDiagramDescription);
             if (optionalDropTool.isPresent()) {
-                var augmentedVariableManager = variableManager.createChild();
+                var childVariableManager = variableManager.createChild();
                 var convertedNodes = Collections.unmodifiableMap(converterContext.getConvertedNodes());
-                augmentedVariableManager.put(CONVERTED_NODES_VARIABLE, convertedNodes);
-                return new DiagramOperationInterpreter(converterContext.getInterpreter(), this.objectService, this.editService, this.getDiagramContext(variableManager),
-                        convertedNodes, this.feedbackMessageService)
-                                .executeTool(optionalDropTool.get(), augmentedVariableManager);
+                childVariableManager.put(CONVERTED_NODES_VARIABLE, convertedNodes);
+
+                return this.toolExecutor.executeTool(optionalDropTool.get(), converterContext.getInterpreter(), childVariableManager);
             } else {
                 return new Failure("No drop handler configured");
             }
@@ -260,7 +299,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
          * The following is a revision to pass an AQLInterpreter to a custom node that required it.
          */
 
-        CustomImageNodeStyleProvider provider = (CustomImageNodeStyleProvider) this.iNodeStyleProviders.stream().filter(p -> p instanceof CustomImageNodeStyleProvider).findFirst().get();
+        CustomImageNodeStyleProvider provider = (CustomImageNodeStyleProvider) this.nodeStyleProviders.stream().filter(p -> p instanceof CustomImageNodeStyleProvider).findFirst().get();
         Function<VariableManager, INodeStyle> styleProvider = variableManager -> {
             var effectiveStyle = this.findEffectiveStyle(viewNodeDescription, interpreter, variableManager);
             Optional<String> optionalEditingContextId = variableManager.get(IEditingContext.EDITING_CONTEXT, IEditingContext.class).map(IEditingContext::getId);
@@ -271,7 +310,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             return stylesFactory.createNodeStyle(effectiveStyle, optionalEditingContextId);
         };
         /* Modified Code End */
-
         Function<VariableManager, ILayoutStrategy> childrenLayoutStrategyProvider = variableManager -> {
             ILayoutStrategy childrenLayoutStrategy = null;
 
@@ -344,7 +382,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
         converterContext.getConvertedNodes().put(viewNodeDescription, result);
         return result;
     }
-    // CHECKSTYLE:ON
 
     private ILayoutStrategy getiLayoutStrategy(ListLayoutStrategyDescription listLayoutStrategyDescription, VariableManager variableManager, AQLInterpreter interpreter) {
         Result resultAreChildNodesDraggable = interpreter.evaluateExpression(variableManager.getVariables(), listLayoutStrategyDescription.getAreChildNodesDraggableExpression());
@@ -504,7 +541,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .build());
     }
 
-    private Function<VariableManager, List<?>> getSemanticElementsProvider(org.eclipse.sirius.components.view.diagram.DiagramElementDescription elementDescription, AQLInterpreter interpreter) {
+    private Function<VariableManager, List<?>> getSemanticElementsProvider(DiagramElementDescription elementDescription, AQLInterpreter interpreter) {
         return variableManager -> {
             Result result = interpreter.evaluateExpression(variableManager.getVariables(), elementDescription.getSemanticCandidatesExpression());
             List<Object> candidates = result.asObjects().orElse(List.of());
@@ -525,7 +562,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             semanticElementsProvider = this.getSemanticElementsProvider(viewEdgeDescription, interpreter);
         } else {
             //
-            var sourceNodeDescriptions = viewEdgeDescription.getSourceNodeDescriptions().stream().map(converterContext.getConvertedNodes()::get);
+            var sourceNodeDescriptions = viewEdgeDescription.getSourceDescriptions().stream().map(converterContext.getConvertedNodes()::get);
             semanticElementsProvider = new RelationBasedSemanticElementsProvider(sourceNodeDescriptions.map(NodeDescription::getId).toList());
         }
 
@@ -534,27 +571,27 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             return result.asBoolean().orElse(true);
         };
 
-        Function<VariableManager, List<Element>> sourceNodesProvider = null;
+        Function<VariableManager, List<Element>> sourceProvider = null;
         if (viewEdgeDescription.isIsDomainBasedEdge()) {
-            sourceNodesProvider = variableManager -> {
+            sourceProvider = variableManager -> {
                 var optionalCache = variableManager.get(DiagramDescription.CACHE, DiagramRenderingCache.class);
                 if (optionalCache.isEmpty()) {
                     return List.of();
                 }
                 DiagramRenderingCache cache = optionalCache.get();
-                String sourceFinderExpression = viewEdgeDescription.getSourceNodesExpression();
+                String sourceFinderExpression = viewEdgeDescription.getSourceExpression();
 
                 Result result = interpreter.evaluateExpression(variableManager.getVariables(), sourceFinderExpression);
                 List<Object> semanticCandidates = result.asObjects().orElse(List.of());
-                var nodeCandidates = semanticCandidates.stream().flatMap(semanticObject -> cache.getElementsRepresenting(semanticObject).stream());
+                var diagramElementCandidates = semanticCandidates.stream().flatMap(semanticObject -> cache.getElementsRepresenting(semanticObject).stream());
 
-                return nodeCandidates
-                        .filter(nodeElement -> viewEdgeDescription.getSourceNodeDescriptions().stream().anyMatch(nodeDescription -> this.isFromDescription(nodeElement, nodeDescription)))
+                return diagramElementCandidates
+                        .filter(diagramElement -> viewEdgeDescription.getSourceDescriptions().stream().anyMatch(description -> this.isFromDescription(diagramElement, description)))
                         .filter(Objects::nonNull)
                         .toList();
             };
         } else {
-            sourceNodesProvider = variableManager -> {
+            sourceProvider = variableManager -> {
                 var optionalObject = variableManager.get(VariableManager.SELF, Object.class);
                 var optionalCache = variableManager.get(DiagramDescription.CACHE, DiagramRenderingCache.class);
                 if (optionalObject.isEmpty() || optionalCache.isEmpty()) {
@@ -571,7 +608,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             };
         }
 
-        Function<VariableManager, List<Element>> targetNodesProvider = new TargetNodesProvider(this.diagramIdProvider, viewEdgeDescription, interpreter);
+        Function<VariableManager, List<Element>> targetProvider = new TargetProvider(this.diagramIdProvider, viewEdgeDescription, interpreter);
 
         Function<VariableManager, EdgeStyle> styleProvider = variableManager -> {
             var effectiveStyle = viewEdgeDescription.getConditionalStyles().stream()
@@ -588,13 +625,13 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .targetObjectIdProvider(this.semanticTargetIdProvider)
                 .targetObjectKindProvider(this.semanticTargetKindProvider)
                 .targetObjectLabelProvider(this.semanticTargetLabelProvider)
-                .sourceNodeDescriptions(viewEdgeDescription.getSourceNodeDescriptions().stream().map(converterContext.getConvertedNodes()::get).toList())
-                .targetNodeDescriptions(viewEdgeDescription.getTargetNodeDescriptions().stream().map(converterContext.getConvertedNodes()::get).toList())
+                .sourceDescriptions(viewEdgeDescription.getSourceDescriptions().stream().map(converterContext.getConvertedElements()::get).toList())
+                .targetDescriptions(viewEdgeDescription.getTargetDescriptions().stream().map(converterContext.getConvertedElements()::get).toList())
                 .semanticElementsProvider(semanticElementsProvider)
                 .shouldRenderPredicate(shouldRenderPredicate)
                 .synchronizationPolicy(synchronizationPolicy)
-                .sourceNodesProvider(sourceNodesProvider)
-                .targetNodesProvider(targetNodesProvider)
+                .sourceProvider(sourceProvider)
+                .targetProvider(targetProvider)
                 .styleProvider(styleProvider)
                 .deleteHandler(this.createDeleteHandler(viewEdgeDescription, converterContext));
 
@@ -617,15 +654,13 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 this.deleteFromDiagram(variableManager);
                 result = new Success();
             } else {
-                VariableManager child = variableManager.createChild();
+                VariableManager childVariableManager = variableManager.createChild();
                 var convertedNodes = Collections.unmodifiableMap(converterContext.getConvertedNodes());
-                child.put(CONVERTED_NODES_VARIABLE, convertedNodes);
+                childVariableManager.put(CONVERTED_NODES_VARIABLE, convertedNodes);
 
-                var optionalTooltool = new ToolFinder().findDeleteTool(diagramElementDescription);
-                if (optionalTooltool.isPresent()) {
-                    result = new DiagramOperationInterpreter(converterContext.getInterpreter(), this.objectService, this.editService, this.getDiagramContext(variableManager),
-                            convertedNodes, this.feedbackMessageService)
-                                    .executeTool(optionalTooltool.get(), child);
+                var optionalDeleteTool = new ToolFinder().findDeleteTool(diagramElementDescription);
+                if (optionalDeleteTool.isPresent()) {
+                    result = this.toolExecutor.executeTool(optionalDeleteTool.get(), converterContext.getInterpreter(), childVariableManager);
                 } else {
                     result = new Failure("No deletion tool configured");
                 }
@@ -671,8 +706,8 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             childVariableManager.put("newLabel", newLabel);
             var convertedNodes = Collections.unmodifiableMap(converterContext.getConvertedNodes());
             childVariableManager.put(CONVERTED_NODES_VARIABLE, convertedNodes);
-            return new DiagramOperationInterpreter(converterContext.getInterpreter(), this.objectService, this.editService, this.getDiagramContext(variableManager), convertedNodes,
-                    this.feedbackMessageService).executeTool(labelEditTool, childVariableManager);
+
+            return this.toolExecutor.executeTool(labelEditTool, converterContext.getInterpreter(), childVariableManager);
         }).orElse(null);
     }
 
@@ -687,9 +722,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
             Optional<LabelEditTool> optionalTool = new ToolFinder().findLabelEditTool(edgeDescription, edgeLabelKind);
             if (optionalTool.isPresent()) {
-                result = new DiagramOperationInterpreter(converterContext.getInterpreter(), this.objectService, this.editService, this.getDiagramContext(variableManager),
-                        convertedNodes, this.feedbackMessageService)
-                                .executeTool(optionalTool.get(), childVariableManager);
+                result = this.toolExecutor.executeTool(optionalTool.get(), converterContext.getInterpreter(), childVariableManager);
             } else {
                 result = new Failure("No label edition tool configured");
             }
@@ -710,23 +743,22 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private Function<VariableManager, IStatus> createDropNodeHandler(DropNodeTool dropNodeTool, ViewDiagramDescriptionConverterContext converterContext) {
         return variableManager -> {
-            VariableManager child = variableManager.createChild();
+            VariableManager childVariableManager = variableManager.createChild();
             var convertedNodes = Collections.unmodifiableMap(converterContext.getConvertedNodes());
-            child.put(CONVERTED_NODES_VARIABLE, convertedNodes);
-            return new DiagramOperationInterpreter(converterContext.getInterpreter(), this.objectService, this.editService, this.getDiagramContext(variableManager), convertedNodes,
-                    this.feedbackMessageService).executeTool(dropNodeTool, child);
+            childVariableManager.put(CONVERTED_NODES_VARIABLE, convertedNodes);
+
+            return this.toolExecutor.executeTool(dropNodeTool, converterContext.getInterpreter(), childVariableManager);
         };
     }
 
     private Predicate<Element> isFromCompatibleSourceMapping(org.eclipse.sirius.components.view.diagram.EdgeDescription edgeDescription) {
-        return nodeElement -> edgeDescription.getSourceNodeDescriptions().stream().anyMatch(nodeDescription -> this.isFromDescription(nodeElement, nodeDescription));
+        return diagramElement -> edgeDescription.getSourceDescriptions().stream().anyMatch(description -> this.isFromDescription(diagramElement, description));
     }
 
-    private boolean isFromDescription(Element nodeElement, DiagramElementDescription diagramElementDescription) {
-        if (nodeElement.getProps() instanceof NodeElementProps props) {
-            return Objects.equals(this.diagramIdProvider.getId(diagramElementDescription), props.getDescriptionId());
-        }
-        return false;
+    private boolean isFromDescription(Element diagramElement, DiagramElementDescription diagramElementDescription) {
+        return diagramElement.getProps() instanceof NodeElementProps nodeElementProps && Objects.equals(this.diagramIdProvider.getId(diagramElementDescription), nodeElementProps.getDescriptionId())
+                || diagramElement.getProps() instanceof EdgeElementProps edgeElementProps
+                        && Objects.equals(this.diagramIdProvider.getId(diagramElementDescription), edgeElementProps.getDescriptionId());
     }
 
     private Optional<Object> self(VariableManager variableManager) {
@@ -735,9 +767,5 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private String evaluateString(AQLInterpreter interpreter, VariableManager variableManager, String expression) {
         return interpreter.evaluateExpression(variableManager.getVariables(), expression).asString().orElse("");
-    }
-
-    private IDiagramContext getDiagramContext(VariableManager variableManager) {
-        return variableManager.get(IDiagramContext.DIAGRAM_CONTEXT, IDiagramContext.class).orElse(null);
     }
 }

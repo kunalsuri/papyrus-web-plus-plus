@@ -43,7 +43,7 @@ describe('Containment reference widget tests', () => {
         expect(chips[2]).to.have.attr('data-testid', 'Operation2');
       });
     // add a new Operation (Operation3) child
-    cy.get('@reference').findByTestId('containment-reference-create-child').should('be.visible').click();
+    cy.get('@reference').findByTestId('containment-reference-create-child').scrollIntoView().should('be.visible').click();
     // check that Class has now three Operation children
     cy.checkChildren('Class', ['Operation1', 'Operation2', 'Operation3'], false);
     cy.get('@reference').findByTestId('Operation3').should('be.visible');

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.activity;
 
@@ -338,7 +339,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions, boolean isInput) {
         // Copied from Papyrus Desktop, see
         // org.eclipse.papyrus.sirius.uml.diagram.activity.services.ActivityDiagramServices
-        EObject createdElement = this.create(parentExpansionRegion, "uml::ExpansionNode", UMLPackage.eINSTANCE.getStructuredActivityNode_Node().getName(), targetView, diagramContext,
+        EObject createdElement = this.createInHolder(parentExpansionRegion, "uml::ExpansionNode", UMLPackage.eINSTANCE.getStructuredActivityNode_Node().getName(), targetView, diagramContext,
                 capturedNodeDescriptions);
         if (createdElement instanceof ExpansionNode) {
             EStructuralFeature expansionNodeFeature;

@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.component;
 
@@ -156,6 +157,24 @@ public class ComponentDiagramService extends AbstractDiagramService {
     public EObject createPortCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return this.createPropertyAndSubType(container, this.umlPackage.getPort().getName(), targetView, diagramContext, capturedNodeDescriptions);
+    }
+
+    /**
+     * A service to create a {@link Port} in the given {@code container}.
+     *
+     * @param container
+     *            the future container
+     * @param targetView
+     *            the selected Graphical container
+     * @param diagramContext
+     *            the diagram context
+     * @param capturedNodeDescription
+     *            the {@link NodeDescription}s
+     * @return the created {@link Port}
+     */
+    public EObject createPortInHolderCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+            Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
+        return this.createPropertyAndSubType(container, this.umlPackage.getPort().getName(), this.getParentNode(targetView, diagramContext.getDiagram()), diagramContext, capturedNodeDescriptions);
     }
 
     /**

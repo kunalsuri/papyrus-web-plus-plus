@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.component;
 
@@ -20,6 +21,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.CPDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
 import org.eclipse.papyrus.web.tools.checker.DeletionGraphicalChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeSemanticDeletionSemanticChecker;
 import org.eclipse.papyrus.web.tools.component.checker.CPDInterfaceDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.test.NodeDeletionTest;
@@ -97,7 +99,8 @@ public class CPDSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        Node componentContainer = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getComponent()), COMPONENT_CONTAINER);
+        this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getComponent()), COMPONENT_CONTAINER);
+        Node componentContainer = (Node) this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER);
         this.createNodeWithLabel(componentContainer.getId(), new CreationTool(ToolSections.NODES, UML.getComponent()), UML.getComponent().getName() + COMPONENT_SUB_NODE_SUFFIX);
         this.createNodeWithLabel(componentContainer.getId(), new CreationTool(ToolSections.NODES, UML.getPort()), UML.getPort().getName() + COMPONENT_SUB_NODE_SUFFIX);
         this.createNodeWithLabel(componentContainer.getId(), new CreationTool(ToolSections.NODES, UML.getProperty()), UML.getProperty().getName() + COMPONENT_SUB_NODE_SUFFIX);
@@ -105,9 +108,11 @@ public class CPDSubNodeSemanticDeletionTest extends NodeDeletionTest {
         this.createNodeWithLabel(interfaceContainer.getId(), new CreationTool(ToolSections.NODES, UML.getOperation()), UML.getOperation().getName() + INTERFACE_SUB_NODE_SUFFIX);
         this.createNodeWithLabel(interfaceContainer.getId(), new CreationTool(ToolSections.NODES, UML.getReception()), UML.getReception().getName() + INTERFACE_SUB_NODE_SUFFIX);
         this.createNodeWithLabel(interfaceContainer.getId(), new CreationTool(ToolSections.NODES, UML.getProperty()), UML.getProperty().getName() + INTERFACE_SUB_NODE_SUFFIX);
-        Node packageContainer = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getPackage()), PACKAGE_CONTAINER);
+        this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getPackage()), PACKAGE_CONTAINER);
+        Node packageContainer = (Node) this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER);
         this.createPackageAndModelSubNodes(packageContainer, PACKAGE_SUB_NODE_SUFFIX);
-        Node modelContainer = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getModel()), MODEL_CONTAINER);
+        this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getModel()), MODEL_CONTAINER);
+        Node modelContainer = (Node) this.findGraphicalElementContentByLabel(MODEL_CONTAINER);
         this.createPackageAndModelSubNodes(modelContainer, MODEL_SUB_NODE_SUFFIX);
     }
 
@@ -129,7 +134,13 @@ public class CPDSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @ParameterizedTest
     @MethodSource("componentParameters")
     public void testDeleteSemanticNodeInComponent(EClass elementType, EReference containmentReference) {
-        DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(COMPONENT_CONTAINER));
+        DeletionGraphicalChecker graphicalChecker;
+        if (UML.getPort().isSuperTypeOf(elementType)) {
+            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementExcludingContentByLabel(COMPONENT_CONTAINER));
+        } else {
+            graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER));
+        }
+        new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER));
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(COMPONENT_CONTAINER), containmentReference);
         this.deleteSemanticNode(elementType.getName() + COMPONENT_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
@@ -159,9 +170,11 @@ public class CPDSubNodeSemanticDeletionTest extends NodeDeletionTest {
     public void testDeleteSemanticNodeInModel(EClass elementType, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker;
         if (UML.getInterface().isSuperTypeOf(elementType)) {
-            graphicalChecker = new CPDInterfaceDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(MODEL_CONTAINER));
+            graphicalChecker = new CPDInterfaceDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER));
+        } else if (UML.getConstraint().isSuperTypeOf(elementType)) {
+            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER));
         } else {
-            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(MODEL_CONTAINER));
+            graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER));
         }
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(MODEL_CONTAINER), containmentReference);
@@ -173,9 +186,11 @@ public class CPDSubNodeSemanticDeletionTest extends NodeDeletionTest {
     public void testDeleteSemanticNodeInPackage(EClass elementType, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker;
         if (UML.getInterface().isSuperTypeOf(elementType)) {
-            graphicalChecker = new CPDInterfaceDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER));
+            graphicalChecker = new CPDInterfaceDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER));
+        } else if (UML.getConstraint().isSuperTypeOf(elementType)) {
+            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER));
         } else {
-            graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(PACKAGE_CONTAINER));
+            graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER));
         }
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), containmentReference);

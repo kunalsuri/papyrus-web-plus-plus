@@ -30,6 +30,7 @@ import {
   setBorderNodesPosition,
   ForcedDimensions,
   getHeaderHeightFootprint,
+  getInsideLabelWidthConstraint,
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { Node } from '@xyflow/react';
 import { CuboidNodeData } from './CuboidNode.types';
@@ -87,7 +88,8 @@ export class CuboidNodeLayoutHandler implements INodeLayoutHandler<CuboidNodeDat
 
     const nodeIndex = findNodeIndex(visibleNodes, node.id);
     const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth = (labelElement?.getBoundingClientRect().width ?? 0) + 2 * borderWidth + labelPadding;
+    const labelWidth =
+      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
     const headerHeightFootprint = getHeaderHeightFootprint(labelElement, node.data.insideLabel, 'TOP');
     const borderNodes = directChildren.filter((node) => node.data.isBorderNode);
     const directNodesChildren = directChildren.filter((child) => !child.data.isBorderNode);
@@ -238,7 +240,8 @@ export class CuboidNodeLayoutHandler implements INodeLayoutHandler<CuboidNodeDat
   ) {
     const nodeIndex = findNodeIndex(visibleNodes, node.id);
     const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth = (labelElement?.getBoundingClientRect().width ?? 0) + 2 * borderWidth + labelPadding;
+    const labelWidth =
+      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
 
     const labelHeight =
       rectangularNodePadding + (labelElement?.getBoundingClientRect().height ?? 0) + rectangularNodePadding;

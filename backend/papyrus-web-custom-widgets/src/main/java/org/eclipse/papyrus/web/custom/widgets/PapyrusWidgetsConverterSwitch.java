@@ -1,9 +1,5 @@
 /*****************************************************************************
-<<<<<<< Upstream, based on origin/master
  * Copyright (c) 2023, 2025 CEA LIST, Obeo.
-=======
- * Copyright (c) 2023, 2024 CEA LIST, Obeo, Artal Technologies.
->>>>>>> 0bbc31c [210] Added Custom Widgets and Symbol Page to all Nodes
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0

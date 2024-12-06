@@ -367,7 +367,7 @@ public class NoteStyleDescriptionBuilder {
                     this.queryBuilder.emptyString(), //
                     CallQuery.queryAttributeOnSelf(this.noteToElementReference), //
                     () -> this.collectNodesWithDomain(diagramDescription, this.domainType), //
-                    () -> this.collectNodesWithDomain(diagramDescription, this.annotedDomainType));
+                    () -> this.collectNodesWithDomainAndWithoutContent(diagramDescription, this.annotedDomainType));
             DeleteTool deleteTool = DiagramFactory.eINSTANCE.createDeleteTool();
             deleteTool.setName("Remove " + this.domainType.getName());
             ChangeContext deleteToolChangeContext = ViewFactory.eINSTANCE.createChangeContext();
@@ -419,6 +419,13 @@ public class NoteStyleDescriptionBuilder {
      */
     protected List<NodeDescription> collectNodesWithDomain(DiagramDescription description, EClass... domains) {
         return this.collectNodesWithDomain(description, false, false, domains);
+    }
+
+    protected List<NodeDescription> collectNodesWithDomainAndWithoutContent(DiagramDescription description, EClass... domains) {
+        return this.collectNodesWithDomain(description, domains).stream() //
+                .filter(nd -> !"SHARED_DESCRIPTIONS".equals(nd.getName())) //
+                .filter(nd -> !nd.getName().contains("Content"))
+                .toList();
     }
 
     /**

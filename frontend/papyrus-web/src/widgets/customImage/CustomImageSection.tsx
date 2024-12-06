@@ -34,9 +34,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { makeStyles } from 'tss-react/mui';
 import { AddImageIcon } from './AddImageIcon';
 import {
+  CustomImageParams,
   CustomImageWidgetState,
   CustomImageWidgetStyleProps,
   GQLCustomImageWidget,
@@ -119,13 +121,14 @@ export const CustomImageSection = ({
   readOnly,
 }: PropertySectionComponentProps<GQLCustomImageWidget>) => {
   const { addErrorMessage, addMessages } = useMultiToast();
+  const { projectId } = useParams<CustomImageParams>();
   const { httpOrigin } = useContext<ServerContextValue>(ServerContext);
   const [state, setState] = useState<CustomImageWidgetState>({
     modal: null,
     url: widget.currentUuid ? httpOrigin + widget.currentUuid : '',
     validImage: widget.currentUuid !== undefined && widget.currentUuid !== '',
   });
-  const { data, loading, refreshImages } = useProjectImages(editingContextId);
+  const { data, loading, refreshImages } = useProjectImages(projectId);
   const [newUuidApi, { loading: newUuidLoading, data: newUuidData, error: newUuidError }] = useMutation<
     GQLNewUuidData,
     GQLNewUuidVariables
@@ -221,7 +224,7 @@ export const CustomImageSection = ({
   if (state.modal === 'Upload') {
     modal = (
       <UploadImageModal
-        projectId={editingContextId}
+        projectId={projectId}
         onImageUploaded={() => {
           refreshImages();
           closeModal();

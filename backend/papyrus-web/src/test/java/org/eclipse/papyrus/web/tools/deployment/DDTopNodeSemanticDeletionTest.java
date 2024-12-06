@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.deployment;
 
@@ -19,6 +20,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.DDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
 import org.eclipse.papyrus.web.tools.checker.DeletionGraphicalChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeSemanticDeletionSemanticChecker;
 import org.eclipse.papyrus.web.tools.test.NodeDeletionTest;
 import org.eclipse.papyrus.web.tools.utils.CreationTool;
@@ -56,16 +58,21 @@ public class DDTopNodeSemanticDeletionTest extends NodeDeletionTest {
         super(DEFAULT_DOCUMENT, DDDiagramDescriptionBuilder.DD_REP_NAME, UML.getModel());
     }
 
-    private static Stream<Arguments> parameterProvider() {
+    private static Stream<Arguments> parameterHolderProvider() {
         return Stream.of(//
                 Arguments.of(ARTIFACT1, UML.getPackage_PackagedElement()), //
-                Arguments.of(CONSTRAINT1, UML.getNamespace_OwnedRule()), //
-                Arguments.of(DEPLOYMENT_SPECIFICATION1, UML.getPackage_PackagedElement()), //
                 Arguments.of(DEVICE1, UML.getPackage_PackagedElement()), //
                 Arguments.of(EXECUTION_ENVIRONMENT1, UML.getPackage_PackagedElement()), //
                 Arguments.of(MODEL1, UML.getPackage_PackagedElement()), //
                 Arguments.of(NODE1, UML.getPackage_PackagedElement()), //
                 Arguments.of(PACKAGE1, UML.getPackage_PackagedElement()) //
+        );
+    }
+
+    private static Stream<Arguments> parameterProvider() {
+        return Stream.of(//
+                Arguments.of(CONSTRAINT1, UML.getPackage_PackagedElement()), //
+                Arguments.of(DEPLOYMENT_SPECIFICATION1, UML.getPackage_PackagedElement()) //
         );
     }
 
@@ -93,8 +100,20 @@ public class DDTopNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("parameterProvider")
     public void testDeleteSemanticNode(String elementName, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, null);
+
         NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, this::getRootSemanticElement,
                 containmentReference);
         this.deleteSemanticNode(elementName, new CombinedChecker(graphicalChecker, semanticChecker));
     }
+
+    @ParameterizedTest
+    @MethodSource("parameterHolderProvider")
+    public void testDeleteSemanticNodeHolder(String elementName, EReference containmentReference) {
+        DeletionGraphicalChecker graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, null);
+
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, this::getRootSemanticElement,
+                containmentReference);
+        this.deleteSemanticNode(elementName, new CombinedChecker(graphicalChecker, semanticChecker));
+    }
+
 }

@@ -92,7 +92,7 @@ describe('Mono-valued reference widget tests', () => {
     // check instance is properly created
     cy.checkChildren('Activity', ['Reception1']);
     // clear reference content
-    cy.getByTestId('Specification-clear').should('be.visible').click();
+    cy.getByTestId('Specification-clear').scrollIntoView().should('be.visible').click();
     // check reference no longer contains previous content
     cy.getByTestId('reference-value-').should('not.exist');
   });

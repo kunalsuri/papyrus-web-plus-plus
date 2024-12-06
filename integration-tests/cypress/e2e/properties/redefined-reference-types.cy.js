@@ -56,7 +56,7 @@ describe('Redefined reference types test', () => {
   it('check DurationConstraint.specification: DurationInterval instead of ValueSpecification', () => {
     cy.getByTestId('DurationConstraint').should('be.visible').click();
     cy.activateDetailsTabAndWaitForElement('UML', 'containment-reference-Specification')
-      .findByTestId('containment-reference-create-child')
+      .findByTestId('containment-reference-create-child').scrollIntoView()
       .should('be.visible')
       .click();
     cy.getByTestId('containment-reference-Specification').findByTestId('DurationInterval1').should('be.visible');

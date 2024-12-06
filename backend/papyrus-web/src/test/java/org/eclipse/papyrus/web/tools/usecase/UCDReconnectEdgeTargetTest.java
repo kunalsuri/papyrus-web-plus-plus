@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.usecase;
 
@@ -111,7 +112,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectAbstractionTarget(EClass newTargetType) {
         String abstractionId = this.createEdge(ACTIVITY_EDGE_SOURCE, ACTIVITY_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getAbstraction()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(abstractionId, newTargetLabel, graphicalChecker);
     }
 
@@ -120,7 +121,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectAssociationTarget(EClass newTargetType) {
         String associationId = this.createEdge(ACTIVITY_EDGE_SOURCE, ACTIVITY_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getAssociation()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(associationId, newTargetLabel, graphicalChecker);
     }
 
@@ -129,7 +130,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectDependencyTarget(EClass newTargetType) {
         String dependencyId = this.createEdge(ACTIVITY_EDGE_SOURCE, ACTIVITY_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getDependency()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(dependencyId, newTargetLabel, graphicalChecker);
     }
 
@@ -138,7 +139,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectExtendTarget(EClass newTargetType) {
         String extendId = this.createEdge(USE_CASE_EDGE_SOURCE, USE_CASE_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getExtend()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(extendId, newTargetLabel, graphicalChecker);
     }
 
@@ -147,7 +148,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectGeneralizationTarget(EClass newTargetType) {
         String generalizationId = this.createEdge(ACTIVITY_EDGE_SOURCE, ACTIVITY_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getGeneralization()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(generalizationId, newTargetLabel, graphicalChecker);
     }
 
@@ -156,7 +157,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectIncludeTarget(EClass newTargetType) {
         String includeId = this.createEdge(USE_CASE_EDGE_SOURCE, USE_CASE_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getInclude()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(includeId, newTargetLabel, graphicalChecker);
     }
 
@@ -165,7 +166,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectPackageImportTarget(EClass newTargetType) {
         String packageImportId = this.createEdge(PACKAGE_EDGE_SOURCE, PACKAGE_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getPackageImport()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(packageImportId, newTargetLabel, graphicalChecker);
     }
 
@@ -174,7 +175,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectPackageMergeTarget(EClass newTargetType) {
         String packageMergeId = this.createEdge(PACKAGE_EDGE_SOURCE, PACKAGE_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getPackageMerge()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(packageMergeId, newTargetLabel, graphicalChecker);
     }
 
@@ -183,7 +184,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectRealizationTarget(EClass newTargetType) {
         String realizationId = this.createEdge(ACTIVITY_EDGE_SOURCE, ACTIVITY_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getRealization()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(realizationId, newTargetLabel, graphicalChecker);
     }
 
@@ -192,7 +193,7 @@ public class UCDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectUsageTarget(EClass newTargetType) {
         String usageId = this.createEdge(ACTIVITY_EDGE_SOURCE, ACTIVITY_EDGE_TARGET, new UCDCreationTool(UCDToolSections.EDGES, UML.getUsage()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(usageId, newTargetLabel, graphicalChecker);
     }
 }

@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2023 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 190
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.view;
 
@@ -38,6 +38,10 @@ public class IdBuilder {
     public static final String NEW = "New ";
 
     public static final String COMPARTMENT_NODE_SUFFIX = "_CompartmentNode";
+
+    public static final String CONTENT_NODE_SUFFIX = "_Content";
+
+    public static final String HOLDER_NODE_SUFFIX = "_Holder";
 
     public static final String SHARED_SUFFIX = "_SHARED";
 
@@ -92,6 +96,16 @@ public class IdBuilder {
     public static boolean isCompartmentNode(NodeDescription description) {
         String name = description.getName();
         return name != null && name.endsWith(COMPARTMENT_NODE_SUFFIX);
+    }
+
+    public static boolean isContentNode(NodeDescription description) {
+        String name = description.getName();
+        return name != null && name.endsWith(CONTENT_NODE_SUFFIX);
+    }
+
+    public static boolean isHolderNode(NodeDescription description) {
+        String name = description.getName();
+        return name != null && name.endsWith(HOLDER_NODE_SUFFIX);
     }
 
     // Workaround for https://github.com/PapyrusSirius/papyrus-web/issues/164

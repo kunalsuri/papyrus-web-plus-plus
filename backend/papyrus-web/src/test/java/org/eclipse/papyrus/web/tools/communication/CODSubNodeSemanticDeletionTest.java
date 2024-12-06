@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.communication;
 
@@ -24,6 +25,7 @@ import org.eclipse.papyrus.web.tools.checker.NodeSemanticDeletionSemanticChecker
 import org.eclipse.papyrus.web.tools.test.NodeDeletionTest;
 import org.eclipse.papyrus.web.tools.utils.CreationTool;
 import org.eclipse.papyrus.web.tools.utils.ToolSections;
+import org.eclipse.sirius.components.diagrams.Node;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,7 +61,8 @@ public class CODSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @BeforeEach
     public void setUp() {
         this.setUpWithIntermediateRoot(ROOT_INTERACTION, UML.getInteraction());
-        String interactionId = this.getDiagram().getNodes().get(0).getId();
+        Node rootContent = (Node) this.findGraphicalElementContentByLabel(ROOT_INTERACTION);
+        String interactionId = rootContent.getId();
         this.createNodeWithLabel(interactionId, new CreationTool(ToolSections.NODES, UML.getLifeline()), UML.getLifeline().getName());
         this.createNodeWithLabel(interactionId, new CreationTool(ToolSections.NODES, UML.getConstraint()), UML.getConstraint().getName());
         this.createNodeWithLabel(interactionId, new CreationTool(ToolSections.NODES, UML.getDurationObservation()), UML.getDurationObservation().getName());
@@ -75,7 +78,7 @@ public class CODSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @ParameterizedTest
     @MethodSource("interactionParameters")
     public void testDeleteSemanticNodeInInteraction(EClass elementType, EReference containmentReference) {
-        DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(ROOT_INTERACTION));
+        DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ROOT_INTERACTION));
         NodeSemanticDeletionSemanticChecker semanticChecker;
         if (UML.getDurationObservation().isSuperTypeOf(elementType) || UML.getTimeObservation().isSuperTypeOf(elementType)) {
             semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, () -> this.getRootSemanticElement(), containmentReference);

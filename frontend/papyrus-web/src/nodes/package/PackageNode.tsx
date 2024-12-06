@@ -100,6 +100,7 @@ const packageContainerStyle = (
     padding: '8px',
     width: '100%',
     height: '100%',
+
     opacity: faded ? '0.4' : '',
     ...style,
     background: getCSSColor(String(style.background), theme),

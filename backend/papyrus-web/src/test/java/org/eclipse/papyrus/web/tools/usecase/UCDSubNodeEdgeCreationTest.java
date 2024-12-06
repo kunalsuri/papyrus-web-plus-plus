@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.usecase;
 
@@ -90,7 +91,8 @@ public class UCDSubNodeEdgeCreationTest extends EdgeCreationTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
-        Node packageContainerNode = this.createNodeWithLabel(this.representationId, new UCDCreationTool(UCDToolSections.NODES, UML.getPackage()), PACKAGE_CONTAINER);
+        this.createNodeWithLabel(this.representationId, new UCDCreationTool(UCDToolSections.NODES, UML.getPackage()), PACKAGE_CONTAINER);
+        Node packageContainerNode = (Node) this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER);
         this.packageContainerId = packageContainerNode.getId();
         this.createSourceAndTargetNodes(this.packageContainerId, new UCDCreationTool(UCDToolSections.SUBJECT, UML.getActivity()));
         this.createSourceAndTargetNodes(this.packageContainerId, new UCDCreationTool(UCDToolSections.NODES, UML.getActor()));

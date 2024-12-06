@@ -31,6 +31,7 @@ import {
   INodeLayoutHandler,
   NodeData,
   setBorderNodesPosition,
+  getInsideLabelWidthConstraint,
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { Node } from '@xyflow/react';
 import { CuboidNodeListData } from './CuboidNode.types';
@@ -89,7 +90,8 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
 
     const nodeIndex = findNodeIndex(visibleNodes, node.id);
     const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth = (labelElement?.getBoundingClientRect().width ?? 0) + 2 * borderWidth + labelPadding;
+    const labelWidth =
+      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
     const labelHeight =
       rectangularNodePadding + (labelElement?.getBoundingClientRect().height ?? 0) + rectangularNodePadding;
     let headerHeightFootprint = getHeaderHeightFootprint(labelElement, node.data.insideLabel, 'TOP');
@@ -172,7 +174,7 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
 
     const childrenContentBox = computeNodesBox(visibleNodes, directNodesChildren);
 
-    const labelOnlyWidth = labelElement?.getBoundingClientRect().width ?? 0;
+    const labelOnlyWidth = getInsideLabelWidthConstraint(node.data.insideLabel, labelElement);
     const nodeMinComputeWidth = Math.max(childrenContentBox.width, labelOnlyWidth) + borderWidth * 2;
 
     const directChildrenAwareNodeHeight =
@@ -227,7 +229,8 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
   ) {
     const nodeIndex = findNodeIndex(visibleNodes, node.id);
     const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth = (labelElement?.getBoundingClientRect().width ?? 0) + 2 * borderWidth + labelPadding;
+    const labelWidth =
+      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
 
     const labelHeight =
       rectangularNodePadding + (labelElement?.getBoundingClientRect().height ?? 0) + rectangularNodePadding;

@@ -94,3 +94,5 @@ export interface SelectImageModalProps {
   onImageSelected: (newUuid: string) => void;
   onClose: () => void;
 }
+
+export type CustomImageParams = 'projectId';

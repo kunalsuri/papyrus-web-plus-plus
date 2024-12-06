@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.communication;
 
@@ -78,9 +79,9 @@ public class CODSemanticDropTest extends SemanticDropTest {
         } else {
             elementToDrop = this.createSemanticElement(this.findSemanticElementByName(ROOT_INTERACTION), containmentReference, elementType, elementType.getName());
         }
-        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementByLabel(ROOT_INTERACTION),
+        NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ROOT_INTERACTION),
                 CODMappingTypes.getMappingType(elementType), this.getCapturedNodes());
-        this.semanticDropOnContainer(ROOT_INTERACTION, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(ROOT_INTERACTION, this.getObjectService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest

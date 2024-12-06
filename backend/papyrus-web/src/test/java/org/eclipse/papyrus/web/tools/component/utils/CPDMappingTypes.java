@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.component.utils;
 
@@ -33,7 +34,11 @@ public final class CPDMappingTypes {
     }
 
     public static String getMappingType(EClass eClass) {
-        String result = CPD_PREFIX + eClass.getName();
+        String suffix = switch (eClass.getName()) {
+            case "Component", "Model", "Package" -> "_Holder";
+            default -> "";
+        };
+        String result = CPD_PREFIX + eClass.getName() + suffix;
         if (UMLPackage.eINSTANCE.getRelationship().isSuperTypeOf(eClass)) {
             result = CPD_PREFIX + eClass.getName() + "_DomainEdge";
         }
@@ -41,7 +46,11 @@ public final class CPDMappingTypes {
     }
 
     public static String getMappingTypeAsSubNode(EClass eClass) {
-        String result = CPD_PREFIX + eClass.getName() + "_SHARED";
+        String suffix = switch (eClass.getName()) {
+            case "Component", "Property", "Model", "Package" -> "_Holder";
+            default -> "";
+        };
+        String result = CPD_PREFIX + eClass.getName() + "_SHARED" + suffix;
         if (UMLPackage.eINSTANCE.getOperation().isSuperTypeOf(eClass) || UMLPackage.eINSTANCE.getReception().isSuperTypeOf(eClass)) {
             // Operations/Receptions aren't suffixed with "_SHARED" even if they are sub-nodes, because they aren't
             // shared

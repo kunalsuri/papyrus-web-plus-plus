@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.profile;
 
@@ -20,6 +21,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.uml.PRDDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.tools.checker.CombinedChecker;
 import org.eclipse.papyrus.web.tools.checker.DeletionGraphicalChecker;
+import org.eclipse.papyrus.web.tools.checker.HolderDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.checker.NodeSemanticDeletionSemanticChecker;
 import org.eclipse.papyrus.web.tools.profile.checker.PRDClassifierDeletionGraphicalChecker;
 import org.eclipse.papyrus.web.tools.profile.checker.PRDEnumerationDeletionGraphicalChecker;
@@ -96,10 +98,13 @@ public class PRDTopNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("parameterProvider")
     public void testDeleteGraphicalNode(String elementName, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker;
+
         if (ENUMERATION1.equals(elementName)) {
             graphicalChecker = new PRDEnumerationDeletionGraphicalChecker(this::getDiagram, null);
         } else if (List.of(CLASS1, DATA_TYPE1, STEREOTYPE1).contains(elementName)) {
             graphicalChecker = new PRDClassifierDeletionGraphicalChecker(this::getDiagram, null);
+        } else if (List.of(PACKAGE1, PROFILE1).contains(elementName)) {
+            graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, null);
         } else {
             graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, null);
         }

@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
- * All rights reserved. This program and the accompanying materials
+ * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.deployment;
 
@@ -105,7 +106,7 @@ public class DDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectCommunicationPathTarget(EClass newTargetType) {
         String communicationPathId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getCommunicationPath()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(communicationPathId, newTargetLabel, graphicalChecker);
     }
 
@@ -114,7 +115,7 @@ public class DDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectDependencyTarget(EClass newTargetType) {
         String dependencyId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getDependency()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(dependencyId, newTargetLabel, graphicalChecker);
     }
 
@@ -123,7 +124,7 @@ public class DDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectDeploymentTarget(EClass newTargetType) {
         String deploymentPathId = this.createEdge(ARTIFACT_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getDeployment()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(deploymentPathId, newTargetLabel, graphicalChecker);
     }
 
@@ -132,7 +133,7 @@ public class DDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectGeneralizationTarget(EClass newTargetType) {
         String generalizationId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getGeneralization()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(generalizationId, newTargetLabel, graphicalChecker);
     }
 
@@ -141,7 +142,7 @@ public class DDReconnectEdgeTargetTest extends ReconnectEdgeTargetTest {
     public void testReconnectManifestationTarget(EClass newTargetType) {
         String manifestationId = this.createEdge(DEVICE_EDGE_SOURCE, DEVICE_EDGE_TARGET, new CreationTool(ToolSections.EDGES, UML.getDependency()));
         String newTargetLabel = newTargetType.getName() + NEW_TARGET;
-        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementByLabel(newTargetLabel));
+        Checker graphicalChecker = new EdgeTargetGraphicalChecker(() -> this.findGraphicalElementExcludingContentByLabel(newTargetLabel));
         this.reconnectEdgeTarget(manifestationId, newTargetLabel, graphicalChecker);
     }
 }

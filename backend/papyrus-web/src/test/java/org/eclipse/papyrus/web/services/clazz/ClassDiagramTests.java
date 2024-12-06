@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies
+ * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,11 +10,14 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 190
+ *  Aurelien Didier (Artal Technologies) - Issue 190, 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.clazz;
 
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.CONTENT_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.HOLDER_SUFFIX;
 import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.SHARED_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.UNDERSCORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -83,6 +86,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @WebAppConfiguration
 public class ClassDiagramTests extends AbstractDiagramTest {
+    private static final String SHARED_HOLDER_SUFFIX = SHARED_SUFFIX + UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String SHARED_CONTENT_SUFFIX = SHARED_SUFFIX + UNDERSCORE + CONTENT_SUFFIX;
 
     private static final IdBuilder ID_BUILDER = new IdBuilder(CDDiagramDescriptionBuilder.CD_PREFIX, new UMLMetamodelHelper());
 
@@ -90,9 +96,21 @@ public class ClassDiagramTests extends AbstractDiagramTest {
 
     private static final String CD_COMMENT_SHARED = ID_BUILDER.getSpecializedDomainNodeName(UML.getComment(), SHARED_SUFFIX);
 
-    private static final String CD_PACKAGE = ID_BUILDER.getDomainNodeName(UML.getPackage());
+    private static final String CD_PACKAGE_TOP_HOLDER = ID_BUILDER.getSpecializedDomainNodeName(UML.getPackage(), HOLDER_SUFFIX);
 
-    private static final String CD_MODEL = ID_BUILDER.getDomainNodeName(UML.getModel());
+    private static final String CD_PACKAGE_TOP_CONTENT = ID_BUILDER.getSpecializedDomainNodeName(UML.getPackage(), CONTENT_SUFFIX);
+
+    private static final String CD_MODEL_TOP_HOLDER = ID_BUILDER.getSpecializedDomainNodeName(UML.getModel(), HOLDER_SUFFIX);
+
+    private static final String CD_MODEL_TOP_CONTENT = ID_BUILDER.getSpecializedDomainNodeName(UML.getModel(), CONTENT_SUFFIX);
+
+    private static final String CD_PACKAGE_SHARED_HOLDER = ID_BUILDER.getSpecializedDomainNodeName(UML.getPackage(), SHARED_HOLDER_SUFFIX);
+
+    private static final String CD_PACKAGE_SHARED_CONTENT = ID_BUILDER.getSpecializedDomainNodeName(UML.getPackage(), SHARED_CONTENT_SUFFIX);
+
+    private static final String CD_MODEL_SHARED_HOLDER = ID_BUILDER.getSpecializedDomainNodeName(UML.getModel(), SHARED_HOLDER_SUFFIX);
+
+    private static final String CD_MODEL_SHARED_CONTENT = ID_BUILDER.getSpecializedDomainNodeName(UML.getModel(), SHARED_CONTENT_SUFFIX);
 
     private static final String CD_CLASS = ID_BUILDER.getDomainNodeName(UML.getClass_());
 
@@ -103,10 +121,6 @@ public class ClassDiagramTests extends AbstractDiagramTest {
     private static final String CD_PRIMITIVE_TYPE = ID_BUILDER.getDomainNodeName(UML.getPrimitiveType());
 
     private static final String CD_DATA_TYPE = ID_BUILDER.getDomainNodeName(UML.getDataType());
-
-    private static final String CD_PACKAGE_CHILD = ID_BUILDER.getSpecializedDomainNodeName(UML.getPackage(), SHARED_SUFFIX);
-
-    private static final String CD_MODEL_CHILD = ID_BUILDER.getSpecializedDomainNodeName(UML.getModel(), SHARED_SUFFIX);
 
     private static final String CD_CLASS_CHILD = ID_BUILDER.getSpecializedDomainNodeName(UML.getClass_(), SHARED_SUFFIX);
 
@@ -145,13 +159,22 @@ public class ClassDiagramTests extends AbstractDiagramTest {
     @Test
     public void checkRootPackageCreation() {
         this.init();
-        this.getServiceTester().assertRootCreation(UML.getPackage(), UML.getPackage_PackagedElement(), CD_PACKAGE);
+        Pair<EObject, Node> semanticAndNode = this.getServiceTester().assertRootCreation(UML.getPackage(), UML.getPackage_PackagedElement(), CD_PACKAGE_TOP_HOLDER);
+        EObject semantic = semanticAndNode.getFirst();
+
+        // Assert a content is created
+        this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_TOP_CONTENT, semantic);
     }
 
     @Test
     public void checkRootModelCreation() {
         this.init();
-        this.getServiceTester().assertRootCreation(UML.getModel(), UML.getPackage_PackagedElement(), CD_MODEL);
+        Pair<EObject, Node> semanticAndNode = this.getServiceTester().assertRootCreation(UML.getModel(), UML.getPackage_PackagedElement(), CD_MODEL_TOP_HOLDER);
+        EObject semantic = semanticAndNode.getFirst();
+
+        // Assert a content is created
+        this.getDiagramHelper().assertGetUniqueMatchingNode(CD_MODEL_TOP_CONTENT, semantic);
+
     }
 
     @Test
@@ -533,52 +556,64 @@ public class ClassDiagramTests extends AbstractDiagramTest {
     public void checkModelChildren() {
         Package pack = this.init();
 
-        Model parent = this.createIn(Model.class, pack);
-        Node parentNode = this.getDiagramHelper().createNodeInDiagram(CD_MODEL, parent);
+        Model model = this.createIn(Model.class, pack);
+        this.getDiagramHelper().createNodeInDiagram(CD_MODEL_TOP_HOLDER, model);
+        Node content = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_MODEL_TOP_CONTENT, model);
 
-        this.checkPackageChildren(parentNode, true);
+        this.checkPackageChildren(content, true);
     }
 
     private void checkPackageChildren(Node parentNode, boolean recurse) {
         // Model
-        Node droppedModelNode = this.getServiceTester().assertChildCreationAndDrop(parentNode, Model.class, UML.getPackage_PackagedElement(), CD_MODEL_CHILD);
+        Node droppedModelNode = this.getServiceTester().assertChildCreationAndDrop(parentNode, Model.class, UML.getPackage_PackagedElement(), CD_MODEL_SHARED_HOLDER);
         if (recurse) {
-            this.checkPackageChildren(droppedModelNode, false);
+            EObject model = this.getDiagramHelper().getSemanticElement(droppedModelNode);
+            this.getDiagramHelper().assertGetUniqueMatchingNode(CD_MODEL_SHARED_HOLDER, model);
+            Node contentNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_MODEL_SHARED_CONTENT, model);
+            this.checkPackageChildren(contentNode, false);
         }
 
         // Package
-        Node droppedPackageNode = this.getServiceTester().assertChildCreationAndDrop(parentNode, Package.class, UML.getPackage_PackagedElement(), CD_PACKAGE_CHILD);
+        Node droppedPackageNodeHolder = this.getServiceTester().assertChildCreationAndDrop(parentNode, Package.class, UML.getPackage_PackagedElement(), CD_PACKAGE_SHARED_HOLDER);
+        EObject pack = this.getDiagramHelper().getSemanticElement(droppedPackageNodeHolder);
+        Node droppedPackageNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_SHARED_CONTENT, pack);
+
         if (recurse) {
-            this.checkPackageChildren(droppedPackageNode, false);
+            EObject subpack = this.getDiagramHelper().getSemanticElement(droppedPackageNodeContent);
+            this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_SHARED_HOLDER, subpack);
+            Node contentNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_SHARED_CONTENT, subpack);
+            this.checkPackageChildren(contentNode, false);
         }
 
         // Comment
-        this.getServiceTester().assertChildCreationAndDrop(parentNode, Comment.class, UML.getElement_OwnedComment(), CD_COMMENT_SHARED);
+        this.getServiceTester().assertChildCreationAndDrop(droppedPackageNodeContent, Comment.class, UML.getElement_OwnedComment(), CD_COMMENT_SHARED);
 
         // Class in Package
-        this.getServiceTester().assertChildCreationAndDrop(parentNode, Class.class, UML.getPackage_PackagedElement(), CD_CLASS_CHILD);
+        this.getServiceTester().assertChildCreationAndDrop(droppedPackageNodeContent, Class.class, UML.getPackage_PackagedElement(), CD_CLASS_CHILD);
 
         // Interface
-        this.getServiceTester().assertChildCreationAndDrop(parentNode, Interface.class, UML.getPackage_PackagedElement(), CD_INTERFACE_CHILD);
+        this.getServiceTester().assertChildCreationAndDrop(droppedPackageNodeContent, Interface.class, UML.getPackage_PackagedElement(), CD_INTERFACE_CHILD);
 
         // PrimitiveType
-        this.getServiceTester().assertChildCreationAndDrop(parentNode, PrimitiveType.class, UML.getPackage_PackagedElement(), CD_PRIMITIVE_TYPE_CHILD);
+        this.getServiceTester().assertChildCreationAndDrop(droppedPackageNodeContent, PrimitiveType.class, UML.getPackage_PackagedElement(), CD_PRIMITIVE_TYPE_CHILD);
 
         // DataType
-        this.getServiceTester().assertChildCreationAndDrop(parentNode, DataType.class, UML.getPackage_PackagedElement(), CD_DATA_TYPE_CHILD);
+        this.getServiceTester().assertChildCreationAndDrop(droppedPackageNodeContent, DataType.class, UML.getPackage_PackagedElement(), CD_DATA_TYPE_CHILD);
 
         // Enumeration
-        this.getServiceTester().assertChildCreationAndDrop(parentNode, Enumeration.class, UML.getPackage_PackagedElement(), CD_ENUMERATION_TYPE_CHILD);
+        this.getServiceTester().assertChildCreationAndDrop(droppedPackageNodeContent, Enumeration.class, UML.getPackage_PackagedElement(), CD_ENUMERATION_TYPE_CHILD);
     }
 
     @Test
     public void checkPackageChildren() {
         Package pack = this.init();
 
-        Package parent = this.createIn(Package.class, pack);
-        Node parentNode = this.getDiagramHelper().createNodeInDiagram(CD_PACKAGE, parent);
+        this.createIn(Package.class, pack);
+        this.getDiagramHelper().createNodeInDiagram(CD_PACKAGE_TOP_HOLDER, pack);
+        Node content = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_TOP_CONTENT, pack);
 
-        this.checkPackageChildren(parentNode, true);
+        this.checkPackageChildren(content, true);
+
     }
 
     @Test
@@ -625,10 +660,11 @@ public class ClassDiagramTests extends AbstractDiagramTest {
 
         // Check with class inside a package
         Package subPack = this.createIn(Package.class, pack);
-        Node subPackageNode = this.getServiceTester().assertSemanticDrop(subPack, null, CD_PACKAGE);
+        this.getServiceTester().assertSemanticDrop(subPack, null, CD_PACKAGE_TOP_HOLDER);
+        Node subPackageContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_TOP_CONTENT, subPack);
 
         Class nestedClass = this.createIn(Class.class, subPack);
-        Node nestedClassNode = this.getServiceTester().assertSemanticDrop(nestedClass, subPackageNode, CD_CLASS_CHILD);
+        Node nestedClassNode = this.getServiceTester().assertSemanticDrop(nestedClass, subPackageContent, CD_CLASS_CHILD);
 
         Node interfaceNode = this.getServiceTester().assertSemanticDrop(targetInterface, null, CD_INTERFACE);
         this.getServiceTester().buildDomainBasedEdgeTestHelper(ID_BUILDER)//
@@ -645,7 +681,7 @@ public class ClassDiagramTests extends AbstractDiagramTest {
         Node rootClassNode = this.getServiceTester().assertSemanticDrop(rootClass, null, CD_CLASS);
 
         Interface nestedInsterface = this.createIn(Interface.class, subPack);
-        Node nestedInterfaceNode = this.getServiceTester().assertSemanticDrop(nestedInsterface, subPackageNode, CD_INTERFACE_CHILD);
+        Node nestedInterfaceNode = this.getServiceTester().assertSemanticDrop(nestedInsterface, subPackageContent, CD_INTERFACE_CHILD);
 
         this.getServiceTester().buildDomainBasedEdgeTestHelper(ID_BUILDER)//
                 .withSource(nestedClass)//
@@ -692,9 +728,10 @@ public class ClassDiagramTests extends AbstractDiagramTest {
         // Check with class inside a package
         Package subPack = this.createIn(Package.class, pack);
 
-        Node subPackageNode = this.getServiceTester().assertSemanticDrop(subPack, null, CD_PACKAGE);
+        this.getServiceTester().assertSemanticDrop(subPack, null, CD_PACKAGE_TOP_HOLDER);
+        Node subPackageNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_TOP_CONTENT, subPack);
         Class nestedClass = this.createIn(Class.class, subPack);
-        Node nestedClassNode = this.getServiceTester().assertSemanticDrop(nestedClass, subPackageNode, CD_CLASS_CHILD);
+        Node nestedClassNode = this.getServiceTester().assertSemanticDrop(nestedClass, subPackageNodeContent, CD_CLASS_CHILD);
 
         Node interfaceNode = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_INTERFACE, targetInterface);
         this.getServiceTester().buildDomainBasedEdgeTestHelper(ID_BUILDER)//
@@ -711,7 +748,7 @@ public class ClassDiagramTests extends AbstractDiagramTest {
         Node rootClassNode = this.getServiceTester().assertSemanticDrop(rootClass, null, CD_CLASS);
 
         Interface nestedInsterface = this.createIn(Interface.class, subPack);
-        Node nestedInterfaceNode = this.getServiceTester().assertSemanticDrop(nestedInsterface, subPackageNode, CD_INTERFACE_CHILD);
+        Node nestedInterfaceNode = this.getServiceTester().assertSemanticDrop(nestedInsterface, subPackageNodeContent, CD_INTERFACE_CHILD);
 
         this.getServiceTester().buildDomainBasedEdgeTestHelper(ID_BUILDER)//
                 .withSource(nestedClass)//
@@ -796,7 +833,7 @@ public class ClassDiagramTests extends AbstractDiagramTest {
     public void checkUsageReconnectionEdge() {
         Package pack = this.init();
 
-        Node sourcePackageNode = this.getServiceTester().assertSemanticDrop(pack, null, CD_PACKAGE);
+        Node sourcePackageNode = this.getServiceTester().assertSemanticDrop(pack, null, CD_PACKAGE_TOP_HOLDER);
         Class targetClass = this.createIn(Class.class, pack);
         Usage usage = this.createUsage(pack, pack, targetClass);
         Interface anInterface = this.createIn(Interface.class, pack);
@@ -809,7 +846,7 @@ public class ClassDiagramTests extends AbstractDiagramTest {
         // Check source reconnection
         this.getServiceTester().assertSourceReconnection(//
                 new ElementMatcher(usage, CD_USAGE), //
-                new ElementMatcher(pack, CD_PACKAGE), //
+                new ElementMatcher(pack, CD_PACKAGE_TOP_HOLDER), //
                 new ElementMatcher(anInterface, CD_INTERFACE), //
                 new ElementMatcher(targetClass, CD_CLASS));
 
@@ -817,7 +854,7 @@ public class ClassDiagramTests extends AbstractDiagramTest {
         this.getServiceTester().assertTargetReconnection(//
                 new ElementMatcher(usage, CD_USAGE), //
                 new ElementMatcher(targetClass, CD_CLASS), //
-                new ElementMatcher(pack, CD_PACKAGE), //
+                new ElementMatcher(pack, CD_PACKAGE_TOP_HOLDER), //
                 new ElementMatcher(anInterface, CD_INTERFACE));
 
     }
@@ -1248,8 +1285,8 @@ public class ClassDiagramTests extends AbstractDiagramTest {
         Package childPackage1 = this.createIn(Package.class, parentPackage);
         Class futureChildClass = this.createIn(Class.class, pack);
 
-        Node parentNode = this.getDiagramHelper().createNodeInDiagram(CD_PACKAGE, parentPackage);
-        Node childPackageNode = this.getDiagramHelper().createNodeInDiagram(CD_PACKAGE, childPackage1);
+        Node parentNode = this.getDiagramHelper().createNodeInDiagram(CD_PACKAGE_TOP_HOLDER, parentPackage);
+        Node childPackageNode = this.getDiagramHelper().createNodeInDiagram(CD_PACKAGE_TOP_HOLDER, childPackage1);
         Node childNode = this.getDiagramHelper().createNodeInDiagram(CD_CLASS, childClass1);
         Node futureChildNode = this.getDiagramHelper().createNodeInDiagram(CD_CLASS, futureChildClass);
 
@@ -1419,12 +1456,13 @@ public class ClassDiagramTests extends AbstractDiagramTest {
 
         // Check on children node
 
-        Node parentNode = this.getServiceTester().assertSemanticDrop(pack, null, CD_PACKAGE);
-        Node c1Node = this.getServiceTester().assertSemanticDrop(c1, parentNode, CD_CLASS_CHILD);
-        Node p1Node = this.getServiceTester().assertSemanticDrop(p1, parentNode, CD_PRIMITIVE_TYPE_CHILD);
-        Node i1Node = this.getServiceTester().assertSemanticDrop(i1, parentNode, CD_INTERFACE_CHILD);
-        Node d1Node = this.getServiceTester().assertSemanticDrop(d1, parentNode, CD_DATA_TYPE_CHILD);
-        Node e1Node = this.getServiceTester().assertSemanticDrop(e1, parentNode, CD_ENUMERATION_TYPE_CHILD);
+        this.getServiceTester().assertSemanticDrop(pack, null, CD_PACKAGE_TOP_HOLDER);
+        Node parentNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(CD_PACKAGE_TOP_CONTENT, pack);
+        Node c1Node = this.getServiceTester().assertSemanticDrop(c1, parentNodeContent, CD_CLASS_CHILD);
+        Node p1Node = this.getServiceTester().assertSemanticDrop(p1, parentNodeContent, CD_PRIMITIVE_TYPE_CHILD);
+        Node i1Node = this.getServiceTester().assertSemanticDrop(i1, parentNodeContent, CD_INTERFACE_CHILD);
+        Node d1Node = this.getServiceTester().assertSemanticDrop(d1, parentNodeContent, CD_DATA_TYPE_CHILD);
+        Node e1Node = this.getServiceTester().assertSemanticDrop(e1, parentNodeContent, CD_ENUMERATION_TYPE_CHILD);
 
         this.getDiagramHelper().assertGetExistDomainBasedEdge(CD_ASSOCIATION, this.getDiagramHelper().getSemanticElement(c1i1Edge), //
                 c1Node, i1Node);

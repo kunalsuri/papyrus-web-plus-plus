@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2024 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -10,9 +10,13 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Aurelien Didier (Artal Technologies) - Issue 229
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.usecase;
 
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.CONTENT_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.HOLDER_SUFFIX;
+import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.UNDERSCORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,9 +49,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 public class UseCaseDiagramTests extends AbstractDiagramTest {
 
+    private static final String TOP_HOLDER_SUFFIX = UNDERSCORE + HOLDER_SUFFIX;
+
+    private static final String TOP_CONTENT_SUFFIX = UNDERSCORE + CONTENT_SUFFIX;
+
     private static final IdBuilder ID_BUILDER = new IdBuilder(UCDDiagramDescriptionBuilder.UCD_PREFIX, new UMLMetamodelHelper());
 
-    private static final String UCD_INTERACTION_NODE_NAME = ID_BUILDER.getDomainNodeName(UML.getInteraction());
+    private static final String UCD_INTERACTION_NAME = ID_BUILDER.getDomainNodeName(UML.getInteraction());
 
     private static final String UCD_PACKAGE_NODE_NAME = ID_BUILDER.getDomainNodeName(UML.getPackage());
 
@@ -112,11 +120,12 @@ public class UseCaseDiagramTests extends AbstractDiagramTest {
     public void testCreateUseCaseInPackage() {
         Package rootPack = this.init();
         Package childPack = this.createIn(Package.class, rootPack);
-        org.eclipse.sirius.components.diagrams.Node childPackNode = this.getDiagramHelper().createNodeInDiagram(UCD_PACKAGE_NODE_NAME, childPack);
+        this.getDiagramHelper().createNodeInDiagram(UCD_PACKAGE_NODE_NAME + TOP_HOLDER_SUFFIX, childPack);
+        org.eclipse.sirius.components.diagrams.Node childPackNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(UCD_PACKAGE_NODE_NAME + TOP_CONTENT_SUFFIX, childPack);
 
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createUseCaseUCD(childPack, childPackNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createUseCaseUCD(childPack, childPackNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -127,7 +136,7 @@ public class UseCaseDiagramTests extends AbstractDiagramTest {
         assertTrue(childPack.getPackagedElements().contains(useCase));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(UCD_USECASE_SHARED_NODE_NAME, childPackNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(UCD_USECASE_SHARED_NODE_NAME, childPackNodeContent, newElement);
     }
 
     /**
@@ -140,11 +149,11 @@ public class UseCaseDiagramTests extends AbstractDiagramTest {
 
         Package rootPack = this.init();
         Interaction interaction = this.createIn(Interaction.class, rootPack);
-        org.eclipse.sirius.components.diagrams.Node interactionNode = this.getDiagramHelper().createNodeInDiagram(UCD_INTERACTION_NODE_NAME, interaction);
-
+        this.getDiagramHelper().createNodeInDiagram(UCD_INTERACTION_NAME + TOP_HOLDER_SUFFIX, interaction);
+        org.eclipse.sirius.components.diagrams.Node interactionNodeContent = this.getDiagramHelper().assertGetUniqueMatchingNode(UCD_INTERACTION_NAME + TOP_CONTENT_SUFFIX, interaction);
         EObject newElement = this.getDiagramHelper().modify(context -> {
             EObject aNewElement = this.getDiagramService()//
-                    .createUseCaseUCD(interaction, interactionNode, context, this.getDiagramHelper().getConvertedNodes());
+                    .createUseCaseUCD(interaction, interactionNodeContent, context, this.getDiagramHelper().getConvertedNodes());
             return aNewElement;
         });
 
@@ -155,7 +164,7 @@ public class UseCaseDiagramTests extends AbstractDiagramTest {
         assertTrue(interaction.getOwnedUseCases().contains(useCase));
 
         // check node creation
-        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(UCD_USECASE_SHARED_NODE_NAME, interactionNode, newElement);
+        this.getDiagramHelper().assertGetUniqueMatchingNodeIn(UCD_USECASE_SHARED_NODE_NAME, interactionNodeContent, newElement);
     }
 
     /**
