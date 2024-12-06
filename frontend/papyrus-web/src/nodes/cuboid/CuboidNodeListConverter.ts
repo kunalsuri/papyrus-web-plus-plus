@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2024 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,10 @@
 import {
   BorderNodePosition,
   ConnectionHandle,
+  convertHandles,
+  convertInsideLabel,
+  convertLineStyle,
+  convertOutsideLabels,
   GQLDiagram,
   GQLDiagramDescription,
   GQLEdge,
@@ -24,27 +28,22 @@ import {
   GQLViewModifier,
   IConvertEngine,
   INodeConverter,
-  convertHandles,
-  convertInsideLabel,
-  convertLineStyle,
-  convertOutsideLabels,
   isListLayoutStrategy,
-  convertInsideLabel,
-  GQLHandleLayoutData,
+  NodeData,
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { Node, XYPosition } from '@xyflow/react';
-import { GQLPackageNodeStyle, PackageNodeData } from './PackageNode.types';
+import { CuboidNodeListData, GQLCuboidNodeStyle } from './CuboidNode.types';
 
 const defaultPosition: XYPosition = { x: 0, y: 0 };
 
-const toPackageNode = (
+const toCuboidListNode = (
   gqlDiagram: GQLDiagram,
-  gqlNode: GQLNode<GQLPackageNodeStyle>,
+  gqlNode: GQLNode<GQLCuboidNodeStyle>,
   gqlParentNode: GQLNode<GQLNodeStyle> | null,
   nodeDescription: GQLNodeDescription | undefined,
   isBorderNode: boolean,
-  gqlEdge: GQLEdge[]
-): Node<PackageNodeData> => {
+  gqlEdges: GQLEdge[]
+): Node<CuboidNodeListData> => {
   const {
     targetObjectId,
     targetObjectLabel,
@@ -59,18 +58,14 @@ const toPackageNode = (
     labelEditable,
   } = gqlNode;
 
-  const handleLayoutData: GQLHandleLayoutData[] = gqlDiagram.layoutData.nodeLayoutData
-    .filter((nodeLayoutData) => nodeLayoutData.id === id)
-    .flatMap((nodeLayoutData) => nodeLayoutData.handleLayoutData);
-
-  const connectionHandles: ConnectionHandle[] = convertHandles(gqlNode.id, gqlEdge, handleLayoutData);
+  const connectionHandles: ConnectionHandle[] = convertHandles(gqlNode, gqlEdges);
   const gqlNodeLayoutData: GQLNodeLayoutData | undefined = gqlDiagram.layoutData.nodeLayoutData.find(
     (nodeLayoutData) => nodeLayoutData.id === id
   );
   const isNew = gqlNodeLayoutData === undefined;
   const resizedByUser = gqlNodeLayoutData?.resizedByUser ?? false;
 
-  const data: PackageNodeData = {
+  const data: CuboidNodeListData = {
     targetObjectId,
     targetObjectLabel,
     targetObjectKind,
@@ -84,18 +79,26 @@ const toPackageNode = (
     },
     insideLabel: null,
     outsideLabels: convertOutsideLabels(outsideLabels),
+    isBorderNode: isBorderNode,
+    borderNodePosition: isBorderNode ? BorderNodePosition.EAST : null,
     faded: state === GQLViewModifier.Faded,
     pinned,
-    isBorderNode: isBorderNode,
+    labelEditable,
     nodeDescription,
+    connectionHandles,
     defaultWidth: gqlNode.defaultWidth,
     defaultHeight: gqlNode.defaultHeight,
-    borderNodePosition: isBorderNode ? BorderNodePosition.EAST : null,
-    connectionHandles,
-    labelEditable,
     isNew,
-    resizedByUser,
+    areChildNodesDraggable: isListLayoutStrategy(gqlNode.childrenLayoutStrategy)
+      ? gqlNode.childrenLayoutStrategy.areChildNodesDraggable
+      : true,
+    topGap: isListLayoutStrategy(gqlNode.childrenLayoutStrategy) ? gqlNode.childrenLayoutStrategy.topGap : 0,
+    bottomGap: isListLayoutStrategy(gqlNode.childrenLayoutStrategy) ? gqlNode.childrenLayoutStrategy.bottomGap : 0,
     isListChild: isListLayoutStrategy(gqlParentNode?.childrenLayoutStrategy),
+    resizedByUser,
+    growableNodeIds: isListLayoutStrategy(gqlNode.childrenLayoutStrategy)
+      ? gqlNode.childrenLayoutStrategy.growableNodeIds
+      : [],
     isDropNodeTarget: false,
     isDropNodeCandidate: false,
     isHovered: false,
@@ -112,9 +115,9 @@ const toPackageNode = (
     data.insideLabel.headerPosition = 'TOP';
   }
 
-  const node: Node<PackageNodeData> = {
+  const node: Node<CuboidNodeListData> = {
     id,
-    type: 'packageNode',
+    type: 'cuboidNodeList',
     data,
     position: defaultPosition,
     hidden: gqlNode.state === GQLViewModifier.Hidden,
@@ -143,15 +146,34 @@ const toPackageNode = (
   return node;
 };
 
-export class PackageNodeConverter implements INodeConverter {
+const adaptChildrenBorderNodes = (nodes: Node[], gqlChildrenNodes: GQLNode<GQLNodeStyle>[]): void => {
+  const visibleChildrenNodes = nodes
+    .filter(
+      (child) =>
+        gqlChildrenNodes.map((gqlChild) => gqlChild.id).find((gqlChildId) => gqlChildId === child.id) !== undefined
+    )
+    .filter((child) => !child.hidden);
+  visibleChildrenNodes.forEach((child, index) => {
+    let childData = child.data as NodeData;
+    child.data.style = {
+      ...childData.style,
+      borderTopWidth: childData.style.borderWidth,
+      borderLeftWidth: childData.style.borderWidth,
+      borderRightWidth: childData.style.borderWidth,
+      borderBottomWidth: childData.style.borderWidth,
+    };
+  });
+};
+
+export class CuboidNodeListConverter implements INodeConverter {
   canHandle(gqlNode: GQLNode<GQLNodeStyle>) {
-    return gqlNode.style.__typename === 'PackageNodeStyle' && gqlNode.childrenLayoutStrategy?.kind !== 'List';
+    return gqlNode.style.__typename === 'CuboidNodeStyle' && gqlNode.childrenLayoutStrategy?.kind === 'List';
   }
 
   handle(
     convertEngine: IConvertEngine,
     gqlDiagram: GQLDiagram,
-    gqlNode: GQLNode<GQLPackageNodeStyle>,
+    gqlNode: GQLNode<GQLCuboidNodeStyle>,
     gqlEdges: GQLEdge[],
     parentNode: GQLNode<GQLNodeStyle> | null,
     isBorderNode: boolean,
@@ -160,7 +182,9 @@ export class PackageNodeConverter implements INodeConverter {
     nodeDescriptions: GQLNodeDescription[]
   ) {
     const nodeDescription = nodeDescriptions.find((description) => description.id === gqlNode.descriptionId);
-    nodes.push(toPackageNode(gqlDiagram, gqlNode, parentNode, nodeDescription ?? undefined, isBorderNode, gqlEdges));
+    if (nodeDescription) {
+      nodes.push(toCuboidListNode(gqlDiagram, gqlNode, parentNode, nodeDescription, isBorderNode, gqlEdges));
+    }
 
     const borderNodeDescriptions: GQLNodeDescription[] = (nodeDescription?.borderNodeDescriptionIds ?? []).flatMap(
       (nodeDescriptionId) =>
@@ -187,5 +211,6 @@ export class PackageNodeConverter implements INodeConverter {
       diagramDescription,
       childNodeDescriptions
     );
+    adaptChildrenBorderNodes(nodes, gqlNode.childNodes ?? []);
   }
 }

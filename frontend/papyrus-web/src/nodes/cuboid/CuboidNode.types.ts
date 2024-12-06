@@ -15,6 +15,13 @@ import { GQLNodeStyle, NodeData } from '@eclipse-sirius/sirius-components-diagra
 
 export interface CuboidNodeData extends NodeData {}
 
+export interface CuboidNodeListData extends NodeData {
+  areChildNodesDraggable: boolean;
+  topGap: number;
+  bottomGap: number;
+  growableNodeIds: string[];
+}
+
 export interface GQLCuboidNodeStyle extends GQLNodeStyle {
   background: string;
   borderColor: string;

@@ -26,13 +26,13 @@ import {
   INodeConverter,
   convertHandles,
   GQLHandleLayoutData,
+  convertInsideLabel,
   convertLineStyle,
   convertOutsideLabels,
   isListLayoutStrategy,
-  convertInsideLabel,
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { Node, XYPosition } from '@xyflow/react';
-import { GQLCuboidNodeStyle, CuboidNodeData } from './CuboidNode.types';
+import { CuboidNodeData, GQLCuboidNodeStyle } from './CuboidNode.types';
 
 const defaultPosition: XYPosition = { x: 0, y: 0 };
 
@@ -139,7 +139,7 @@ const toCuboidNode = (
 
 export class CuboidNodeConverter implements INodeConverter {
   canHandle(gqlNode: GQLNode<GQLNodeStyle>) {
-    return gqlNode.style.__typename === 'CuboidNodeStyle';
+    return gqlNode.style.__typename === 'CuboidNodeStyle' && gqlNode.childrenLayoutStrategy?.kind !== 'List';
   }
 
   handle(
