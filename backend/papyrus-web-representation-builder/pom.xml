@@ -12,101 +12,105 @@
      Obeo - initial API and implementation
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>papyrus-web</groupId>
-		<artifactId>papyrus-web-parent</artifactId>
-		<version>2025.1.7-SNAPSHOT</version>
-		<relativePath>../papyrus-web-parent</relativePath>
-	</parent>
-	<artifactId>papyrus-web-representation-builder</artifactId>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>papyrus-web</groupId>
+        <artifactId>papyrus-web-parent</artifactId>
+        <version>2025.1.7-SNAPSHOT</version>
+        <relativePath>../papyrus-web-parent</relativePath>
+    </parent>
+    <artifactId>papyrus-web-representation-builder</artifactId>
 
-	<name>papyrus-web-representation-builder</name>
-	<description>Papyrus Web Representation Builder</description>
-
-
-	<dependencies>
-
-		<!-- Internal dependencies -->
-		<dependency>
-			<groupId>papyrus-web</groupId>
-			<artifactId>papyrus-web-sirius-contributions</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>papyrus-web</groupId>
-			<artifactId>papyrus-web-tests</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>papyrus-web</groupId>
-			<artifactId>papyrus-web-customnodes</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>papyrus-web</groupId>
-			<artifactId>papyrus-web-customnodes-edit</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <name>papyrus-web-representation-builder</name>
+    <description>Papyrus Web Representation Builder</description>
 
 
-		<!-- External Dependencies -->
-		<dependency>
-			<groupId>org.eclipse.uml2.plugins</groupId>
-			<artifactId>org.eclipse.uml2.uml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.uml2.plugins</groupId>
-			<artifactId>org.eclipse.uml2.types</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.sirius</groupId>
-			<artifactId>sirius-components-emf</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.sirius</groupId>
-			<artifactId>sirius-components-view-edit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.sirius</groupId>
-			<artifactId>sirius-components-view-diagram-customnodes</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.sirius</groupId>
-			<artifactId>sirius-components-collaborative-diagrams</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.papyrus.domainservices</groupId>
-			<artifactId>org.eclipse.papyrus.uml.domain.services</artifactId>
-			<!-- Workaround for https://stackoverflow.com/questions/72625637/maven-build-failed-due-to-jdt-dependencies-no-versions-available-for-org-osgi -->
-			<exclusions>
-				<exclusion>
-					<groupId>org.osgi</groupId>
-					<artifactId>org.osgi.service.prefs</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+
+        <!-- Internal dependencies -->
+        <dependency>
+            <groupId>papyrus-web</groupId>
+            <artifactId>papyrus-web-sirius-contributions</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>papyrus-web</groupId>
+            <artifactId>papyrus-web-tests</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>papyrus-web</groupId>
+            <artifactId>papyrus-web-customnodes</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>papyrus-web</groupId>
+            <artifactId>papyrus-web-customnodes-edit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+        <!-- External Dependencies -->
+        <dependency>
+            <groupId>org.eclipse.uml2.plugins</groupId>
+            <artifactId>org.eclipse.uml2.uml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.uml2.plugins</groupId>
+            <artifactId>org.eclipse.uml2.types</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.sirius</groupId>
+            <artifactId>sirius-components-emf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.sirius</groupId>
+            <artifactId>sirius-components-view-edit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.sirius</groupId>
+            <artifactId>sirius-components-view-diagram-customnodes</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.sirius</groupId>
+            <artifactId>sirius-components-view-diagram</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.sirius</groupId>
+            <artifactId>sirius-components-collaborative-diagrams</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.papyrus.domainservices</groupId>
+            <artifactId>org.eclipse.papyrus.uml.domain.services</artifactId>
+            <!-- Workaround for https://stackoverflow.com/questions/72625637/maven-build-failed-due-to-jdt-dependencies-no-versions-available-for-org-osgi -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.service.prefs</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>

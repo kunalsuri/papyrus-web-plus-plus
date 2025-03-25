@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -12,9 +12,8 @@
  *  Obeo - Initial API and implementation
  ***************************************************************************/
 
-import { IconOverlay, useSelection } from '@eclipse-sirius/sirius-components-core';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
-import { getCSSColor, useMultiToast } from '@eclipse-sirius/sirius-components-core';
+import { IconOverlay, getCSSColor, useMultiToast, useSelection } from '@eclipse-sirius/sirius-components-core';
 import {
   PropertySectionComponentProps,
   PropertySectionLabel,
@@ -26,12 +25,13 @@ import {
   GQLReferenceWidgetStyle,
   GQLSuccessPayload,
 } from '@eclipse-sirius/sirius-components-widget-reference';
+import AddIcon from '@mui/icons-material/Add';
 import { Typography } from '@mui/material';
-import { makeStyles } from 'tss-react/mui';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
-import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
+import ReorderItemsDialog from '../dialogs/ReorderItemsDialog';
 import {
   ContainmentReferenceDialogKind,
   GQLClickContainmentReferenceItemMutationData,
@@ -52,7 +52,6 @@ import {
 import ReorderIcon from './ReorderIcon';
 import CreateNewChildDialog from './dialogs/CreateNewChildDialog';
 import { ChildCreationDescription } from './dialogs/CreateNewChildDialog.types';
-import ReorderItemsDialog from '../dialogs/ReorderItemsDialog';
 
 const useStyles = makeStyles<GQLReferenceWidgetStyle>()(
   (theme, { color, fontSize, italic, bold, underline, strikeThrough }) => ({
@@ -332,8 +331,8 @@ const ContainmentReferenceSection = ({
   };
 
   const handleReferenceItemSimpleClick = (item: GQLContainmentReferenceItem) => {
-    const { id, kind } = item;
-    setSelection({ entries: [{ id, kind }] });
+    const { id } = item;
+    setSelection({ entries: [{ id }] });
     if (item.hasClickAction) {
       const variables: GQLClickContainmentReferenceItemMutationVariables = {
         input: {
@@ -349,8 +348,8 @@ const ContainmentReferenceSection = ({
     }
   };
   const handleReferenceItemDoubleClick = (item: GQLContainmentReferenceItem) => {
-    const { id, kind } = item;
-    setSelection({ entries: [{ id, kind }] });
+    const { id } = item;
+    setSelection({ entries: [{ id }] });
     if (item.hasClickAction) {
       const variables: GQLClickContainmentReferenceItemMutationVariables = {
         input: {

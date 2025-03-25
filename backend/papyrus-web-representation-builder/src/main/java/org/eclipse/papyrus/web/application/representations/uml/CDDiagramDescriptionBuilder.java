@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -43,6 +43,7 @@ import org.eclipse.sirius.components.view.ChangeContext;
 import org.eclipse.sirius.components.view.ViewFactory;
 import org.eclipse.sirius.components.view.diagram.ArrowStyle;
 import org.eclipse.sirius.components.view.diagram.DiagramDescription;
+import org.eclipse.sirius.components.view.diagram.DiagramElementDescription;
 import org.eclipse.sirius.components.view.diagram.DiagramFactory;
 import org.eclipse.sirius.components.view.diagram.DropNodeTool;
 import org.eclipse.sirius.components.view.diagram.EdgeDescription;
@@ -276,7 +277,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Model} on the Diagram.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createModelTopNodeDescription(DiagramDescription diagramDescription) {
         EClass modelEClass = this.pack.getModel();
@@ -304,7 +305,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Package} on the Diagram.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createPackageTopNodeDescription(DiagramDescription diagramDescription) {
         EClass packageEClass = this.pack.getPackage();
@@ -378,14 +379,13 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     /**
      * Creates a shared compartment reused by <i>Class</i> {@link NodeDescription}.
      * <p>
-     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the
-     * diagram.
+     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the diagram.
      * <p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment to create
+     *         the name of the compartment to create
      */
     private void createCompartmentForClassSharedNodeDescription(DiagramDescription diagramDescription, String compartmentName) {
         EClass classEClass = this.pack.getClass_();
@@ -401,14 +401,13 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     /**
      * Creates a shared compartment reused by <i>DataType</i> {@link NodeDescription}.
      * <p>
-     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the
-     * diagram.
+     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the diagram.
      * <p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment to create
+     *         the name of the compartment to create
      */
     private void createCompartmentForDataTypeSharedNodeDescription(DiagramDescription diagramDescription, String compartmentName) {
         EClass dataTypeEClass = this.pack.getDataType();
@@ -425,14 +424,13 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     /**
      * Creates a shared compartment reused by <i>DataType</i> {@link NodeDescription}.
      * <p>
-     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the
-     * diagram.
+     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the diagram.
      * <p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment to create
+     *         the name of the compartment to create
      * @return
      */
     private NodeDescription createCompartmentForEnumerationSharedNodeDescription(DiagramDescription diagramDescription, String compartmentName) {
@@ -448,14 +446,13 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     /**
      * Creates a shared compartment reused by <i>DataType</i> {@link NodeDescription}.
      * <p>
-     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the
-     * diagram.
+     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the diagram.
      * <p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment to create
+     *         the name of the compartment to create
      */
     private void createCompartmentForInterfaceSharedNodeDescription(DiagramDescription diagramDescription, String compartmentName) {
         EClass interfaceEClass = this.pack.getInterface();
@@ -472,14 +469,13 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     /**
      * Creates a shared compartment reused by <i>DataType</i> {@link NodeDescription}.
      * <p>
-     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the
-     * diagram.
+     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the diagram.
      * <p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment to create
+     *         the name of the compartment to create
      */
     private void createCompartmentForPrimitiveTypeSharedNodeDescription(DiagramDescription diagramDescription, String compartmentName) {
         EClass primitiveTypeEClass = this.pack.getPrimitiveType();
@@ -496,14 +492,13 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     /**
      * Creates a shared compartment reused by <i>Class</i> {@link NodeDescription}.
      * <p>
-     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the
-     * diagram.
+     * The created {@link NodeDescription} compartment is added to the <i>shared</i> {@link NodeDescription} of the diagram.
      * <p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment to create
+     *         the name of the compartment to create
      */
     private void createCompartmentForSignalSharedNodeDescription(DiagramDescription diagramDescription, String compartmentName) {
         EClass signalEClass = this.pack.getSignal();
@@ -520,7 +515,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates a <i>Property</i> child reused by <i>Attributes</i> compartments.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createAttributeSharedNodeDescription(DiagramDescription diagramDescription) {
         List<EClass> owners = List.of(this.pack.getClass_(), this.pack.getDataType(), this.pack.getPrimitiveType(), this.pack.getInterface(), this.pack.getSignal());
@@ -538,9 +533,9 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param classifierEClass
-     *            the classifier sub-type to represent
+     *         the classifier sub-type to represent
      * @return the created {@link NodeDescription}
      */
     private NodeDescription createClassifierSharedNodeDescription(DiagramDescription diagramDescription, EClass classifierEClass) {
@@ -569,7 +564,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates a <i>Property</i> child reused by <i>Attributes</i> compartments.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createEnumerationLiteralSharedNodeDescription(DiagramDescription diagramDescription) {
         List<EClass> owners = List.of(this.pack.getEnumeration());
@@ -587,7 +582,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createModelSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass modelEClass = this.pack.getModel();
@@ -619,7 +614,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates a <i>Property</i> child reused by <i>Attributes</i> compartments.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createNestedClassifierSharedNodeDescription(DiagramDescription diagramDescription) {
         List<EClass> owners = List.of(this.pack.getClass_(), this.pack.getInterface());
@@ -635,7 +630,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates a <i>Operation</i> child reused by <i>Operations</i> compartments.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createOperationSharedNodeDescription(DiagramDescription diagramDescription) {
         List<EClass> owners = List.of(this.pack.getClass_(), this.pack.getDataType(), this.pack.getPrimitiveType(), this.pack.getInterface());
@@ -653,7 +648,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createPackageSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass packageEClass = this.pack.getPackage();
@@ -685,7 +680,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates a <i>Property</i> child reused by <i>Attributes</i> compartments.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createReceptionSharedNodeDescription(DiagramDescription diagramDescription) {
         List<EClass> owners = List.of(this.pack.getClass_());
@@ -699,28 +694,27 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     /**
      * Creates a {@link NodeDescription} reused in a {@link NodeDescription} compartment.
      * <p>
-     * The created {@link NodeDescription} is added to the provided {@code parentNodeDescription}
-     * {@link NodeDescription} and reused by the {@code owners} {@link NodeDescription}s.
+     * The created {@link NodeDescription} is added to the provided {@code parentNodeDescription} {@link NodeDescription} and reused by the {@code owners} {@link NodeDescription}s.
      * <p>
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param parentNodeDescription
-     *            the {@link NodeDescription} used to contain the created {@link NodeDescription}
+     *         the {@link NodeDescription} used to contain the created {@link NodeDescription}
      * @param domainType
-     *            the domain type used to define the new {@link NodeDescription}
+     *         the domain type used to define the new {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment which contain the child {@link NodeDescription} to create
+     *         the name of the compartment which contain the child {@link NodeDescription} to create
      * @param semanticQuery
-     *            the semantic candidate expression to get semantic element
+     *         the semantic candidate expression to get semantic element
      * @param semanticRefTool
-     *            the containment reference to used for the creation
+     *         the containment reference to used for the creation
      * @param owners
-     *            the semantic types that can contain this {@link NodeDescription}
+     *         the semantic types that can contain this {@link NodeDescription}
      * @param forbiddenOwners
-     *            the list of domain types to exclude
+     *         the list of domain types to exclude
      * @param forbiddenNodeDescriptionPredicate
-     *            predicate on the {@link NodeDescription} to exclude
+     *         predicate on the {@link NodeDescription} to exclude
      * @return the created {@link NodeDescription}
      */
     // CHECKSTYLE:OFF
@@ -858,7 +852,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
 
         ChangeContext changeContext = this.getViewBuilder().createChangeContextOperation(toolQuery);
         containmentLinkEdge.eAdapters().add(new CallbackAdapter(() -> {
-            List<NodeDescription> targetNodeDescriptions = containmentLinkEdge.getTargetNodeDescriptions();
+            List<DiagramElementDescription> targetNodeDescriptions = containmentLinkEdge.getTargetDescriptions();
             tool.getTargetElementDescriptions().addAll(targetNodeDescriptions);
         }));
         tool.getBody().add(changeContext);
@@ -944,7 +938,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
 
         ChangeContext changeContext = this.getViewBuilder().createChangeContextOperation(toolQuery);
         containmentLinkEdge.eAdapters().add(new CallbackAdapter(() -> {
-            List<NodeDescription> targetNodeDescriptions = containmentLinkEdge.getTargetNodeDescriptions();
+            List<DiagramElementDescription> targetNodeDescriptions = containmentLinkEdge.getTargetDescriptions();
             tool.getTargetElementDescriptions().addAll(targetNodeDescriptions);
         }));
         tool.getBody().add(changeContext);
@@ -996,7 +990,7 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
         EdgeTool tool = this.getViewBuilder().createFeatureBasedEdgeTool(specializationName, query, List.of());
         tool.setIconURLsExpression(ViewBuilder.getIconPathFromString(iconName));
         cdAssociation.eAdapters().add(new CallbackAdapter(() -> {
-            List<NodeDescription> targetNodeDescriptions = cdAssociation.getTargetNodeDescriptions();
+            List<DiagramElementDescription> targetNodeDescriptions = cdAssociation.getTargetDescriptions();
             tool.getTargetElementDescriptions().addAll(targetNodeDescriptions);
         }));
         tool.getBody().add(changeContext);
@@ -1023,11 +1017,11 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Add graphical dropped tool on Shared compartment {@link NodeDescription}.
      *
      * @param diagramDescription
-     *            the {@link DiagramDescription} containing the Shared {@link NodeDescription}
+     *         the {@link DiagramDescription} containing the Shared {@link NodeDescription}
      * @param compartmentName
-     *            the name of the compartment to complete with the drop tool
-     * @param cdSharedCompartmentDescription
-     *            the Shared compartment {@link NodeDescription}
+     *         the name of the compartment to complete with the drop tool
+     * @param cdSharedCompartmentForDataTypeDescription
+     *         the Shared compartment {@link NodeDescription}
      */
     private void addDropToolOnSharedCompartment(DiagramDescription diagramDescription, String compartmentName, NodeDescription cdSharedCompartmentForDataTypeDescription) {
         // Add dropped tool on Shared Compartment container

@@ -1,5 +1,6 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,6 +29,7 @@ import org.eclipse.papyrus.web.application.representations.view.builders.Callbac
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.view.diagram.ArrowStyle;
 import org.eclipse.sirius.components.view.diagram.DiagramDescription;
+import org.eclipse.sirius.components.view.diagram.DiagramElementDescription;
 import org.eclipse.sirius.components.view.diagram.DiagramFactory;
 import org.eclipse.sirius.components.view.diagram.DropNodeTool;
 import org.eclipse.sirius.components.view.diagram.EdgeDescription;
@@ -146,7 +148,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Artifact} on the Diagram.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createArtifactTopNodeDescription(DiagramDescription diagramDescription) {
         EClass artifactEClass = this.umlPackage.getArtifact();
@@ -181,7 +183,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link DeploymentSpecification} on the Diagram.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createDeploymentSpecificationTopNodeDescription(DiagramDescription diagramDescription) {
         EClass deploymentSpecificationEClass = this.umlPackage.getDeploymentSpecification();
@@ -209,7 +211,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Device} on the Diagram.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createDeviceTopNodeDescription(DiagramDescription diagramDescription) {
         NodeDescription ddDeviceTopNodeDescription = this.createClassifierTopNodeDescription(diagramDescription, this.umlPackage.getDevice());
@@ -227,7 +229,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link ExecutionEnvironment} on the Diagram.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createExecutionEnvironmentTopNodeDescription(DiagramDescription diagramDescription) {
         NodeDescription ddExecutionEnvironmentTopNodeDescription = this.createClassifierTopNodeDescription(diagramDescription, this.umlPackage.getExecutionEnvironment());
@@ -247,7 +249,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Model} on the Diagram.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createModelTopNodeDescription(DiagramDescription diagramDescription) {
         EClass modelEClass = this.umlPackage.getModel();
@@ -273,7 +275,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Node} on the Diagram.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createNodeTopNodeDescription(DiagramDescription diagramDescription) {
         NodeDescription ddNodeTopNodeDescription = this.createClassifierTopNodeDescription(diagramDescription, this.umlPackage.getNode());
@@ -292,7 +294,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Package} on the Diagram.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createPackageTopNodeDescription(DiagramDescription diagramDescription) {
         EClass packageEClass = this.umlPackage.getPackage();
@@ -322,9 +324,9 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Creates the {@link NodeDescription} representing an UML {@link Classifier} on Diagram with 3D box node.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      * @param type
-     *            type of the {@link Classifier} to create
+     *         type of the {@link Classifier} to create
      * @return the created {@link} NodeDescription.
      */
     private NodeDescription createClassifierTopNodeDescription(DiagramDescription diagramDescription, EClass type) {
@@ -357,7 +359,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createArtifactSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass artifactEClass = this.umlPackage.getArtifact();
@@ -402,7 +404,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createDeploymentSpecificationSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass deploymentSepecificationEClass = this.umlPackage.getDeploymentSpecification();
@@ -440,7 +442,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createDeviceSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass deviceEClass = this.umlPackage.getDevice();
@@ -486,7 +488,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createExecutionEnvironmentSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass executionEnvironmentEClass = this.umlPackage.getExecutionEnvironment();
@@ -532,7 +534,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createNodeSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass nodeEClass = this.umlPackage.getNode();
@@ -576,7 +578,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createPackageSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass packageEClass = this.umlPackage.getPackage();
@@ -610,7 +612,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * </p>
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link NodeDescription}
      */
     private void createModelSharedNodeDescription(DiagramDescription diagramDescription) {
         EClass modelEClass = this.umlPackage.getModel();
@@ -641,7 +643,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Create the {@link EdgeDescription} representing an UML {@link CommunicationPath}.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createCommunicationPathEdgeDescription(DiagramDescription diagramDescription) {
         Supplier<List<NodeDescription>> nodeSourcesAndTargets = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getNode());
@@ -668,7 +670,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Create the {@link EdgeDescription} representing an UML {@link Dependency}.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createDependencyEdgeDescription(DiagramDescription diagramDescription) {
         Supplier<List<NodeDescription>> namedElementCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getNamedElement());
@@ -690,7 +692,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Create the {@link EdgeDescription} representing an UML {@link Deployment}.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createDeploymentEdgeDescription(DiagramDescription diagramDescription) {
 
@@ -717,7 +719,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Create the {@link EdgeDescription} representing an UML {@link Generalization}.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createGeneralizationEdgeDescription(DiagramDescription diagramDescription) {
         Supplier<List<NodeDescription>> sourceAndTargetDescriptionsSupplier = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getClassifier());
@@ -741,7 +743,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
      * Create the {@link EdgeDescription} representing an UML {@link Manifestation}.
      *
      * @param diagramDescription
-     *            the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
+     *         the Deployment {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createManifestationEdgeDescription(DiagramDescription diagramDescription) {
         Supplier<List<NodeDescription>> packageableELementTargetCollector = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getPackageableElement());
@@ -758,7 +760,7 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
         EdgeTool ddManifestationEdgeCreationTool = this.getViewBuilder().createDomainBasedEdgeToolWithService("New Manifestation", DeploymentDiagramServices.CREATE_MANIFESTATION);
 
         ddManifestationEdgeDescription.eAdapters().add(new CallbackAdapter(() -> {
-            List<NodeDescription> targetNodeDescriptions = ddManifestationEdgeDescription.getTargetNodeDescriptions();
+            List<DiagramElementDescription> targetNodeDescriptions = ddManifestationEdgeDescription.getTargetDescriptions();
             ddManifestationEdgeCreationTool.getTargetElementDescriptions().addAll(targetNodeDescriptions);
         }));
 

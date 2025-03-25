@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -110,7 +110,7 @@ public class ViewBuilder {
      * Creates a semantic drop tool with the given {@code semanticDropToolId}.
      *
      * @param semanticDropToolId
-     *            identifier of the semantic tool to create
+     *         identifier of the semantic tool to create
      * @return the new semantic drop tool.
      */
     public DropTool createGenericSemanticDropTool(String semanticDropToolId) {
@@ -127,7 +127,7 @@ public class ViewBuilder {
      * Creates a graphical drop tool with the given {@code graphicalDropToolId}.
      *
      * @param graphicalDropToolId
-     *            identifier of the graphical tool to create
+     *         identifier of the graphical tool to create
      * @return the new graphical drop tool.
      */
     public DropNodeTool createGraphicalDropTool(String graphicalDropToolId) {
@@ -202,12 +202,12 @@ public class ViewBuilder {
         edgeDescription.setPalette(DiagramFactory.eINSTANCE.createEdgePalette());
 
         edgeDescription.eAdapters().add(new CallbackAdapter(() -> {
-            edgeDescription.getSourceNodeDescriptions().addAll(sources.get());
-            edgeDescription.getTargetNodeDescriptions().addAll(targets.get());
+            edgeDescription.getSourceDescriptions().addAll(sources.get());
+            edgeDescription.getTargetDescriptions().addAll(targets.get());
         }));
 
-        edgeDescription.setSourceNodesExpression(this.queryBuilder.aqlDomainBaseGetSourceQuery());
-        edgeDescription.setTargetNodesExpression(this.queryBuilder.aqlDomainBaseGetTargetsQuery());
+        edgeDescription.setSourceExpression(this.queryBuilder.aqlDomainBaseGetSourceQuery());
+        edgeDescription.setTargetExpression(this.queryBuilder.aqlDomainBaseGetTargetsQuery());
 
         edgeDescription.setStyle(this.createDefaultEdgeStyle());
 
@@ -236,7 +236,7 @@ public class ViewBuilder {
         // Configure the tool's target element descriptions once the representation has been fully created. This ensures
         // that description.getTargetNodeDescription has been filled with the descriptions.
         description.eAdapters().add(new CallbackAdapter(() -> {
-            List<NodeDescription> targetNodeDescriptions = description.getTargetNodeDescriptions();
+            List<DiagramElementDescription> targetNodeDescriptions = description.getTargetDescriptions();
             tool.getTargetElementDescriptions().addAll(targetNodeDescriptions);
         }));
         tool.getBody().add(changeContext);
@@ -267,11 +267,11 @@ public class ViewBuilder {
      * Create a creation tool to create a unsynchronized {@link NodeDescription}.
      *
      * @param name
-     *            the name of the tool
+     *         the name of the tool
      * @param containementRef
-     *            the containment reference used to contained the new element
+     *         the containment reference used to contained the new element
      * @param newType
-     *            the type of the element to create
+     *         the type of the element to create
      * @return a new {@link NodeTool}
      */
     public NodeTool createCreationTool(String name, EReference containementRef, EClass newType) {
@@ -296,19 +296,18 @@ public class ViewBuilder {
     /**
      * Creates a creation {@link NodeTool} that delegates to the provided {@code serviceName}.
      * <p>
-     * This method is used to create creation tools that rely on diagram-specific creation services. See
-     * {@link ViewBuilder#createCreationTool(EReference, EClass)} to create a creation {@link NodeTool} that relies on
-     * the default creation mechanism.
+     * This method is used to create creation tools that rely on diagram-specific creation services. See {@link ViewBuilder#createCreationTool(EReference, EClass)} to create a creation
+     * {@link NodeTool} that relies on the default creation mechanism.
      * </p>
      *
      * @param domain
-     *            the kind of element to create
+     *         the kind of element to create
      * @param toolName
-     *            the name of the tool to create
+     *         the name of the tool to create
      * @param serviceName
-     *            the name of the service to call
+     *         the name of the service to call
      * @param serviceParameters
-     *            the parameters provided to the service
+     *         the parameters provided to the service
      * @return the created {@link NodeTool}
      */
     public NodeTool createCreationTool(String domain, String toolName, String serviceName, List<String> serviceParameters) {
@@ -322,19 +321,17 @@ public class ViewBuilder {
     }
 
     /**
-     * Creates a creation {@link NodeTool} to create {@code newType} elements inside the {@code compartmentName}
-     * compartment of the containing element.
+     * Creates a creation {@link NodeTool} to create {@code newType} elements inside the {@code compartmentName} compartment of the containing element.
      *
      * @param toolName
-     *            the name of the tool to create
+     *         the name of the tool to create
      * @param compartmentName
-     *            the name of the compartment where to create
+     *         the name of the compartment where to create
      * @param containementRef
-     *            the containment reference used to contained the new element
+     *         the containment reference used to contained the new element
      * @param newType
-     *            the new type to create
-     * @return the created {@link NodeTool} used to create {@code newType} elements inside the {@code compartmentName}
-     *         compartment of the containing element
+     *         the new type to create
+     * @return the created {@link NodeTool} used to create {@code newType} elements inside the {@code compartmentName} compartment of the containing element
      */
     public NodeTool createInCompartmentCreationTool(String toolName, String compartmentName, EReference containementRef, String newType) {
         NodeTool nodeTool = DiagramFactory.eINSTANCE.createNodeTool();
@@ -489,13 +486,13 @@ public class ViewBuilder {
         EdgeDescription edgeDescription = DiagramFactory.eINSTANCE.createEdgeDescription();
         edgeDescription.setName(id);
         edgeDescription.setCenterLabelExpression(labelExpression);
-        edgeDescription.setTargetNodesExpression(targetNodeExpression);
+        edgeDescription.setTargetExpression(targetNodeExpression);
         edgeDescription.setStyle(this.createDefaultEdgeStyle());
         edgeDescription.setPalette(DiagramFactory.eINSTANCE.createEdgePalette());
 
         edgeDescription.eAdapters().add(new CallbackAdapter(() -> {
-            edgeDescription.getSourceNodeDescriptions().addAll(sourcesProvider.get());
-            edgeDescription.getTargetNodeDescriptions().addAll(targetsProvider.get());
+            edgeDescription.getSourceDescriptions().addAll(sourcesProvider.get());
+            edgeDescription.getTargetDescriptions().addAll(targetsProvider.get());
         }));
 
         return edgeDescription;
@@ -517,7 +514,7 @@ public class ViewBuilder {
      * Create tool section in the diagram palette.
      *
      * @param name
-     *            the name of the tool section to create
+     *         the name of the tool section to create
      * @return the tool section in the diagram palette
      */
     public DiagramToolSection createDiagramToolSection(String name) {
@@ -530,7 +527,7 @@ public class ViewBuilder {
      * Create tool section in the given node description palette.
      *
      * @param name
-     *            the name of the tool section to create
+     *         the name of the tool section to create
      * @return the tool section in the given node description palette
      */
     public NodeToolSection createNodeToolSection(String name) {
@@ -726,7 +723,7 @@ public class ViewBuilder {
      * Compute the path of the icon.
      *
      * @param name
-     *            the name of element kind
+     *         the name of element kind
      * @return the path of the icon to use for the tool
      */
     public static String getIconPathFromString(String name) {
@@ -736,8 +733,8 @@ public class ViewBuilder {
     /**
      * Compute the path of the icon.
      *
-     * @param name
-     *            the name of the tool
+     * @param toolName
+     *         the name of the tool
      * @return the path of the icon to use for the tool
      */
     public static String getIconURLFromToolName(String toolName) {
