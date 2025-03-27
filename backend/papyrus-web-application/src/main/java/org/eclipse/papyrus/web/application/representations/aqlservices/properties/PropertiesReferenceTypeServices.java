@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,9 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.properties;
 
+import java.util.Objects;
+
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.papyrus.uml.domain.services.properties.ILogger;
 import org.eclipse.papyrus.web.application.properties.UMLRedefinedTypeService;
 
 /**
@@ -26,8 +27,8 @@ public class PropertiesReferenceTypeServices {
 
     private final UMLRedefinedTypeService redefinedTypeService;
 
-    public PropertiesReferenceTypeServices(ILogger logger) {
-        this.redefinedTypeService = new UMLRedefinedTypeService(logger);
+    public PropertiesReferenceTypeServices(UMLRedefinedTypeService redefinedTypeService) {
+        this.redefinedTypeService = Objects.requireNonNull(redefinedTypeService);
     }
 
     /**

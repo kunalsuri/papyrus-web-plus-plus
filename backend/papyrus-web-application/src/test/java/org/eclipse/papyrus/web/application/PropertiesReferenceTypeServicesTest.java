@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ package org.eclipse.papyrus.web.application;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.papyrus.web.application.properties.UMLRedefinedTypeService;
 import org.eclipse.papyrus.web.application.representations.aqlservices.properties.PropertiesReferenceTypeServices;
 import org.eclipse.papyrus.web.tests.utils.MockLogger;
 import org.eclipse.papyrus.web.tests.utils.UMLTestHelper;
@@ -39,7 +40,7 @@ class PropertiesReferenceTypeServicesTest {
 
     @BeforeEach
     public void setUp() {
-        this.propertiesService = new PropertiesReferenceTypeServices(new MockLogger());
+        this.propertiesService = new PropertiesReferenceTypeServices(new UMLRedefinedTypeService(new MockLogger()));
     }
 
     /**
