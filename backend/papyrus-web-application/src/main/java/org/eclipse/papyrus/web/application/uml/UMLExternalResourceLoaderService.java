@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * {@link IExternalResourceLoaderService} in charge of loading UML resources using legacy mecanism (UMLResource and
+ * {@link IExternalResourceLoaderService} in charge of loading UML resources using legacy mechanism (UMLResource and
  * BasicExtendedMetaData) then store the result in a JSonResource.
  *
  * @see https://github.com/eclipse-sirius/sirius-web/issues/3806
