@@ -38,6 +38,7 @@ describe('/new/project', () => {
   });
 
   it('requires a valid name', () => {
+    cy.get('h2').contains('Create a new project').should('exist');
     cy.getByTestId('name').type('Cy');
     cy.getByTestId('create-project').should('be.disabled');
 
@@ -46,12 +47,14 @@ describe('/new/project', () => {
   });
 
   it('navigates to the edit project view on successful project creation with enter', () => {
+    cy.get('h2').contains('Create a new project').should('exist');
     cy.getByTestId('name').type(`${projectName}{enter}`);
 
     cy.url().should('match', new RegExp(Cypress.config().baseUrl + '/projects/[a-z0-9-]*/edit'));
   });
 
   it('navigates to the edit project view on successful project creation by clicking on the create button', () => {
+    cy.get('h2').contains('Create a new project').should('exist');
     cy.getByTestId('name').type(projectName);
     cy.getByTestId('create-project').click();
 

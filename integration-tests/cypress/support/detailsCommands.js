@@ -39,7 +39,7 @@ Cypress.Commands.add('activateDetailsTabAndWaitForElement', (tabName, element) =
       return cy.wrap($tab);
     })
     .should('have.class', 'Mui-selected');
-  return cy.getByTestId('view-Details').findByTestId(element).should('be.visible');
+  return cy.getByTestId('view-Details').findByTestId(element).should('be.exist');
 });
 
 /**

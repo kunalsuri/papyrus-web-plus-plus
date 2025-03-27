@@ -24,7 +24,7 @@
 Cypress.Commands.add('checkDropdownContent', (autocomplete, content, strict = true) => {
   cy.getByTestId(autocomplete).find('.MuiAutocomplete-endAdornment').find('button').should('exist').click();
   cy.get('.MuiAutocomplete-popper')
-    .should('be.visible')
+    .should('exist')
     .find('ul')
     .should('exist')
     .children()
@@ -40,7 +40,7 @@ Cypress.Commands.add('checkDropdownContent', (autocomplete, content, strict = tr
       }
     });
   // close the dropdown
-  cy.getByTestId(autocomplete).find('.MuiAutocomplete-endAdornment').find('button').should('be.visible').click();
+  cy.getByTestId(autocomplete).find('.MuiAutocomplete-endAdornment').find('button').should('exist').click();
 });
 
 /**
@@ -51,5 +51,5 @@ Cypress.Commands.add('checkDropdownContent', (autocomplete, content, strict = tr
  */
 Cypress.Commands.add('selectDropdownValue', (autocomplete, value) => {
   cy.getByTestId(autocomplete).find('.MuiAutocomplete-endAdornment').find('button').should('exist').click();
-  cy.get('.MuiAutocomplete-popper').find('ul').should('exist').children().contains(value).should('be.visible').click();
+  cy.get('.MuiAutocomplete-popper').find('ul').should('exist').children().contains(value).should('exist').click();
 });

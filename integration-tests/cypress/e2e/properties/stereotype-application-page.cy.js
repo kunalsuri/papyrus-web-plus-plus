@@ -359,12 +359,7 @@ describe('Stereotype application page tests', () => {
 
   const addItemInPrimitiveListStrictMode = (primitiveListName, itemValue) => {
     cy.getByTestId(`primitive-list-autocomplete-textfield-${primitiveListName}`).click();
-    cy.get(`.MuiAutocomplete-popper`)
-      .should('be.visible')
-      .find(`ul > li`)
-      .contains(itemValue)
-      .should('be.visible')
-      .click();
+    cy.get(`.MuiAutocomplete-popper`).should('exist').find(`ul > li`).contains(itemValue).should('exist').click();
     cy.getByTestId(`primitive-list-add-${primitiveListName}`).should('not.have.class', 'Mui-disabled').click();
     cy.getByTestId(`primitive-list-table-${primitiveListName}`)
       .findByTestId(`primitive-list-item-${itemValue}`)

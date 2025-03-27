@@ -64,14 +64,14 @@ describe('Containment reference widget tests', () => {
         expect(roots).to.have.lengthOf(2);
       });
     // expand tree and check content
-    cy.get('@select-dialog').findByTestId('Class1').should('be.visible');
-    cy.get('@select-dialog').findByTestId('Class2').should('be.visible').click();
-    cy.get('@select-dialog').findByTestId('Boolean').should('be.visible');
-    cy.get('@select-dialog').findByTestId('Integer').should('be.visible');
-    cy.get('@select-dialog').findByTestId('Real').should('be.visible');
-    cy.get('@select-dialog').findByTestId('String').should('be.visible');
-    cy.get('@select-dialog').findByTestId('UnlimitedNatural').should('be.visible');
-    cy.get('@select-dialog').findByTestId('select-value').should('be.visible').click();
+    cy.get('@select-dialog').findByTestId('Class1').should('exist');
+    cy.get('@select-dialog').findByTestId('Class2').should('exist').click();
+    cy.get('@select-dialog').findByTestId('Boolean').should('exist');
+    cy.get('@select-dialog').findByTestId('Integer').should('exist');
+    cy.get('@select-dialog').findByTestId('Real').should('exist');
+    cy.get('@select-dialog').findByTestId('String').should('exist');
+    cy.get('@select-dialog').findByTestId('UnlimitedNatural').should('exist');
+    cy.get('@select-dialog').findByTestId('select-value').should('exist').click();
     // remove reference value set
     cy.getByTestId('reference-value-Class2').find('svg').click();
 

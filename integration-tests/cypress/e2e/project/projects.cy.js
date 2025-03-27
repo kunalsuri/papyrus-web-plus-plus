@@ -33,6 +33,6 @@ describe('/projects', () => {
 
   it('contains the list of projects', () => {
     cy.createProject(projectName).then(() => cy.reload());
-    cy.getByTestId('projects').find('tr').contains(projectName).should('be.visible');
+    cy.get('table').find('tr').contains(projectName).should('be.visible');
   });
 });

@@ -38,7 +38,7 @@ describe('Profile definition page test', () => {
     // publish the profile
 
     cy.getByTestId('Profile-more').should('be.visible').click();
-    cy.get('.MuiPopover-root').findByTestId('publish-profile').should('be.visible').click();
+    cy.getByTestId('publish-profile').should('be.visible').click();
     cy.getByTestId('publish-profile-dialog').findByTestId('publish-profile-author').find('input').type('John Doe');
     cy.getByTestId('publish-profile-dialog')
       .findByTestId('publish-profile-comment')
@@ -74,11 +74,11 @@ describe('Profile definition page test', () => {
   it('published profile can be removed', () => {
     // publish the profile twice
     cy.getByTestId('Profile-more').should('be.visible').click();
-    cy.get('.MuiPopover-root').findByTestId('publish-profile').should('be.visible').click();
+    cy.getByTestId('publish-profile').should('be.visible').click();
     cy.getByTestId('publish-profile-dialog').findByTestId('publish-profile-publish').should('be.visible').click();
 
     cy.getByTestId('Profile-more').should('be.visible').click();
-    cy.get('.MuiPopover-root').findByTestId('publish-profile').should('be.visible').click();
+    cy.getByTestId('publish-profile').should('be.visible').click();
     cy.getByTestId('publish-profile-dialog').findByTestId('publish-profile-publish').should('be.visible').click();
 
     // check that there are two profile definition
