@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 CEA LIST.
+ * Copyright (c) 2024, 2025 CEA LIST.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ import org.eclipse.sirius.components.view.table.ColumnDescription;
 import org.eclipse.sirius.components.view.table.RowDescription;
 import org.eclipse.sirius.components.view.table.TableDescription;
 import org.eclipse.sirius.emfjson.resource.JsonResource;
-import org.eclipse.uml2.uml.UMLPackage;
 
 /**
  * Builder of the {@link org.eclipse.sirius.components.view.table.TableDescription} to be used in an UML element.
@@ -102,12 +101,13 @@ public class UMLCommentTableRepresentationDescriptionBuilder {
 
         return new TableBuilders().newRowDescription()
                 .name("Comment")
-                .semanticCandidatesExpression("aql:self.getSemanticObjectsFromFeatureName('" + UMLPackage.eINSTANCE.getElement_OwnedComment().getName() + "', globalFilterData, columnFilters, cursor,direction,size)")
+                .semanticCandidatesExpression("aql:self.getAllComments(globalFilterData, columnFilters)->sortComments(columnSort)->toPaginatedData(cursor,direction,size)")
                 .initialHeightExpression("aql:53")
                 .isResizableExpression(AQL_TRUE)
                 .headerIconExpression("aql:self.getElementIconPath()")
                 .headerIndexLabelExpression("aql:rowIndex + 1")
                 .contextMenuEntries(deleteAction)
+                .depthLevelExpression("aql:0")
                 .build();
     }
 
@@ -120,6 +120,7 @@ public class UMLCommentTableRepresentationDescriptionBuilder {
                 .headerIndexLabelExpression("aql:columnIndex.alphabetic()")
                 .semanticCandidatesExpression("aql:Sequence{'" + COMMENT_COLUMN_BODY + "', '" + COMMENT_COLUMN_ANNOTATED_ELEMENTS + "'}")
                 .filterWidgetExpression("text")
+                .isSortableExpression("aql:self.equals('" + COMMENT_COLUMN_BODY + '\'' + ')')
                 .build();
         return List.of(comment);
     }

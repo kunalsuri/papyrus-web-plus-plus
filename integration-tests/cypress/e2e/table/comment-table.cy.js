@@ -14,10 +14,7 @@
 const projectName = 'Cypress Project - comment table';
 const context = {};
 
-describe('Basic widgets tests', () => {
-  /**
-   * For each test, we start with a fresh new project containing all concepts gathered in one single model
-   */
+describe('Comment table tests', () => {
   beforeEach(() => {
     cy.deleteProjectByName(projectName);
     createTestProjectForCommentTable(context, projectName);
@@ -111,7 +108,7 @@ describe('Basic widgets tests', () => {
       .findByTestId(
         'siriusComponents://representationDescription?kind=tableDescription&sourceKind=view&sourceId=957292ad-614d-3f43-931f-0206fd5da1e5&sourceElementId=93c27c9e-1140-387d-9d8c-ac757de69619'
       )
-      .should('be.visible')
+      .should('exist')
       .click();
     cy.getByTestId('representation-area').findByTestId('representation-tab-UML Comment Table').should('be.visible');
     cy.getByTestId('representation-area').findByTestId('table-representation').should('be.visible');

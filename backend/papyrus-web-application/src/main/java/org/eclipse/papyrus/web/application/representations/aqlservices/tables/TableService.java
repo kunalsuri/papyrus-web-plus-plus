@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,6 +39,7 @@ import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IObjectService;
 import org.eclipse.sirius.components.emf.tables.CursorBasedNavigationServices;
 import org.eclipse.sirius.components.tables.ColumnFilter;
+import org.eclipse.sirius.components.tables.ColumnSort;
 import org.eclipse.sirius.components.tables.descriptions.PaginatedData;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Comment;
@@ -53,17 +55,22 @@ import org.springframework.stereotype.Service;
 
 /**
  * AQL services used in UML tables.
+ *
  * @author Jerome Gout
  */
 @Service
 public class TableService {
 
     public static final String VIRTUAL_ROW_PREFIX = "PackageTableTree";
+
     public static final String ID_SEPARATOR = "_";
 
     private static final String OWNED_ATTRIBUTES = VIRTUAL_ROW_PREFIX + "ownedAttributes";
+
     private static final String OWNED_OPERATIONS = VIRTUAL_ROW_PREFIX + "ownedOperations";
+
     private static final String OWNED_NESTED_CLASSES = VIRTUAL_ROW_PREFIX + "ownedNestedClasses";
+
     private static final String OWNED_PARAMETERS = VIRTUAL_ROW_PREFIX + "ownedParameters";
 
     private final ILogger logger;
@@ -86,7 +93,9 @@ public class TableService {
 
     /**
      * Returns the label of a given UML element.
-     * @param element an UML element
+     *
+     * @param element
+     *         an UML element
      * @return a String that is the label of the given element
      */
     public String getElementLabel(EObject element) {
@@ -118,11 +127,13 @@ public class TableService {
         return result.toString();
     }
 
-
-
-    /** Returns a String that contains all annotated elements label of a given {@link Comment} separated by a given separators.
-     * @param comment an UML Comment
-     * @param separator a separator used between labels of the comment annotated elements.
+    /**
+     * Returns a String that contains all annotated elements label of a given {@link Comment} separated by a given separators.
+     *
+     * @param comment
+     *         an UML Comment
+     * @param separator
+     *         a separator used between labels of the comment annotated elements.
      * @return a String that contains all annotated elements label of a given {@link Comment} separated by a given separators.
      */
     public String getCommentAnnotatedElementLabels(Comment comment, String separator) {
@@ -133,7 +144,9 @@ public class TableService {
 
     /**
      * Returns the icon path of the given UML element.
-     * @param element an UML Element
+     *
+     * @param element
+     *         an UML Element
      * @return the list of all paths associated to the given element
      */
     public List<String> getElementIconPath(Element element) {
@@ -142,7 +155,9 @@ public class TableService {
 
     /**
      * Convert a numerical index to an alphabetic one.
-     * @param indexObject an Integer index
+     *
+     * @param indexObject
+     *         an Integer index
      * @return the alphabetic index starting to "A" equivalent to the given index.
      */
     public String alphabetic(Integer indexObject) {
@@ -164,7 +179,9 @@ public class TableService {
 
     /**
      * Returns the list of structural features (attribute or reference) that are used as column in the Comment table.
-     * @param self a comment
+     *
+     * @param self
+     *         a comment
      * @return the structural features that are presented as column in the Comment Table
      */
     public List<EStructuralFeature> getCommentColumns(EObject self) {
@@ -173,7 +190,9 @@ public class TableService {
 
     /**
      * Returns the label used in the column header of the table for the given structural feature.
-     * @param self a structural feature that designate a column of the table.
+     *
+     * @param self
+     *         a structural feature that designate a column of the table.
      * @return the label of the column header of the table for the given structural feature.
      */
     public String getCommentColumnLabel(EStructuralFeature self) {
@@ -188,8 +207,11 @@ public class TableService {
 
     /**
      * Returns the text value for a given structural feature (column) and a Comment (row).
-     * @param self a UML element which is expected to be a Comment
-     * @param columnFeature a structural feature of the given element
+     *
+     * @param self
+     *         a UML element which is expected to be a Comment
+     * @param columnFeature
+     *         a structural feature of the given element
      * @return the textual value of the given structural feature of the given comment.
      */
     public String getCommentCellValue(EObject self, EStructuralFeature columnFeature) {
@@ -221,14 +243,41 @@ public class TableService {
      *         the direction of the navigation
      * @param size
      *         the size of the table page (number of row chosen in the navigation control)
-     * @return the list of semantic objects of the given self element through its feature given by name
-     * this list is wrapped inside a pagination mechanism.
+     * @return the list of semantic objects of the given self element through its feature given by name this list is wrapped inside a pagination mechanism.
      */
     public PaginatedData getSemanticObjectsFromFeatureName(EObject self, String featureName, String globalFilter, List<ColumnFilter> columnFilters, EObject cursor, String direction, int size) {
         var result = new ArrayList<Object>();
 
         Predicate<EObject> predicate = this.getValidCommentCandidatePredicate(self, globalFilter, columnFilters);
         return this.cursorBasedNavigationServices.collect(self, cursor, direction, size, predicate);
+    }
+
+    public List<Comment> getAllComments(EObject self, String globalFilter, List<ColumnFilter> columnFilters) {
+        List<Comment> result = List.of();
+
+        if (self instanceof Package pack) {
+            result = pack.eContents().stream()
+                    .filter(Comment.class::isInstance)
+                    .map(Comment.class::cast)
+                    .filter(this.getValidCommentCandidatePredicate(self, globalFilter, columnFilters))
+                    .toList();
+        }
+        return result;
+    }
+
+    public List<Comment> sortComments(List<Object> objects, List<ColumnSort> columnSort) {
+        var comments = new ArrayList<>(objects.stream().filter(Comment.class::isInstance).map(Comment.class::cast).toList());
+        for (int i = columnSort.size() - 1; i >= 0; i--) {
+            var sort = columnSort.get(i);
+            if ("Body".equals(sort.id())) {
+                if (sort.desc()) {
+                    comments.sort(Comparator.comparing(Comment::getBody, String.CASE_INSENSITIVE_ORDER).reversed());
+                } else {
+                    comments.sort(Comparator.comparing(Comment::getBody, String.CASE_INSENSITIVE_ORDER));
+                }
+            }
+        }
+        return comments;
     }
 
     /**
@@ -280,7 +329,9 @@ public class TableService {
 
     /**
      * Returns all types found underneath the given UML Package.
-     * @param umlPackage an UML Package
+     *
+     * @param umlPackage
+     *         an UML Package
      * @return the list of types owned by the given package
      */
     public List<Type> getOwnedTypes(Package umlPackage) {
@@ -289,20 +340,26 @@ public class TableService {
 
     /**
      * Return whether the given type contains the filters text in one of the properties of one stereotype applied to this type.
-     * @param type ab UML type
-     * @param editingContext the current editing context used to retrieve semantic objects
-     * @param globalFilter the global filter text
-     * @param columnFilters the list of column filters
+     *
+     * @param type
+     *         ab UML type
+     * @param editingContext
+     *         the current editing context used to retrieve semantic objects
+     * @param globalFilter
+     *         the global filter text
+     * @param columnFilters
+     *         the list of column filters
      * @return <code>true</code> if the given type contains the global filter text in one of the properties of one stereotype applied to this type and <code>false</code> otherwise.
-     * if no filters are given returns <code>true</code> as well.
+     *         if no filters are given returns <code>true</code> as well.
      */
     public boolean containsFilterValue(Type type, IEditingContext editingContext, String globalFilter, List<ColumnFilter> columnFilters) {
         boolean result = true;
         if (globalFilter != null && !globalFilter.isBlank()) {
-            result = type.getStereotypeApplications().stream()
+            result = this.getStereotypeApplicationLabels(type).stream().anyMatch(name -> this.contains(name, globalFilter));
+            result = result || type.getStereotypeApplications().stream()
                     .anyMatch(stereotypeApplication ->
                             this.stereotypeApplicationServices.getAllFeatures(stereotypeApplication).stream()
-                                    .anyMatch(eStructuralFeature -> this.containsInValue(stereotypeApplication, eStructuralFeature, globalFilter)));
+                                    .anyMatch(eStructuralFeature -> this.contains(this.getStereotypeCellValue(type, eStructuralFeature).toString(), globalFilter)));
         }
         result = result && columnFilters.stream().allMatch(columnFilter -> {
             boolean isMatching = true;
@@ -325,20 +382,15 @@ public class TableService {
         return result;
     }
 
-    private boolean containsInValue(EObject stereotypeApplication, EStructuralFeature feature, String globalFilter) {
-        return Optional.ofNullable(stereotypeApplication.eGet(feature)).stream()
-                .map(o -> this.contains(o.toString(), globalFilter))
-                .findFirst()
-                .orElse(false);
-    }
-
     private boolean contains(String s, String text) {
         return s.toLowerCase().contains(text.toLowerCase());
     }
 
     /**
      * Return the list of label of stereotype applications applied on the given element.
-     * @param self an UML element
+     *
+     * @param self
+     *         an UML element
      * @return the list of label of stereotype applications applied on the given element separated by the given separator.
      */
     public List<String> getStereotypeApplicationLabels(Element self) {
@@ -350,8 +402,11 @@ public class TableService {
 
     /**
      * Return a joined String of the given list of String and the given separator.
-     * @param labels a list of String to join
-     * @param separator the separator placed in between two strings
+     *
+     * @param labels
+     *         a list of String to join
+     * @param separator
+     *         the separator placed in between two strings
      * @return a joined String of the given list of String and the given separator.
      */
     public String join(List<String> labels, String separator) {
@@ -360,29 +415,35 @@ public class TableService {
 
     /**
      * Return the list of all stereotypes applied to the given type.
-     * @param type an UML type
+     *
+     * @param type
+     *         an UML type
      * @return the list of all stereotypes applied to the given type.
      */
     public List<Stereotype> getStereotypes(Type type) {
-        return  type.getApplicableStereotypes().stream()
+        return type.getApplicableStereotypes().stream()
                 .toList();
     }
 
     /**
      * Return the list of all distinct stereotype classes applied to the given type.
-     * @param type an UML type
+     *
+     * @param type
+     *         an UML type
      * @return the list of all distinct stereotype classes applied to the given type.
      */
     public List<EClass> getStereotypeClasses(Type type) {
-        return  type.getApplicableStereotypes().stream()
+        return type.getApplicableStereotypes().stream()
                 .map(Stereotype::getDefinition)
                 .toList();
     }
 
     /**
      * Return the list of all valid structural features defined by the given EClass.
-     * @param eClass an EClass
-     * @return  the list of all valid structural features defined by the given EClass.
+     *
+     * @param eClass
+     *         an EClass
+     * @return the list of all valid structural features defined by the given EClass.
      */
     public List<EStructuralFeature> getAllFeatures(EClass eClass) {
         return eClass.getEAllStructuralFeatures().stream()
@@ -404,23 +465,24 @@ public class TableService {
 
     /**
      * Returns the content of the cell between the given element (row) and the given feature (column).
-     * @param self a UML element
-     * @param columnFeature a structural feature of a stereotype application of the given element
+     *
+     * @param self
+     *         a UML element
+     * @param columnFeature
+     *         a structural feature of a stereotype application of the given element
      * @return the textual value of the given structural feature or "N/A" if this feature is not available on the given element.
      */
     public Object getStereotypeCellValue(Element self, EStructuralFeature columnFeature) {
         String result = "N/A";
-        if (this.belongsTo(columnFeature, self)) {
-            EObject stereotypeApplication = this.getStereotypeApplicationAppliedOn(self, columnFeature);
-            if (stereotypeApplication != null) {
-                Object value = this.getStereotypeFeatureContent(stereotypeApplication, columnFeature);
-                if (value instanceof List<?> list) {
-                    result = "[" + String.join(", ", list.stream()
-                            .map(this::getLabel)
-                            .toList()) + "]";
-                } else {
-                    result = this.getLabel(value);
-                }
+        EObject stereotypeApplication = this.getStereotypeApplicationAppliedOn(self, columnFeature);
+        if (stereotypeApplication != null) {
+            Object value = this.getStereotypeFeatureContent(stereotypeApplication, columnFeature);
+            if (value instanceof List<?> list) {
+                result = "[" + String.join(", ", list.stream()
+                        .map(this::getLabel)
+                        .toList()) + "]";
+            } else {
+                result = this.getLabel(value);
             }
         }
         return result;
@@ -440,14 +502,6 @@ public class TableService {
         return value;
     }
 
-    private boolean belongsTo(EStructuralFeature columnFeature, Element element) {
-        boolean belongs = element.eClass().getEAllStructuralFeatures().contains(columnFeature);
-        if (!belongs && element instanceof Type type) {
-            belongs = this.getStereotypeClasses(type).contains(columnFeature.getEContainingClass());
-        }
-        return belongs;
-    }
-
     private String getLabel(Object value) {
         String result = "";
         if (value instanceof EObject) {
@@ -460,8 +514,11 @@ public class TableService {
 
     /**
      * Given an Element and a feature, return the stereotype application applied on the Element defining the feature.
-     * @param self an Element
-     * @param columnFeature a feature
+     *
+     * @param self
+     *         an Element
+     * @param columnFeature
+     *         a feature
      * @return the stereotype application applied on the given Element defining the given feature or <code>null</code> if the feature is not belonging to any stereotype application of the element.
      */
     private EObject getStereotypeApplicationAppliedOn(Element self, EStructuralFeature columnFeature) {
@@ -474,8 +531,11 @@ public class TableService {
 
     /**
      * Returns the element to select when user selects a cell content in a Stereotype table.
-     * @param self the row element
-     * @param columnFeature the structural feature associated to the cell (via its column)
+     *
+     * @param self
+     *         the row element
+     * @param columnFeature
+     *         the structural feature associated to the cell (via its column)
      * @return if the cell contains referenced element return the first (or unique) element, otherwise self itself.
      */
     public EObject getStereotypeSelectedTargetObject(Element self, EStructuralFeature columnFeature) {
@@ -493,7 +553,9 @@ public class TableService {
 
     /**
      * Returns the first annotated element to be selected.
-     * @param self an UML comment element
+     *
+     * @param self
+     *         an UML comment element
      * @return the first element in the annotated element of the given comment or self argument if no annotated elements.
      */
     public EObject getFirstAnnotatedElement(Comment self) {
@@ -502,7 +564,8 @@ public class TableService {
                 .orElse(self);
     }
 
-    public List<Object> getPackageTableTreeSemanticElements(Package self, IEditingContext editingContext, String globalFilter, List<ColumnFilter> columnFilters, List<String> expandedIds, List<String> activeRowFilterIds) {
+    public List<Object> getPackageTableTreeSemanticElements(Package self, IEditingContext editingContext, String globalFilter, List<ColumnFilter> columnFilters, List<String> expandedIds,
+            List<String> activeRowFilterIds) {
         Predicate<Object> predicate = object -> {
             boolean isValidCandidate = true;
             if (object instanceof NamedElement element) {
