@@ -23,7 +23,7 @@
     </parent>
     <groupId>papyrus-web</groupId>
     <artifactId>papyrus-web-parent</artifactId>
-    <version>2025.1.7-SNAPSHOT</version>
+    <version>2025.4.0</version>
     <name>papyrus-web-parent</name>
     <description>Parent Pom for Papyrus Web Project</description>
     <packaging>pom</packaging>
