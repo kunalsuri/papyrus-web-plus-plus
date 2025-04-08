@@ -84,6 +84,7 @@ public class UMLCommentTableRepresentationDescriptionBuilder {
                 .rowDescription(rowDescription)
                 .columnDescriptions(columnDescriptions.toArray(new ColumnDescription[0]))
                 .cellDescriptions(cellDescriptions.toArray(new CellDescription[0]))
+                .defaultPageSizeIndexExpression("aql:1")
                 .build();
 
     }
