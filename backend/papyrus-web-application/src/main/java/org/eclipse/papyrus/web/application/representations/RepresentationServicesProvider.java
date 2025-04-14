@@ -41,7 +41,7 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.propertie
 import org.eclipse.papyrus.web.application.representations.aqlservices.properties.PropertiesReferenceTypeServices;
 import org.eclipse.papyrus.web.application.representations.aqlservices.scope.ReachableElementsServices;
 import org.eclipse.papyrus.web.application.representations.aqlservices.statemachine.StateMachineDiagramService;
-import org.eclipse.papyrus.web.application.representations.aqlservices.tables.TableService;
+import org.eclipse.papyrus.web.application.representations.aqlservices.tables.UMLCommentTableServices;
 import org.eclipse.papyrus.web.application.representations.aqlservices.useCase.UseCaseDiagramService;
 import org.eclipse.papyrus.web.application.representations.uml.ADDiagramDescriptionBuilder;
 import org.eclipse.papyrus.web.application.representations.uml.CDDiagramDescriptionBuilder;
@@ -143,6 +143,6 @@ public class RepresentationServicesProvider implements IJavaServiceProvider {
     private void registerTableServices(RepresentationDescription representationDescription, List<Class<?>> services) {
         services.add(ReachableElementsServices.class);
         services.add(PropertiesStereotypeApplicationServices.class);
-        services.add(TableService.class);
+        services.add(UMLCommentTableServices.class);
     }
 }
