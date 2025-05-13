@@ -1,6 +1,5 @@
 /*****************************************************************************
  * Copyright (c) 2024, 2025 CEA LIST, Obeo.
- * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -99,7 +98,7 @@ public final class CODDiagramDescriptionBuilder extends AbstractRepresentationDe
      * Creates the {@link NodeDescription} representing an UML {@link Interaction}.
      *
      * @param diagramDescription
-     *         the Communication {@link DiagramDescription} containing the created {@link NodeDescription}
+     *            the Communication {@link DiagramDescription} containing the created {@link NodeDescription}
      * @return the {@link NodeDescription} representing an UML {@link Interaction}.
      */
     protected NodeDescription createInteractionTopNodeDescription(DiagramDescription diagramDescription) {
@@ -129,7 +128,7 @@ public final class CODDiagramDescriptionBuilder extends AbstractRepresentationDe
      * Create the {@link NodeDescription} and creation tool representing an UML {@link Lifeline}.
      *
      * @param parentNodeDescription
-     *         the {@link NodeDescription} containing the {@link Lifeline} {@link NodeDescription}
+     *            the {@link NodeDescription} containing the {@link Lifeline} {@link NodeDescription}
      */
     private void createLifelineSubNodeDescription(NodeDescription parentNodeDescription) {
         RectangularNodeStyleDescription rectangularNodeStyle = this.getViewBuilder().createRectangularNodeStyle();
@@ -153,7 +152,7 @@ public final class CODDiagramDescriptionBuilder extends AbstractRepresentationDe
      * Create the {@link NodeDescription} and creation tool representing an UML {@link DurationObservation}.
      *
      * @param parentNodeDescription
-     *         the {@link NodeDescription} containing the {@link DurationObservation} {@link NodeDescription}
+     *            the {@link NodeDescription} containing the {@link DurationObservation} {@link NodeDescription}
      */
     private void createDurationObservationSubNodeDescription(NodeDescription parentNodeDescription) {
         NodeStyleDescription durationObservationNodeStyle = this.getViewBuilder().createImageNodeStyle("view/images/DurationObservation.svg");
@@ -184,7 +183,7 @@ public final class CODDiagramDescriptionBuilder extends AbstractRepresentationDe
      * Create the {@link NodeDescription} and creation tool representing an UML {@link TimeObservation}.
      *
      * @param parentNodeDescription
-     *         the {@link NodeDescription} containing the {@link TimeObservation} {@link NodeDescription}
+     *            the {@link NodeDescription} containing the {@link TimeObservation} {@link NodeDescription}
      */
     private void createTimeObservationSubNodeDescription(NodeDescription parentNodeDescription) {
         NodeStyleDescription timeObservationNodeStyle = this.getViewBuilder().createImageNodeStyle("view/images/TimeObservation.svg");
@@ -216,7 +215,7 @@ public final class CODDiagramDescriptionBuilder extends AbstractRepresentationDe
      * Create the {@link EdgeDescription} representing an UML {@link Message}.
      *
      * @param diagramDescription
-     *         the Communication {@link DiagramDescription} containing the created {@link EdgeDescription}
+     *            the Communication {@link DiagramDescription} containing the created {@link EdgeDescription}
      */
     private void createMessageEdgeDescription(DiagramDescription diagramDescription) {
         Supplier<List<NodeDescription>> sourceAndTargetDescriptionsSupplier = () -> this.collectNodesWithDomain(diagramDescription, this.umlPackage.getLifeline());
