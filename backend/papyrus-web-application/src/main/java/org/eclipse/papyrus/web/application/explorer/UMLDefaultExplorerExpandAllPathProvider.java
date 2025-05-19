@@ -17,6 +17,7 @@ package org.eclipse.papyrus.web.application.explorer;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ import org.eclipse.sirius.components.collaborative.trees.services.api.ITreeNavig
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IPayload;
 import org.eclipse.sirius.components.core.api.IRepresentationDescriptionSearchService;
+import org.eclipse.sirius.components.representations.IRepresentationRenderVariableCustomizer;
 import org.eclipse.sirius.components.representations.VariableManager;
 import org.eclipse.sirius.components.trees.Tree;
 import org.eclipse.sirius.components.trees.TreeItem;
@@ -57,12 +59,15 @@ public class UMLDefaultExplorerExpandAllPathProvider implements IExpandAllTreePa
 
     private UMLDefaultTreeExplorerInstaller umlDefaultExplorerInstaller;
 
+    private final List<IRepresentationRenderVariableCustomizer> renderVariableCustomizers;
+
     public UMLDefaultExplorerExpandAllPathProvider(ITreeNavigationService treeNavigationService,
-            IRepresentationDescriptionSearchService representationDescriptionSearchService, UMLDefaultTreeExplorerInstaller umlDefaultExplorerInstaller) {
-        super();
+            IRepresentationDescriptionSearchService representationDescriptionSearchService, UMLDefaultTreeExplorerInstaller umlDefaultExplorerInstaller,
+            List<IRepresentationRenderVariableCustomizer> renderVariableCustomizers) {
         this.treeNavigationService = treeNavigationService;
         this.representationDescriptionSearchService = representationDescriptionSearchService;
         this.umlDefaultExplorerInstaller = umlDefaultExplorerInstaller;
+        this.renderVariableCustomizers = Objects.requireNonNull(renderVariableCustomizers);
     }
 
     @Override
@@ -87,6 +92,9 @@ public class UMLDefaultExplorerExpandAllPathProvider implements IExpandAllTreePa
             variableManager.put(TreeRenderer.ANCESTOR_IDS, itemAncestors);
             variableManager.put(IEditingContext.EDITING_CONTEXT, editingContext);
             variableManager.put(TreeDescription.ID, treeItemId);
+            for (var renderVariableCustomizer : this.renderVariableCustomizers) {
+                variableManager = renderVariableCustomizer.customize(optionalTreeDescription.get(), variableManager);
+            }
             maxDepth = this.addAllContents(optionalTreeDescription.get(), treeItemId, maxDepth, treeItemIdsToExpand, maxDepth, variableManager);
         }
         return new ExpandAllTreePathSuccessPayload(input.id(), new TreePath(treeItemIdsToExpand.stream().toList(), maxDepth));

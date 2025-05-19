@@ -86,11 +86,11 @@ public class UMLDefaultTreeDescriptionBuilder {
 
         return new TreeDescriptionBuilder()
                 .name(UML_EXPLORER)
-                .childrenExpression("aql:self.getChildrenItems(editingContext,expanded, " + TreeRenderer.ANCESTOR_IDS + "," + TreeRenderer.INDEX + ")")
+                .childrenExpression("aql:self.getChildrenItems(editingContext,expanded, " + TreeRenderer.ANCESTOR_IDS + "," + TreeRenderer.INDEX + ", existingRepresentations)")
                 .deletableExpression("aql:self.canBeDeleted()")
                 .editableExpression("aql:self.canBeRenamed()")
                 .elementsExpression("aql:editingContext.getRootElements(activeFilterIds)")
-                .hasChildrenExpression("aql:self.hasChildren(editingContext," + TreeRenderer.ANCESTOR_IDS + "," + TreeRenderer.INDEX + ")")
+                .hasChildrenExpression("aql:self.hasChildren(editingContext," + TreeRenderer.ANCESTOR_IDS + "," + TreeRenderer.INDEX + ", existingRepresentations)")
                 .treeItemIconExpression("aql:self.getIconURLs()")
                 .kindExpression("aql:self.getItemKind()")
                 .parentExpression("aql:self.getParentItem(id,editingContext)")
