@@ -140,7 +140,7 @@ Again, be sure to replace `$GITHUB_ACCESS_TOKEN` with the value of your access t
 
 Build steps:
 
-. Clone the Papyrus Web repository https://github.com/PapyrusSirius/papyrus-web[papyrus-web]
+. Clone the Papyrus Web repository https://gitlab.eclipse.org/eclipse/papyrus/org.eclipse.papyrus-web[papyrus-web]
 
 . Build the frontend ([.small]#from the `frontend` subfolder of Papyrus web main location#):
 +
@@ -199,21 +199,21 @@ The set up of the Github token is required for setting up back end and front (se
 
 . Clone Papyrus web repositories:
 +
-* https://github.com/PapyrusSirius/papyrus-web[papyrus-web] repo
-* https://github.com/PapyrusSirius/papyrus-uml-services[Papyrus UML services] repo
+* https://gitlab.eclipse.org/eclipse/papyrus/org.eclipse.papyrus-web[papyrus-web] repo
+* https://gitlab.eclipse.org/eclipse/papyrus/org.eclipse.papyrus-domainservices[Papyrus Domain Services] repo
 
 . Import Papyrus web projects in workspace
 +
 * From Papyrus web repository import all terminal Eclipse projets located in the backend folder
-* From Papyrus UML services repository import the following projects:
-** `papyrus-uml-services/plugins/org.eclipse.papyrus.uml.domain.services`
-** `papyrus-uml-services/plugins/org.eclipse.papyrus.uml.domain.services.test`
-** `papyrus-uml-services/releng/org.eclipse.papyrus.uml.domain.services.resources`
-** `papyrus-uml-services/releng/org.eclipse.papyrus.uml.domain.services.releng.target`
+* From Papyrus Domain Services repository import the following projects:
+** `org.eclipse.papyrus-domainservices/plugins/org.eclipse.papyrus.uml.domain.services`
+** `org.eclipse.papyrus-domainservices/plugins/org.eclipse.papyrus.uml.domain.services.test`
+** `org.eclipse.papyrus-domainservices/releng/org.eclipse.papyrus.uml.domain.services.resources`
+** `org.eclipse.papyrus-domainservices/releng/org.eclipse.papyrus.uml.domain.services.releng.target`
 
 [NOTE]
 ====
-In order to use the project _papyrus-uml-services/plugins/org.eclipse.papyrus.uml.domain.services_ in your runtime you need to add the following line in _\papyrus-uml-services\plugins\org.eclipse.papyrus.uml.domain.services\.classpath_. This change should not be committed.
+In order to use the project _org.eclipse.papyrus-domainservices/plugins/org.eclipse.papyrus.uml.domain.services_ in your runtime you need to add the following line in _\org.eclipse.papyrus-domainservices\plugins\org.eclipse.papyrus.uml.domain.services\.classpath_. This change should not be committed.
 ```xml
 <classpathentry kind="output" path="target/classes"/>
 ```
