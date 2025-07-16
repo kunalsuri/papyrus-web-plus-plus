@@ -22,6 +22,9 @@ export class ExtensionRegistryMergeStrategy extends DefaultExtensionRegistryMerg
     if (identifier === 'apolloClient#apolloClientOptionsConfigurers') {
       return this.mergeApolloClientContributions(existingValues, newValues);
     }
+    if (identifier === 'navigationBarMenu#helpURL') {
+      return this.mergeNavigationBarMenuHelpURL(existingValues, newValues);
+    }
     return newValues;
   }
 
@@ -32,6 +35,16 @@ export class ExtensionRegistryMergeStrategy extends DefaultExtensionRegistryMerg
     return {
       identifier: 'papyrusweb_apolloClient#apolloClientOptionsConfigurers',
       data: [...existingApolloClientContributions.data, ...newApolloClientContributions.data],
+    };
+  }
+
+  private mergeNavigationBarMenuHelpURL(
+    apolloClientOptionsConfigurers: DataExtension<any>,
+    _otherApolloClientOptionsConfigurers: DataExtension<any>
+  ): DataExtension<any> {
+    return {
+      identifier: '`papyrus_web_doc_navigationBarMenu#helpURL',
+      data: apolloClientOptionsConfigurers.data,
     };
   }
 }

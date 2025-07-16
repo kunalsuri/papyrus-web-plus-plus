@@ -27,13 +27,12 @@ import {
   DiagramRepresentationConfiguration,
   footerExtensionPoint,
   navigationBarIconExtensionPoint,
-  navigationBarMenuIconExtensionPoint,
+  navigationBarMenuHelpURLExtensionPoint,
   NodeTypeRegistry,
   SiriusWebApplication,
 } from '@eclipse-sirius/sirius-web-application';
 import { forkRegistry } from '@eclipse-sirius/sirius-web-view-fork';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import { Help } from './core/Help';
 import { httpOrigin, wsOrigin } from './core/URL';
 import { CuboidNode } from './nodes/cuboid/CuboidNode';
 import { CuboidNodeConverter } from './nodes/cuboid/CuboidNodeConverter';
@@ -292,12 +291,6 @@ extensionRegistry.addComponent(treeItemContextMenuEntryExtensionPoint, {
   Component: PublishProfileTreeItemContextMenuContribution,
 });
 
-// Help component contribution
-extensionRegistry.addComponent(navigationBarMenuIconExtensionPoint, {
-  identifier: 'papyrus-help',
-  Component: () => <Help />,
-});
-
 // Footer contribution
 extensionRegistry.addComponent(footerExtensionPoint, {
   identifier: 'papyrus-footer',
@@ -308,6 +301,12 @@ extensionRegistry.addComponent(footerExtensionPoint, {
 extensionRegistry.addComponent(navigationBarIconExtensionPoint, {
   identifier: 'papyrusweb_navigationbar#icon',
   Component: PapyrusNavigationBarIcon,
+});
+
+// Customize help url
+extensionRegistry.putData(navigationBarMenuHelpURLExtensionPoint, {
+  identifier: `papyrus_web_doc_${navigationBarMenuHelpURLExtensionPoint.identifier}`,
+  data: `${httpOrigin}/doc/index.html`,
 });
 
 // Table contribution
