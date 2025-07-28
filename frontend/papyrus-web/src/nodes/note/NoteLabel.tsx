@@ -76,7 +76,7 @@ const labelContentStyle = (theme: Theme, label: Label): React.CSSProperties => {
 const labelOverflowStyle = (): React.CSSProperties => {
   const style: React.CSSProperties = {};
   style.overflow = 'auto';
-  style.overflowWrap = 'break-word';
+  style.overflowWrap = 'anywhere';
 
   return style;
 };
