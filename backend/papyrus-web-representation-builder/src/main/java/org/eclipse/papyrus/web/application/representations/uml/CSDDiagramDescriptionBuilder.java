@@ -39,6 +39,7 @@ import org.eclipse.sirius.components.view.diagram.EdgeTool;
 import org.eclipse.sirius.components.view.diagram.LineStyle;
 import org.eclipse.sirius.components.view.diagram.NodeDescription;
 import org.eclipse.sirius.components.view.diagram.NodeTool;
+import org.eclipse.sirius.components.view.diagram.OutsideLabelDescription;
 import org.eclipse.sirius.components.view.diagram.SynchronizationPolicy;
 import org.eclipse.uml2.uml.UMLPackage;
 
@@ -280,6 +281,9 @@ public class CSDDiagramDescriptionBuilder extends AbstractRepresentationDescript
                 queryOperationOnSelf(this.pack.getClassifier__AllAttributes()));
 
         this.csdSharedDescription.getBorderNodesDescriptions().add(portOnClassifierDescription);
+        portOnClassifierDescription.setInsideLabel(null);
+        OutsideLabelDescription old = this.getViewBuilder().createDefaultOutsideLabelDescription(true);
+        portOnClassifierDescription.getOutsideLabels().add(old);
 
         this.createDefaultToolSectionsInNodeDescription(portOnClassifierDescription);
         NodeTool cdPortCreationTool = this.getViewBuilder().createCreationToolInHolder(this.pack.getInterface_OwnedAttribute(), portEClass);
@@ -303,6 +307,9 @@ public class CSDDiagramDescriptionBuilder extends AbstractRepresentationDescript
                 semanticCandidateExpression);
 
         this.csdSharedDescription.getBorderNodesDescriptions().add(portOnPropertyDescription);
+        portOnPropertyDescription.setInsideLabel(null);
+        OutsideLabelDescription old = this.getViewBuilder().createDefaultOutsideLabelDescription(true);
+        portOnPropertyDescription.getOutsideLabels().add(old);
 
         this.createDefaultToolSectionsInNodeDescription(portOnPropertyDescription);
 
