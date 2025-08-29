@@ -1089,11 +1089,11 @@ public class ADDiagramDescriptionBuilder extends AbstractRepresentationDescripti
         this.createDefaultToolSectionsInNodeDescription(adInputExpansionNodeSharedNodeDescription);
 
         NodeTool adInputExpansionNodeSharedNodeCreationTool = this.getViewBuilder().createCreationTool(this.umlPackage.getExpansionNode().getName(),
-                "New Input " + this.umlPackage.getExpansionNode().getName(),
+                "New Input Expansion Node",
                 ActivityDiagramServices.CREATE_EXPANSION_NODE, List.of(SELECTED_NODE, DIAGRAM_CONTEXT, CONVERTED_NODES, String.valueOf(true)));
         this.reuseNodeAndCreateTool(adInputExpansionNodeSharedNodeDescription, diagramDescription, adInputExpansionNodeSharedNodeCreationTool, EXPANSION_REGION,
                 List.of(this.umlPackage.getExpansionRegion()), List.of());
-        NodeTool outputExpansionNodeTool = this.getViewBuilder().createCreationTool(this.umlPackage.getExpansionNode().getName(), "New Output " + this.umlPackage.getExpansionNode().getName(),
+        NodeTool outputExpansionNodeTool = this.getViewBuilder().createCreationTool(this.umlPackage.getExpansionNode().getName(), "New Output Expansion Node",
                 ActivityDiagramServices.CREATE_EXPANSION_NODE,
                 List.of(SELECTED_NODE, DIAGRAM_CONTEXT, CONVERTED_NODES, String.valueOf(false)));
         this.reuseNodeAndCreateTool(adInputExpansionNodeSharedNodeDescription, diagramDescription, outputExpansionNodeTool, EXPANSION_REGION, List.of(this.umlPackage.getExpansionRegion()), List.of());

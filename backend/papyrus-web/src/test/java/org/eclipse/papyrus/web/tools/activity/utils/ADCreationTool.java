@@ -49,7 +49,7 @@ public final class ADCreationTool extends org.eclipse.papyrus.web.tools.utils.Cr
         // ExpansionNode can be created with both New Input ExpansionNode and New Output ExpansionNode tools. We choose
         // to create only input ExpansionNode to run the tests.
         if (UMLPackage.eINSTANCE.getExpansionNode().isSuperTypeOf(eClass)) {
-            result = "New Input " + eClass.getName();
+            result = "New Input Expansion Node";
         }
         return result;
     }
