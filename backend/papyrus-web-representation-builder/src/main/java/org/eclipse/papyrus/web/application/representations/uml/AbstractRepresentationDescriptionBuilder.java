@@ -74,6 +74,7 @@ import org.eclipse.sirius.components.view.diagram.NodeDescription;
 import org.eclipse.sirius.components.view.diagram.NodeStyleDescription;
 import org.eclipse.sirius.components.view.diagram.NodeTool;
 import org.eclipse.sirius.components.view.diagram.NodeToolSection;
+import org.eclipse.sirius.components.view.diagram.RectangularNodeStyleDescription;
 import org.eclipse.sirius.components.view.diagram.SynchronizationPolicy;
 import org.eclipse.sirius.components.view.diagram.Tool;
 import org.eclipse.sirius.components.view.diagram.UserResizableDirection;
@@ -1518,7 +1519,8 @@ public abstract class AbstractRepresentationDescriptionBuilder {
         if (isShared) {
             suffix = SHARED_SUFFIX + UNDERSCORE + CONTENT_SUFFIX;
         }
-        NodeDescription contentNodeDescription = this.newNodeBuilder(eClass, this.getViewBuilder().createRectangularNodeStyle())//
+        RectangularNodeStyleDescription createRectangularNodeStyle = this.getViewBuilder().createRectangularNodeStyle();
+        NodeDescription contentNodeDescription = this.newNodeBuilder(eClass, createRectangularNodeStyle)//
                 .name(this.getIdBuilder().getSpecializedDomainNodeName(eClass, suffix)) //
                 .semanticCandidateExpression(this.getQueryBuilder().querySelf())//
                 .deleteTool(this.getViewBuilder().createNodeDeleteTool(eClass.getName())) //
@@ -1526,6 +1528,8 @@ public abstract class AbstractRepresentationDescriptionBuilder {
                 .synchronizationPolicy(SynchronizationPolicy.SYNCHRONIZED)//
                 .layoutStrategyDescription(DiagramFactory.eINSTANCE.createFreeFormLayoutStrategyDescription())//
                 .build();
+        createRectangularNodeStyle.setBackground(this.styleProvider.getTransparentColor());
+
         return contentNodeDescription;
     }
 
