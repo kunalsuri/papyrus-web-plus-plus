@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2023, 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -36,11 +36,8 @@ describe('Custom Image tests', () => {
 
   it('Custom Image custom widget tests', () => {
     // Switch to regular explorer so that the annotation may be visible
-    cy.getByTestId('tree-descriptions-menu-icon').should('be.visible').click();
-    cy.get('ul')
-      .get('li')
-      .eq(2) /*.contains('Explorer')*/
-      .click({ force: true });
+    cy.getByTestId('tree-descriptions-menu-icon').should('be.visible').click();  
+    cy.get('#tree-descriptions-menu').should('exist').find('ul').find('li').eq(1).contains('Explorer').click()
     cy.getByTestId('model4test.uml-more').click();
     cy.getByTestId('expand-all').click();
     // Select Symbol page
