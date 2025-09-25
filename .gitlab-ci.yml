@@ -29,6 +29,15 @@ docker-build:
     - echo 'print image name'
     - echo "$CI_REGISTRY_IMAGE${CONTAINER_NAME:+/$CONTAINER_NAME}:$IMAGE_TAG"
     - echo -e "Building and shipping image to $CI_REGISTRY - $BUILD_IMAGE_NAME"
+    #//IMAGE_TAG override the calculus inherited of the Eclipse template
+    - |
+        if [ -z "${IMAGE_TAG}" ]; then 
+          if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
+            export IMAGE_TAG="latest"
+          fi
+        fi
+        echo "IMAGE_TAG: $IMAGE_TAG"
+
   after_script:
     - echo 'print image name'
     - echo "$CI_REGISTRY_IMAGE${CONTAINER_NAME:+/$CONTAINER_NAME}:$IMAGE_TAG"
@@ -41,7 +50,7 @@ docker-build:
     PUSH_TO_REGISTRY: "true"
     BUILD_ARG: "--opt build-arg:PASSWORD=${GITHUB_COM_TOKEN}"
     DOCKERFILE_NAME: "dockerfiles/Dockerfile"
-    #IMAGE_TAG: $CI_COMMIT_TAG  # no latest tag
+    IMAGE_TAG: ""
   secrets:
     GITHUB_COM_TOKEN:
       vault: $EF_PROJECT_ID/github.com/registry-token@cbi
