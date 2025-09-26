@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="1bedc36e-d587-4ff6-bbaf-e28819d959c1" name="Model">
+  <ownedComment xmi:id="722bf874-06d4-4c31-b0fe-d11865c122f9">
+    <body>My comment 1</body>
+  </ownedComment>
+  <ownedComment xmi:id="1a9dd05e-7cc7-40fa-85e9-6b5846fae106" annotatedElement="82d5df21-e6e7-41d6-8068-373d5f4b22c9">
+    <body>This is a very 
+long comment
+on many lines</body>
+  </ownedComment>
+  <ownedComment xmi:id="6bdd6139-d4b2-4a08-be8f-9b6c879781a9" annotatedElement="24e71a1c-ca2b-4d1a-b3eb-6ad4aa9531d3 1675b6ac-5fce-45a4-983c-2410f11aafd6 82d5df21-e6e7-41d6-8068-373d5f4b22c9">
+    <body>My comment 2</body>
+  </ownedComment>
+  <packagedElement xmi:type="uml:Class" xmi:id="82d5df21-e6e7-41d6-8068-373d5f4b22c9" name="Class 1"/>
+  <packagedElement xmi:type="uml:StateMachine" xmi:id="1675b6ac-5fce-45a4-983c-2410f11aafd6" name="State Machine 1"/>
+  <packagedElement xmi:type="uml:UseCase" xmi:id="24e71a1c-ca2b-4d1a-b3eb-6ad4aa9531d3"/>
+</uml:Model>
