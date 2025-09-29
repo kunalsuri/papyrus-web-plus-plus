@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,8 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.papyrus.web.application.profile.UMLStereotypeMetadata;
 import org.eclipse.papyrus.web.application.profile.services.api.IUMLStereotypeService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Stereotype;
 import org.slf4j.Logger;
@@ -37,17 +38,21 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UMLStereotypeService implements IUMLStereotypeService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UMLProfileService.class);
 
-    private final IObjectService objectService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UMLStereotypeService.class);
 
-    public UMLStereotypeService(IObjectService objectService) {
-        this.objectService = Objects.requireNonNull(objectService);
+    private final IObjectSearchService objectSearchService;
+    private final IIdentityService identityService;
+
+    public UMLStereotypeService(IObjectSearchService objectSearchService, IIdentityService identityService) {
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
+        this.identityService = identityService;
     }
 
     @Override
     public List<UMLStereotypeMetadata> getApplicableStereotypeOn(IEditingContext editingContext, String elementUMLId) {
-        List<UMLStereotypeMetadata> stereotypeMetadatas = this.objectService.getObject(editingContext, elementUMLId)
+        List<UMLStereotypeMetadata> stereotypeMetadatas = this.objectSearchService.getObject(editingContext,
+                        elementUMLId)
                 .filter(Element.class::isInstance)
                 .map(Element.class::cast)
                 .map(this::collectUnappliedStereotypes)
@@ -60,7 +65,7 @@ public class UMLStereotypeService implements IUMLStereotypeService {
         EList<Stereotype> appliedStereotypes = element.getAppliedStereotypes();
         for (Stereotype stereotype : element.getApplicableStereotypes()) {
             if (!appliedStereotypes.contains(stereotype)) {
-                String id = this.objectService.getId(stereotype);
+                String id = this.identityService.getId(stereotype);
                 if (id != null) {
                     result.add(new UMLStereotypeMetadata(this.buildStereotypeQualifiedName(stereotype), id));
                 }
@@ -76,12 +81,13 @@ public class UMLStereotypeService implements IUMLStereotypeService {
     @Override
     public Optional<Object> applyStereotype(IEditingContext editingContext, String elementUMLId, String stereotypeId) {
         Optional<Object> stereotypeApplication = Optional.empty();
-        Optional<Stereotype> stereotypeOpt = this.objectService.getObject(editingContext, stereotypeId)
+        Optional<Stereotype> stereotypeOpt = this.objectSearchService.getObject(editingContext, stereotypeId)
                 .filter(Stereotype.class::isInstance)
                 .map(Stereotype.class::cast);
 
         if (stereotypeOpt.isPresent()) {
-            Optional<Element> elementOpt = this.objectService.getObject(editingContext, elementUMLId).filter(Element.class::isInstance).map(Element.class::cast);
+            Optional<Element> elementOpt = this.objectSearchService.getObject(editingContext, elementUMLId)
+                    .filter(Element.class::isInstance).map(Element.class::cast);
 
             if (elementOpt.isPresent()) {
                 stereotypeApplication = Optional.ofNullable(elementOpt.get().applyStereotype(stereotypeOpt.get()));

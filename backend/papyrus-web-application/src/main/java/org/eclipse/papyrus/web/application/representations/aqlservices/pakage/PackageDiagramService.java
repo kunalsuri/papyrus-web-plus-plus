@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,7 +30,9 @@ import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
 import org.springframework.stereotype.Service;
 
@@ -45,13 +47,17 @@ public class PackageDiagramService extends AbstractDiagramService {
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
 
     /**
      * Constructor.
      *
-     * @param objectService
-     *            service used to retrieve semantic object from a Diagram node
+     * @param identityService
+     *         the service in charge of getting the identity of an object
+     * @param labelService
+     *         the service in charge of getting labels and images of an object
+     * @param objectSearchService
+     *         the service in charge of getting an object from its id
      * @param diagramNavigationService
      *            helper that must introspect the current diagram's structure and its description
      * @param diagramOperationsService
@@ -64,17 +70,25 @@ public class PackageDiagramService extends AbstractDiagramService {
      * @param logger
      *            Logger used to report errors and warnings to the user
      */
-    public PackageDiagramService(IObjectService objectService, IDiagramNavigationService diagramNavigationService, IDiagramOperationsService diagramOperationsService, IEditableChecker editableChecker,
+    //CHECKSTYLE:OFF Injected parameters
+    public PackageDiagramService(IIdentityService identityService, ILabelService labelService,
+            IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService,
+            IDiagramOperationsService diagramOperationsService, IEditableChecker editableChecker,
             IViewDiagramDescriptionService viewDiagramService, ILogger logger) {
-        super(objectService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
+        //CHECKSTYLE:ON Injected parameters
+        super(identityService, labelService, objectSearchService, diagramNavigationService, diagramOperationsService,
+                editableChecker, viewDiagramService, logger);
         this.logger = logger;
     }
 
     @Override
     protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new PackageGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
+                this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new PackageGraphicalDropBehaviorProvider(
+                editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -83,8 +97,11 @@ public class PackageDiagramService extends AbstractDiagramService {
     @Override
     protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new PackageSemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
+                this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new PackageSemanticDropBehaviorProvider(
+                editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;

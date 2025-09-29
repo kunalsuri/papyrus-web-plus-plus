@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,8 @@ import org.eclipse.papyrus.web.application.profile.services.api.IUMLProfileProvi
 import org.eclipse.papyrus.web.domain.boundedcontext.profile.service.api.IProfileCreationService;
 import org.eclipse.papyrus.web.domain.boundedcontext.profile.service.api.IProfileDeletionService;
 import org.eclipse.papyrus.web.domain.boundedcontext.profile.service.api.IProfileSearchService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,16 +33,17 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class UMLProfileConfiguration {
+
     @Bean
-    public UMLProfileService profileDescriptionService(List<IUMLProfileProvider> umlProfileDescriptionProviders, IObjectService objectService, IProfileSearchService profilesearchService,
+    public UMLProfileService profileDescriptionService(List<IUMLProfileProvider> umlProfileDescriptionProviders, IIdentityService identityService, IProfileSearchService profilesearchService,
             IProfileDeletionService profileDeletionService,
-            IProfileCreationService profileCreationService, Registry factoryRegistry) {
+            IProfileCreationService profileCreationService, Registry factoryRegistry, IObjectSearchService objectSearchService) {
         UMLProfileMetadataRegistry registry = new UMLProfileMetadataRegistry();
         umlProfileDescriptionProviders.stream().flatMap(uMLProfileProvider -> {
             return uMLProfileProvider.getUMLProfiles().stream();
         }).forEach(umlProfile -> {
             registry.add(umlProfile);
         });
-        return new UMLProfileService(registry, objectService, profilesearchService, profileDeletionService, profileCreationService, factoryRegistry);
+        return new UMLProfileService(registry, identityService, profilesearchService, profileDeletionService, profileCreationService, factoryRegistry, objectSearchService);
     }
 }

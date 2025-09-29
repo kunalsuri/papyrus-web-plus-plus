@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -79,7 +79,9 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
 
     @Override
     protected AbstractDiagramService buildService() {
-        return new CompositeStructureDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new CompositeStructureDiagramService(this.getIdentityService(), getLabelService(),
+                getObjectSearchService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(),
+                e -> true, this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 
@@ -201,7 +203,8 @@ public class CompositeStructureDiagramServiceTests extends AbstractDiagramTest {
 
         // Test Class in Class recursion
         this.getServiceTester().assertChildCreation(nestedClassNodeContent, UML.getClass_(), UML.getClass_NestedClassifier(), CSD_CLASSIFIER_SHARED + U_HOLDER_SUFFIX,
-                (EObject) this.getObjectService().getObject(this.getEditingContext(), nestedClassNodeContent.getTargetObjectId()).get());
+                (EObject) this.getObjectSearchService()
+                        .getObject(this.getEditingContext(), nestedClassNodeContent.getTargetObjectId()).get());
     }
 
     /**

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.utils.IVi
 import org.eclipse.papyrus.web.application.representations.aqlservices.utils.SemanticDropSwitch;
 import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Node;
 
 /**
@@ -43,11 +43,11 @@ public class StateMachineSemanticDiagramDropBehaviorProvider implements IWebExte
 
     private final IViewHelper viewHelper;
 
-    private DiagramNavigator diagramNavigator;
+    private final IObjectSearchService objectSearchService;
 
-    private IEditingContext editionContext;
+    private final DiagramNavigator diagramNavigator;
 
-    private IObjectService objectService;
+    private final IEditingContext editionContext;
 
     private final ECrossReferenceAdapter crossRef;
 
@@ -65,14 +65,15 @@ public class StateMachineSemanticDiagramDropBehaviorProvider implements IWebExte
      *            editing context used to retrieve semantic target
      * @param viewHelper
      *            the helper used to create element on a diagram
-     * @param objectService
+     * @param objectSearchService
      *            service used to retrieve semantic target according to node id
      * @param diagramNavigator
      *            the helper used to navigate inside a diagram and/or to its description
      * @param logger
      *            Logger used to report errors and warnings to the user
      */
-    public StateMachineSemanticDiagramDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper, IObjectService objectService, ECrossReferenceAdapter crossRef,
+    public StateMachineSemanticDiagramDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper,
+            IObjectSearchService objectSearchService, ECrossReferenceAdapter crossRef,
             IEditableChecker editableChecker,
             DiagramNavigator diagramNavigator, ILogger logger) {
         this.diagramNavigator = Objects.requireNonNull(diagramNavigator);
@@ -80,7 +81,7 @@ public class StateMachineSemanticDiagramDropBehaviorProvider implements IWebExte
         this.editableChecker = Objects.requireNonNull(editableChecker);
         this.editionContext = Objects.requireNonNull(editionContext);
         this.viewHelper = Objects.requireNonNull(viewHelper);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.logger = logger;
     }
 
@@ -105,7 +106,7 @@ public class StateMachineSemanticDiagramDropBehaviorProvider implements IWebExte
     }
 
     private Object getSemanticObject(String id) {
-        return this.objectService.getObject(this.editionContext, id).orElse(null);
+        return this.objectSearchService.getObject(this.editionContext, id).orElse(null);
     }
 
 }

@@ -104,7 +104,8 @@ public class UCDTopNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("parameterProvider")
     public void testDeleteSemanticNode(String elementName, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, null);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, this::getRootSemanticElement,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext, this::getRootSemanticElement,
                 containmentReference);
         this.deleteSemanticNode(elementName, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -113,7 +114,8 @@ public class UCDTopNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("parameterHolderProvider")
     public void testDeleteHolderSemanticNode(String elementName, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, null);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, this::getRootSemanticElement,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext, this::getRootSemanticElement,
                 containmentReference);
         this.deleteSemanticNode(elementName, new CombinedChecker(graphicalChecker, semanticChecker));
     }

@@ -77,7 +77,7 @@ build_and_deploy:
     MAVEN_OPTS: "-DskipTests -Dcheckstyle.skip -Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
     # Conditional Maven goals - compile for nightly, deploy for releases
     MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DskipTests"
-    NODE_VERSION: "18.7.0"
+    NODE_VERSION: "22.16.0"
     NODE_DIR: "$CI_PROJECT_DIR/.node"
   secrets:
     GITHUB_COM_TOKEN:
@@ -144,7 +144,7 @@ test_all:
   extends: .ef-repo-eclipse-org
   variables:
     MAVEN_VERSION: "3.9.9"
-    NODE_VERSION: "18.7.0"
+    NODE_VERSION: "22.16.0"
     NODE_DIR: "$CI_PROJECT_DIR/.node"  
     ALL_TESTS: "-DallTests"
     MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"

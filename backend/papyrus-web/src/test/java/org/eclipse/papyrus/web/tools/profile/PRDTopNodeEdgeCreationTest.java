@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -125,7 +125,8 @@ public class PRDTopNodeEdgeCreationTest extends EdgeCreationTest {
             expectedSemanticOwnerSupplier = () -> this.findSemanticElementByName(expectedSemanticOwnerName);
         }
         EdgeCreationGraphicalChecker graphicalChecker = new EdgeCreationGraphicalChecker(this::getDiagram, null, PRDMappingTypes.getMappingType(edgeType), this.getCapturedEdges());
-        EdgeCreationSemanticChecker semanticChecker = new EdgeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, edgeType, expectedSemanticOwnerSupplier,
+        EdgeCreationSemanticChecker semanticChecker = new EdgeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, edgeType, expectedSemanticOwnerSupplier,
                 expectedContainmentReference);
         this.createEdge(sourceElementLabel, targetElementLabel, new CreationTool(ToolSections.EDGES, edgeType), new CombinedChecker(graphicalChecker, semanticChecker));
     }

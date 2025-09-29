@@ -769,7 +769,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
 
         this.createActivitySubNodes(activityContainer, ACTIVITY_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, ACTIVITY_LABEL);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(ACTIVITY_LABEL), containmentReference);
         final String elementLabel;
         if (UML.getInterruptibleActivityRegion().equals(elementType)) {
@@ -795,7 +796,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
         } else {
             expectedSemanticOwner = ROOT_ACTIVITY;
         }
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(expectedSemanticOwner), containmentReference);
         this.deleteSemanticNode(elementType.getName() + ACTIVITY_PARTITION_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -810,7 +812,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
 
         this.createConditionalNodeSubNodes(conditionalNodeContainer, CONDITIONAL_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, CONDITIONAL_NODE_LABEL);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(CONDITIONAL_NODE_LABEL), containmentReference);
         this.deleteSemanticNode(elementType.getName() + CONDITIONAL_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -825,7 +828,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
 
         this.createExpansionRegionSubNodes(expansionRegionNodeContainer, EXPANSION_REGION_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, EXPANSION_REGION_LABEL);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(EXPANSION_REGION_LABEL), containmentReference);
         this.deleteSemanticNode(elementType.getName() + EXPANSION_REGION_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -838,7 +842,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
         Node activityPartitionContainer = this.getSubNode(activityPartitionContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getInterruptibleActivityRegion()));
         this.createInterruptibleActivityRegionSubNodes(activityPartitionContainer, INTERRUPTIBLE_ACTIVITY_REGION_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, INTERRUPTIBLE_ACTIVITY_REGION_LABEL);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(ROOT_ACTIVITY), containmentReference);
         this.deleteSemanticNode(elementType.getName() + INTERRUPTIBLE_ACTIVITY_REGION_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -853,7 +858,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
 
         this.createLoopNodeAndStructuredActivityNodeSubNodes(loopNodeContainer, LOOP_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, LOOP_NODE_LABEL);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(LOOP_NODE_LABEL), containmentReference);
         this.deleteSemanticNode(elementType.getName() + LOOP_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -868,7 +874,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
 
         this.createLoopNodeAndStructuredActivityNodeSubNodes(structuredActivityNodeContainer, STRUCTURED_ACTIVITY_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, STRUCTURED_ACTIVITY_NODE_LABEL);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(STRUCTURED_ACTIVITY_NODE_LABEL), containmentReference);
         this.deleteSemanticNode(elementType.getName() + STRUCTURED_ACTIVITY_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -883,7 +890,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
 
         this.createSequenceNodeSubNodes(sequenceNodeContainer, SEQUENCE_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, SEQUENCE_NODE_LABEL);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(SEQUENCE_NODE_LABEL), containmentReference);
         this.deleteSemanticNode(elementType.getName() + SEQUENCE_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -896,7 +904,8 @@ public class ADSubNodeSemanticDeletionTest extends NodeDeletionTest {
         Node parentNode = (Node) this.findGraphicalElementExcludingContentByLabel(parentLabel);
         this.createNodeWithLabel(parentNode.getId(), nodeCreationTool, elementType.getName() + "In_Node");
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, parentLabel);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(parentLabel), containmentReference);
         this.deleteSemanticNode(elementType.getName() + "In_Node", new CombinedChecker(graphicalChecker, semanticChecker));
     }

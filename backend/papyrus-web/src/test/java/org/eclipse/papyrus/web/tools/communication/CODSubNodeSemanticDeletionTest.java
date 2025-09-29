@@ -81,9 +81,12 @@ public class CODSubNodeSemanticDeletionTest extends NodeDeletionTest {
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ROOT_INTERACTION));
         NodeSemanticDeletionSemanticChecker semanticChecker;
         if (UML.getDurationObservation().isSuperTypeOf(elementType) || UML.getTimeObservation().isSuperTypeOf(elementType)) {
-            semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, () -> this.getRootSemanticElement(), containmentReference);
+            semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectSearchService(),
+                    this::getEditingContext, () -> this.getRootSemanticElement(), containmentReference);
         } else {
-            semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, () -> this.findSemanticElementByName(ROOT_INTERACTION), containmentReference);
+            semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectSearchService(),
+                    this::getEditingContext, () -> this.findSemanticElementByName(ROOT_INTERACTION),
+                    containmentReference);
         }
         this.deleteSemanticNode(elementType.getName(), new CombinedChecker(graphicalChecker, semanticChecker));
     }

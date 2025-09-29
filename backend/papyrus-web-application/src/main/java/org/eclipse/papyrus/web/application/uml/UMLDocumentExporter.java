@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.util.BasicExtendedMetaData;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.papyrus.uml.domain.services.EMFUtils;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.emfjson.resource.JsonResource;
 import org.eclipse.sirius.web.application.document.services.api.IDocumentExporter;
 import org.eclipse.uml2.uml.Element;
@@ -48,11 +48,11 @@ public class UMLDocumentExporter implements IDocumentExporter {
 
     private final Logger logger = LoggerFactory.getLogger(UMLDocumentExporter.class);
 
-    private final IObjectService objectService;
+    private final IIdentityService identityService;
 
-    public UMLDocumentExporter(IObjectService objectService) {
+    public UMLDocumentExporter(IIdentityService identityService) {
         super();
-        this.objectService = Objects.requireNonNull(objectService);
+        this.identityService = Objects.requireNonNull(identityService);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class UMLDocumentExporter implements IDocumentExporter {
 
     private void forceStableId(XMLResource outputResource, Notifier notifier) {
         if (notifier instanceof EObject eObject) {
-            String id = this.objectService.getId(eObject);
+            String id = this.identityService.getId(eObject);
             if (id != null && !id.isEmpty()) {
                 outputResource.setID(eObject, id);
             }

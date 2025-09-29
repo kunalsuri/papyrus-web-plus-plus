@@ -176,7 +176,7 @@ public class DDSemanticDropTest extends SemanticDropTest {
             default -> new HolderCreationGraphicalChecker(this::getDiagram, null, DDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
         };
 
-        this.semanticDropOnDiagram(this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnDiagram(this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -197,7 +197,8 @@ public class DDSemanticDropTest extends SemanticDropTest {
                     this.getCapturedNodes());
         }
 
-        this.semanticDropOnContent(ARTIFACT_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(ARTIFACT_CONTAINER, this.getIdentityService().getId(elementToDrop),
+                graphicalChecker);
     }
 
     @ParameterizedTest
@@ -219,7 +220,7 @@ public class DDSemanticDropTest extends SemanticDropTest {
                     this.getCapturedNodes());
         }
 
-        this.semanticDropOnContent(DEVICE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(DEVICE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -239,7 +240,8 @@ public class DDSemanticDropTest extends SemanticDropTest {
                     DDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         }
-        this.semanticDropOnContent(EXECUTION_ENVIRONMENT_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(EXECUTION_ENVIRONMENT_CONTAINER, this.getIdentityService().getId(elementToDrop),
+                graphicalChecker);
     }
 
     @ParameterizedTest
@@ -258,7 +260,7 @@ public class DDSemanticDropTest extends SemanticDropTest {
                     DDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         };
-        this.semanticDropOnContent(MODEL_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(MODEL_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -279,7 +281,7 @@ public class DDSemanticDropTest extends SemanticDropTest {
                     this.getCapturedNodes());
 
         }
-        this.semanticDropOnContent(NODE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(NODE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -298,7 +300,7 @@ public class DDSemanticDropTest extends SemanticDropTest {
                     DDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         };
-        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.utils.IVi
 import org.eclipse.papyrus.web.application.representations.aqlservices.utils.SemanticDropSwitch;
 import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Node;
 
 /**
@@ -44,27 +44,29 @@ public class CompositeStructureSemanticDropBehaviorProvider implements IWebExter
 
     private final IViewHelper viewHelper;
 
-    private final IObjectService objectService;
 
     private final ECrossReferenceAdapter crossRef;
 
     private final IEditableChecker editableChecker;
 
-    private DiagramNavigator diagramNavigator;
+    private final IObjectSearchService objectSearchService;
+
+    private final DiagramNavigator diagramNavigator;
 
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
 
-    public CompositeStructureSemanticDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper, IObjectService objectService, ECrossReferenceAdapter crossRef,
+    public CompositeStructureSemanticDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper,
+            IObjectSearchService objectSearchService, ECrossReferenceAdapter crossRef,
             IEditableChecker editableChecker, DiagramNavigator diagramNavigator, ILogger logger) {
         this.diagramNavigator = Objects.requireNonNull(diagramNavigator);
         this.crossRef = Objects.requireNonNull(crossRef);
         this.editableChecker = Objects.requireNonNull(editableChecker);
         this.editionContext = Objects.requireNonNull(editionContext);
         this.viewHelper = Objects.requireNonNull(viewHelper);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.logger = logger;
     }
 
@@ -89,7 +91,7 @@ public class CompositeStructureSemanticDropBehaviorProvider implements IWebExter
     }
 
     private Object getSemanticObject(String id) {
-        return this.objectService.getObject(this.editionContext, id).orElse(null);
+        return this.objectSearchService.getObject(this.editionContext, id).orElse(null);
 
     }
 

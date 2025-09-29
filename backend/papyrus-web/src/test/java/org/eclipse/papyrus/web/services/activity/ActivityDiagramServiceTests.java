@@ -693,7 +693,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     }
 
     /**
-     * Tests {@link ActivityDiagramService#getActionInputPinCandidatesAD(EObject)} on an {@link Action} with
+     * Tests {@link ActivityDiagramService#getActionInputPinCandidatesAD(EObject)} on an {@link org.eclipse.uml2.uml.Action} with
      * {@link ValuePin}.
      */
     @Test
@@ -725,7 +725,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     }
 
     /**
-     * Tests {@link ActivityDiagramService#getInputPinCandidatesAD(EObject)} on an {@link Action} with {@link InputPin}.
+     * Tests {@link ActivityDiagramService#getInputPinCandidatesAD(EObject)} on an {@link org.eclipse.uml2.uml.Action} with {@link InputPin}.
      */
     @Test
     public void testGetInputPinCandidates() {
@@ -756,7 +756,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     }
 
     /**
-     * Tests {@link ActivityDiagramService#getOutputPinCandidatesAD(EObject)} on an {@link Action} with
+     * Tests {@link ActivityDiagramService#getOutputPinCandidatesAD(EObject)} on an {@link org.eclipse.uml2.uml.Action} with
      * {@link InputPin}.
      */
     @Test
@@ -788,7 +788,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
     }
 
     /**
-     * Tests {@link ActivityDiagramService#getValuePinCandidatesAD(EObject)} on an {@link Action} with {@link ValuePin}.
+     * Tests {@link ActivityDiagramService#getValuePinCandidatesAD(EObject)} on an {@link org.eclipse.uml2.uml.Action} with {@link ValuePin}.
      */
     @Test
     public void testGetValuePinCandidates() {
@@ -835,7 +835,8 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     @Override
     protected AbstractDiagramService buildService() {
-        return new ActivityDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new ActivityDiagramService(getIdentityService(), getLabelService(), getObjectSearchService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true,
+                this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

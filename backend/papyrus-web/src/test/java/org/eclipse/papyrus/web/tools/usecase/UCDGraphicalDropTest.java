@@ -99,9 +99,11 @@ public class UCDGraphicalDropTest extends GraphicalDropTest {
 
         NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, null,
                 UCDMappingTypes.getMappingType(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 this::getRootSemanticElement, containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PACKAGE_NAME), UML.getPackage_PackagedElement());
 
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
@@ -116,9 +118,11 @@ public class UCDGraphicalDropTest extends GraphicalDropTest {
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_NAME),
                 UCDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_NAME), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
@@ -160,9 +164,11 @@ public class UCDGraphicalDropTest extends GraphicalDropTest {
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(containerName),
                 UCDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(containerName), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);

@@ -126,7 +126,8 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
         } else {
             graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER), mappingType, this.getCapturedNodes());
         }
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), expectedContainmentReference);
         this.createSubNode(PACKAGE_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -143,7 +144,8 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
         } else {
             graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER), mappingType, this.getCapturedNodes());
         }
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(MODEL_CONTAINER), expectedContainmentReference);
         this.createSubNode(MODEL_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -162,7 +164,8 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
                     this.getCapturedNodes());
         }
 
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(COMPONENT_CONTAINER), expectedContainmentReference);
         this.createSubNode(COMPONENT_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -193,7 +196,8 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.getSubNode(INTERFACE_CONTAINER, compartmentMapping), mappingType,
                 this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(INTERFACE_CONTAINER), expectedContainmentReference);
         this.createSubNodeOnCompartment(INTERFACE_CONTAINER, compartmentMapping, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -209,15 +213,18 @@ public class CPDSubNodeCreationTest extends NodeCreationTest {
         Node propertyContainerNode = this.createNodeWithLabel(componentContentId, new CreationTool(ToolSections.NODES, expectedType), PROPERTY_CONTAINER);
         // type the property container
         IEMFEditingContext editingContext = (IEMFEditingContext) this.getEditingContext();
-        Optional<Object> propertyContainerOptional = this.getObjectService().getObject(editingContext, propertyContainerNode.getTargetObjectId());
-        Optional<Object> componentTypeOptional = this.getObjectService().getObject(editingContext, componentTypeNode.getTargetObjectId());
+        Optional<Object> propertyContainerOptional = this.getObjectSearchService()
+                .getObject(editingContext, propertyContainerNode.getTargetObjectId());
+        Optional<Object> componentTypeOptional = this.getObjectSearchService()
+                .getObject(editingContext, componentTypeNode.getTargetObjectId());
         Property propertyContainer = (Property) propertyContainerOptional.get();
         propertyContainer.setType((Component) componentTypeOptional.get());
         String mappingType = CPDMappingTypes.getMappingTypeAsSubNode(UML.getProperty());
 
         NodeCreationGraphicalChecker graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROPERTY_CONTAINER), mappingType,
                 this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(COMPONENT_TYPE), expectedContainmentReference);
         CreationTool nodeCreationTool = new CreationTool(ToolSections.NODES, UML.getProperty());
         this.createSubNode(PROPERTY_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));

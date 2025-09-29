@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,8 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.IDiagramElement;
 import org.eclipse.sirius.components.diagrams.Node;
@@ -41,21 +42,25 @@ import org.eclipse.sirius.components.diagrams.Node;
  */
 public abstract class CreationSemanticChecker implements Checker {
 
-    protected IObjectService objectService;
-
     protected Supplier<IEditingContext> editingContextSupplier;
 
-    private EClass expectedType;
+    private final IObjectSearchService objectSearchService;
 
-    private Supplier<EObject> expectedOwnerSupplier;
+    private final IIdentityService identityService;
 
-    private EReference containmentFeature;
+    private final EClass expectedType;
+
+    private final Supplier<EObject> expectedOwnerSupplier;
+
+    private final EReference containmentFeature;
 
     /**
      * Initializes the checker with the provided parameters.
      *
-     * @param objectService
+     * @param objectSearchService
      *            the object service used to retrieve objects and compute identifiers
+     * @param  identityService
+     *            the identity service
      * @param editingContextSupplier
      *            a supplier to access and reload the editing context
      * @param expectedType
@@ -65,9 +70,12 @@ public abstract class CreationSemanticChecker implements Checker {
      * @param containmentFeature
      *            the expected containment feature of the checked element
      */
-    public CreationSemanticChecker(IObjectService objectService, Supplier<IEditingContext> editingContextSupplier, EClass expectedType, Supplier<EObject> expectedOwnerSupplier,
+    public CreationSemanticChecker(IObjectSearchService objectSearchService, IIdentityService identityService,
+            Supplier<IEditingContext> editingContextSupplier, EClass expectedType,
+            Supplier<EObject> expectedOwnerSupplier,
             EReference containmentFeature) {
-        this.objectService = objectService;
+        this.objectSearchService = objectSearchService;
+        this.identityService = identityService;
         this.editingContextSupplier = editingContextSupplier;
         this.expectedType = expectedType;
         this.expectedOwnerSupplier = expectedOwnerSupplier;
@@ -88,9 +96,12 @@ public abstract class CreationSemanticChecker implements Checker {
     protected void validateSemanticOwner(final EObject semanticElement) {
         EObject expectedOwner = this.expectedOwnerSupplier.get();
         // Need to compare IDs because EObject instances are different
-        assertThat(this.getContainmentFeatureValue().stream().map(this.objectService::getId)).as("The semantic owner doesn't contain the checked element")
-                .anyMatch(id -> Objects.equals(id, this.objectService.getId(semanticElement)));
-        assertThat(this.objectService.getId(semanticElement.eContainer())).as("The created element is not contained by the expected owner").isEqualTo(this.objectService.getId(expectedOwner));
+        assertThat(this.getContainmentFeatureValue().stream().map(this.identityService::getId)).as(
+                        "The semantic owner doesn't contain the checked element")
+                .anyMatch(id -> Objects.equals(id, this.identityService.getId(semanticElement)));
+        assertThat(this.identityService.getId(semanticElement.eContainer())).as(
+                        "The created element is not contained by the expected owner")
+                .isEqualTo(this.identityService.getId(expectedOwner));
     }
 
     protected EObject getSemanticElement(IDiagramElement diagramElement) {
@@ -102,7 +113,8 @@ public abstract class CreationSemanticChecker implements Checker {
         } else {
             fail("Unsupported type of IDiagramElement: " + diagramElement);
         }
-        Optional<Object> optSemanticElement = this.objectService.getObject(this.editingContextSupplier.get(), semanticElementId);
+        Optional<Object> optSemanticElement = this.objectSearchService.getObject(this.editingContextSupplier.get(),
+                semanticElementId);
         assertThat(optSemanticElement).isPresent();
         assertThat(optSemanticElement.get()).isInstanceOf(EObject.class);
         EObject semanticElement = (EObject) optSemanticElement.get();

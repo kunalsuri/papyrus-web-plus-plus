@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.IDiagramElement;
 import org.eclipse.sirius.components.diagrams.Node;
 
@@ -38,18 +38,18 @@ import org.eclipse.sirius.components.diagrams.Node;
  */
 public abstract class DeletionSemanticChecker implements Checker {
 
-    protected IObjectService objectService;
-
     protected Supplier<IEditingContext> editingContextSupplier;
 
     protected Supplier<EObject> oldOwnerSupplier;
+    
+    private final IObjectSearchService objectSearchService;
 
-    private EReference containmentFeature;
+    private final EReference containmentFeature;
 
     /**
      * Initializes the checker with the provided parameters.
      *
-     * @param objectService
+     * @param objectSearchService
      *            the object service used to retrieve and compute identifiers
      * @param editingContextSupplier
      *            a supplier to access and reload the editing context
@@ -58,8 +58,10 @@ public abstract class DeletionSemanticChecker implements Checker {
      * @param containmentFeature
      *            the expected containment feature of the checked element
      */
-    public DeletionSemanticChecker(IObjectService objectService, Supplier<IEditingContext> editingContextSupplier, Supplier<EObject> oldOwnerSupplier, EReference containmentFeature) {
-        this.objectService = objectService;
+    public DeletionSemanticChecker(IObjectSearchService objectSearchService,
+            Supplier<IEditingContext> editingContextSupplier, Supplier<EObject> oldOwnerSupplier,
+            EReference containmentFeature) {
+        this.objectSearchService = objectSearchService;
         this.editingContextSupplier = editingContextSupplier;
         this.oldOwnerSupplier = oldOwnerSupplier;
         this.containmentFeature = containmentFeature;
@@ -80,7 +82,8 @@ public abstract class DeletionSemanticChecker implements Checker {
         } else {
             fail();
         }
-        Optional<Object> optSemanticElement = this.objectService.getObject(this.editingContextSupplier.get(), semanticElementId);
+        Optional<Object> optSemanticElement = this.objectSearchService.getObject(this.editingContextSupplier.get(),
+                semanticElementId);
         assertThat(optSemanticElement).isPresent();
         assertThat(optSemanticElement.get()).isInstanceOf(EObject.class);
         EObject semanticElement = (EObject) optSemanticElement.get();

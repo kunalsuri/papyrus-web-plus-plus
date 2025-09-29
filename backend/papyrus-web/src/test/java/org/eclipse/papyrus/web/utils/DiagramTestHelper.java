@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -42,7 +42,10 @@ import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
+import org.eclipse.sirius.components.core.api.labels.StyledString;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.Node;
@@ -64,7 +67,7 @@ import graphql.AssertException;
  */
 public class DiagramTestHelper {
 
-    private IDiagramIdProvider idProvider;
+    private final IDiagramIdProvider idProvider;
 
     private Map<String, NodeDescription> nodeIdToDescriptions;
 
@@ -78,29 +81,37 @@ public class DiagramTestHelper {
 
     private Diagram diagram;
 
-    private IEditingContext editingContext;
+    private final IEditingContext editingContext;
 
-    private final IObjectService objectService;
+    private final IIdentityService identityService;
+
+    private final ILabelService labelService;
+
+    private final IObjectSearchService objectSearchService;
 
     private IDiagramBuilderService diagramBuilderService;
 
     private DiagramDescription diagramDescription;
 
-    private PapyrusRepresentationDescriptionRegistry viewRegistry;
+    private final PapyrusRepresentationDescriptionRegistry viewRegistry;
 
-    private IDiagramOperationsService diagramOpService;
+    private final IDiagramOperationsService diagramOpService;
 
-    private IDiagramNavigationService diagramNavigationService;
+    private final IDiagramNavigationService diagramNavigationService;
 
-    private IViewDiagramDescriptionService viewDiagramDescriptionService;
+    private final IViewDiagramDescriptionService viewDiagramDescriptionService;
 
     // CHECKSTYLE:OFF FOR now
-    public DiagramTestHelper(IEditingContext editingContext, IObjectService objectService, PapyrusRepresentationDescriptionRegistry viewRegistry, IDiagramBuilderService diagramBuilderService,
+    public DiagramTestHelper(IEditingContext editingContext, IIdentityService identityService,
+            ILabelService labelService, IObjectSearchService objectSearchService,
+            PapyrusRepresentationDescriptionRegistry viewRegistry, IDiagramBuilderService diagramBuilderService,
             IDiagramOperationsService diagramOpService, IDiagramNavigationService diagramNavigationService, IViewDiagramDescriptionService viewDiagramDescriptionService,
             IDiagramIdProvider idProvider) {
         super();
         this.editingContext = editingContext;
-        this.objectService = objectService;
+        this.identityService = identityService;
+        this.labelService = labelService;
+        this.objectSearchService = objectSearchService;
         this.viewRegistry = viewRegistry;
         this.diagramBuilderService = diagramBuilderService;
         this.diagramOpService = diagramOpService;
@@ -287,7 +298,8 @@ public class DiagramTestHelper {
      * @return a semantic element (or <b>fails</b>)
      */
     public EObject getSemanticElement(Node node) {
-        Optional<Object> optSemanticOwner = this.objectService.getObject(this.editingContext, node.getTargetObjectId());
+        Optional<Object> optSemanticOwner = this.objectSearchService.getObject(this.editingContext,
+                node.getTargetObjectId());
         if (optSemanticOwner.isEmpty()) {
             fail("Unable to find semantic element of " + node);
         }
@@ -303,7 +315,8 @@ public class DiagramTestHelper {
      * @return a semantic element (or <b>fails</b>)
      */
     public EObject getSemanticElement(Edge edge) {
-        Optional<Object> optSemanticOwner = this.objectService.getObject(this.editingContext, edge.getTargetObjectId());
+        Optional<Object> optSemanticOwner = this.objectSearchService.getObject(this.editingContext,
+                edge.getTargetObjectId());
         if (optSemanticOwner.isEmpty()) {
             fail("Unable to find semantic element of " + edge);
         }
@@ -396,17 +409,17 @@ public class DiagramTestHelper {
 
     /**
      * Checks that the diagram contains a {@link Node} described by
-     * {@link org.eclipse.sirius.components.view.NodeDescription} targeting the given semantic element.
+     * {@link org.eclipse.sirius.components.view.diagram.NodeDescription} targeting the given semantic element.
      *
-     * @param expectedDodeDescriptontionName
-     *            the name of the expected {@link org.eclipse.sirius.components.view.NodeDescription}
+     * @param expectedNodeDescriptionName
+     *            the name of the expected {@link org.eclipse.sirius.components.view.diagram.NodeDescription}
      * @param expectedSemanticElement
      *            the semantic target of the node
      * @return the matched node
      */
-    public Node assertGetUniqueRootNode(String expectedDodeDescriptontionName, EObject expectedSemanticElement) {
+    public Node assertGetUniqueRootNode(String expectedNodeDescriptionName, EObject expectedSemanticElement) {
         Predicate<Object> semanticPredicate = this.buildSemanticPredicate(expectedSemanticElement);
-        Predicate<Node> nodePredicate = this.buildNodeDescriptionNamePredicate(expectedDodeDescriptontionName);
+        Predicate<Node> nodePredicate = this.buildNodeDescriptionNamePredicate(expectedNodeDescriptionName);
         DiagramNavigator navigator = this.buildDiagramNavigator();
         Predicate<Node> parentNodePredicate = this.buildParentNodePredicate(navigator, null);
         return this.getUniqueMatch(navigator, semanticPredicate, parentNodePredicate.and(nodePredicate));
@@ -420,8 +433,17 @@ public class DiagramTestHelper {
 
         } else if (matchingNodes.size() > 1) {
             String matchinString = matchingNodes.stream()//
-                    .map(n -> this.objectService.getObject(this.editingContext, n.getTargetObjectId()))//
-                    .map(s -> this.objectService.getLabel(s))//
+                    .map(n -> this.objectSearchService.getObject(this.editingContext, n.getTargetObjectId()))//
+                    .map(s -> {
+                        String label = "<No Label>";
+                        if (s.isPresent()) {
+                            StyledString styledLabel = this.labelService.getStyledLabel(s.get());
+                            if (styledLabel != null) {
+                                label = styledLabel.toString();
+                            }
+                        }
+                        return label;
+                    })//
                     .collect(joining());
             fail(MessageFormat.format("More than one node matching predicates :{0} ", matchinString));
 
@@ -433,7 +455,7 @@ public class DiagramTestHelper {
      * Checks that a domain based edge exist in the diagram matching the given criteria.
      *
      * @param descriptionName
-     *            the name of the {@link org.eclipse.sirius.components.view.EdgeDescription}
+     *            the name of the {@link EdgeDescription}
      * @param newElement
      *            the target semantic element
      * @param source
@@ -444,7 +466,9 @@ public class DiagramTestHelper {
      */
     public Edge assertGetExistDomainBasedEdge(String descriptionName, EObject newElement, Node source, Node target) {
 
-        Edge matchingEdge = this.getMatchingEdge(Optional.of(descriptionName), Optional.of(this.objectService.getId(newElement)), Optional.of(source.getId()), Optional.of(target.getId()));
+        Edge matchingEdge = this.getMatchingEdge(Optional.of(descriptionName),
+                Optional.of(this.identityService.getId(newElement)), Optional.of(source.getId()),
+                Optional.of(target.getId()));
         if (matchingEdge == null) {
             fail("No domain base edge given the matching criteria");
         }
@@ -543,7 +567,7 @@ public class DiagramTestHelper {
      * Assert there is no feature edge with given description name between the given nodes.
      *
      * @param expectedDescriptionName
-     *            the named (id) of the {@link org.eclipse.sirius.components.view.NodeDescription}
+     *            the named (id) of the {@link org.eclipse.sirius.components.view.diagram.NodeDescription}
      * @param expectedSource
      *            the expected source
      * @param expectedTarget
@@ -592,8 +616,8 @@ public class DiagramTestHelper {
     /**
      * Assert and get a unique node matching the given criteria.
      *
-     * @param expectedParent
-     *            the expected parent node
+     * @param expectedDescriptionName
+     *            the expected description name
      * @param expectedSemanticElement
      *            the expected semantic element
      * @return a node (or fails)

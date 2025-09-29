@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2024 Obeo.
+ * Copyright (c) 2019, 2025 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,12 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.emf.forms.EMFFormDescriptionProvider;
 import org.eclipse.sirius.components.emf.forms.EStructuralFeatureLabelProvider;
+import org.eclipse.sirius.components.emf.forms.api.IEMFFormIfDescriptionProvider;
 import org.eclipse.sirius.components.emf.forms.api.IPropertiesValidationProvider;
+import org.eclipse.sirius.components.emf.forms.api.IWidgetReadOnlyProvider;
 import org.eclipse.sirius.components.forms.WidgetIdProvider;
 import org.eclipse.sirius.components.forms.description.CheckboxDescription;
 import org.eclipse.sirius.components.forms.description.IfDescription;
@@ -37,47 +41,61 @@ import org.eclipse.uml2.types.TypesPackage;
  *
  * @author sbegaudeau
  */
-public class EBooleanIfDescriptionProvider {
+public class EBooleanIfDescriptionProvider implements IEMFFormIfDescriptionProvider {
 
-    private static final String IF_DESCRIPTION_ID = "EBoolean";
+    public static final String IF_DESCRIPTION_ID = "EBoolean";
 
     private static final String CHECKBOX_DESCRIPTION_ID = "Checkbox";
+
+    private final IIdentityService identityService;
 
     private final ComposedAdapterFactory composedAdapterFactory;
 
     private final IPropertiesValidationProvider propertiesValidationProvider;
 
-    private final Function<VariableManager, String> semanticTargetIdProvider;
+    private final IWidgetReadOnlyProvider widgetReadOnlyProvider;
 
-    public EBooleanIfDescriptionProvider(ComposedAdapterFactory composedAdapterFactory, IPropertiesValidationProvider propertiesValidationProvider,
-            Function<VariableManager, String> semanticTargetIdProvider) {
+    public EBooleanIfDescriptionProvider(IIdentityService identityService, ComposedAdapterFactory composedAdapterFactory, IPropertiesValidationProvider propertiesValidationProvider,
+            IWidgetReadOnlyProvider widgetReadOnlyProvider) {
+        this.identityService = Objects.requireNonNull(identityService);
         this.composedAdapterFactory = Objects.requireNonNull(composedAdapterFactory);
         this.propertiesValidationProvider = Objects.requireNonNull(propertiesValidationProvider);
-        this.semanticTargetIdProvider = Objects.requireNonNull(semanticTargetIdProvider);
+        this.widgetReadOnlyProvider = Objects.requireNonNull(widgetReadOnlyProvider);
     }
 
-    public IfDescription getIfDescription() {
-        return IfDescription.newIfDescription(IF_DESCRIPTION_ID)
-                .targetObjectIdProvider(this.semanticTargetIdProvider)
+    @Override
+    public List<IfDescription> getIfDescriptions() {
+        Function<VariableManager, String> targetObjectIdProvider = variableManager -> variableManager.get(VariableManager.SELF, Object.class)
+                .map(this.identityService::getId)
+                .orElse(null);
+
+        return List.of(IfDescription.newIfDescription(IF_DESCRIPTION_ID)
+                .targetObjectIdProvider(targetObjectIdProvider)
                 .predicate(this.getPredicate())
                 .controlDescriptions(List.of(this.getCheckboxDescription()))
-                .build();
+                .build());
     }
 
     private Function<VariableManager, Boolean> getPredicate() {
         return variableManager -> {
             var optionalEAttribute = variableManager.get(AdvancedPropertiesDescriptionProvider.ESTRUCTURAL_FEATURE, EAttribute.class);
-            return optionalEAttribute.filter(eAttribute -> this.isBoolean(eAttribute)).isPresent();
+            return optionalEAttribute.filter(eAttribute -> !eAttribute.isMany() && this.isBoolean(eAttribute)).isPresent();
         };
     }
 
     private boolean isBoolean(EAttribute eAttribute) {
-        return eAttribute.getEType().equals(EcorePackage.Literals.EBOOLEAN) || eAttribute.getEType().equals(TypesPackage.eINSTANCE.getBoolean());
+        return eAttribute.getEType().equals(EcorePackage.Literals.EBOOLEAN)
+                || eAttribute.getEType().equals(TypesPackage.eINSTANCE.getBoolean())
+                || Objects.equals(eAttribute.getEType().getInstanceClassName(), EcorePackage.Literals.EBOOLEAN_OBJECT.getInstanceClassName());
     }
 
     private CheckboxDescription getCheckboxDescription() {
+        Function<VariableManager, String> targetObjectIdProvider = variableManager -> variableManager.get(VariableManager.SELF, Object.class)
+                .map(this.identityService::getId)
+                .orElse(null);
+
         return CheckboxDescription.newCheckboxDescription(CHECKBOX_DESCRIPTION_ID)
-                .targetObjectIdProvider(this.semanticTargetIdProvider)
+                .targetObjectIdProvider(targetObjectIdProvider)
                 .idProvider(new WidgetIdProvider())
                 .labelProvider(this.getLabelProvider())
                 .valueProvider(this.getValueProvider())
@@ -85,23 +103,26 @@ public class EBooleanIfDescriptionProvider {
                 .diagnosticsProvider(this.propertiesValidationProvider.getDiagnosticsProvider())
                 .kindProvider(this.propertiesValidationProvider.getKindProvider())
                 .messageProvider(this.propertiesValidationProvider.getMessageProvider())
+                .isReadOnlyProvider(this.widgetReadOnlyProvider)
                 .build();
     }
 
     private Function<VariableManager, String> getLabelProvider() {
-        return new EStructuralFeatureLabelProvider(AdvancedPropertiesDescriptionProvider.ESTRUCTURAL_FEATURE, this.composedAdapterFactory);
+        return new EStructuralFeatureLabelProvider(EMFFormDescriptionProvider.ESTRUCTURAL_FEATURE, this.composedAdapterFactory);
     }
 
     private Function<VariableManager, Boolean> getValueProvider() {
         return variableManager -> {
             var optionalEObject = variableManager.get(VariableManager.SELF, EObject.class);
-            var optionalEAttribute = variableManager.get(AdvancedPropertiesDescriptionProvider.ESTRUCTURAL_FEATURE, EAttribute.class);
+            var optionalEAttribute = variableManager.get(EMFFormDescriptionProvider.ESTRUCTURAL_FEATURE, EAttribute.class);
             if (optionalEObject.isPresent() && optionalEAttribute.isPresent()) {
                 EObject eObject = optionalEObject.get();
                 EAttribute eAttribute = optionalEAttribute.get();
 
                 Object value = eObject.eGet(eAttribute);
-                return Boolean.valueOf(value.toString());
+                if (value != null) {
+                    return Boolean.valueOf(value.toString());
+                }
             }
             return Boolean.FALSE;
         };
@@ -110,16 +131,20 @@ public class EBooleanIfDescriptionProvider {
     private BiFunction<VariableManager, Boolean, IStatus> getNewValueHandler() {
         return (variableManager, newValue) -> {
             var optionalEObject = variableManager.get(VariableManager.SELF, EObject.class);
-            var optionalEAttribute = variableManager.get(AdvancedPropertiesDescriptionProvider.ESTRUCTURAL_FEATURE, EAttribute.class);
+            var optionalEAttribute = variableManager.get(EMFFormDescriptionProvider.ESTRUCTURAL_FEATURE, EAttribute.class);
+            IStatus result = new Failure("");
             if (optionalEObject.isPresent() && optionalEAttribute.isPresent()) {
                 EObject eObject = optionalEObject.get();
                 EAttribute eAttribute = optionalEAttribute.get();
 
-                eObject.eSet(eAttribute, newValue);
-                return new Success();
+                if (newValue == null) {
+                    eObject.eUnset(eAttribute);
+                } else {
+                    eObject.eSet(eAttribute, newValue);
+                }
+                result = new Success();
             }
-            return new Failure("");
+            return result;
         };
     }
-
 }

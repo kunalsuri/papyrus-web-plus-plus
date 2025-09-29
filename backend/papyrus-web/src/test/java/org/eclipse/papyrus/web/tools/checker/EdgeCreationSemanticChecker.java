@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,8 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 
 /**
  * Utility class to check that a semantic edge has been created in the semantic model.
@@ -35,8 +36,10 @@ public class EdgeCreationSemanticChecker extends CreationSemanticChecker {
     /**
      * Initializes the checker with the provided parameters.
      *
-     * @param objectService
+     * @param objectSearchService
      *            the object service used to retrieve and compute identifiers
+     * @param  identityService
+     *            the identity service
      * @param editingContextSupplier
      *            a supplier to access and reload the editing context
      * @param expectedType
@@ -46,8 +49,11 @@ public class EdgeCreationSemanticChecker extends CreationSemanticChecker {
      * @param containmentFeature
      *            the expected containment feature of the checked edge
      */
-    public EdgeCreationSemanticChecker(IObjectService objectService, Supplier<IEditingContext> editingContextSupplier, EClass expectedType, Supplier<EObject> expectedOwnerSupplier,
+    public EdgeCreationSemanticChecker(IObjectSearchService objectSearchService, IIdentityService identityService,
+            Supplier<IEditingContext> editingContextSupplier, EClass expectedType,
+            Supplier<EObject> expectedOwnerSupplier,
             EReference containmentFeature) {
-        super(objectService, editingContextSupplier, expectedType, expectedOwnerSupplier, containmentFeature);
+        super(objectSearchService, identityService, editingContextSupplier, expectedType, expectedOwnerSupplier,
+                containmentFeature);
     }
 }

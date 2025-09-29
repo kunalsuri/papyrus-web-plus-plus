@@ -111,7 +111,8 @@ public class UCDSubNodeCreationTest extends NodeCreationTest {
             default -> new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_NAME), mappingType,
                     this.getCapturedNodes());
         };
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_NAME), containmentReference);
     }
 
@@ -149,7 +150,8 @@ public class UCDSubNodeCreationTest extends NodeCreationTest {
         String mappingType = UCDMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(containerName), mappingType,
                 this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(containerName), containmentReference);
         this.createSubNode(containerName, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }

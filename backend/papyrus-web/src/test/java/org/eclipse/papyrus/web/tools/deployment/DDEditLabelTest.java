@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -115,7 +115,8 @@ public class DDEditLabelTest extends EditLabelTest {
             default -> NEW_LABEL;
         };
         LabelGraphicalChecker graphicalChecker = new LabelGraphicalChecker(expectedGraphicalLabel);
-        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectService(), this::getEditingContext, NEW_LABEL);
+        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectSearchService(),
+                this::getEditingContext, NEW_LABEL);
         this.editLabel(elementName, NEW_LABEL, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 }

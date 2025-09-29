@@ -169,16 +169,16 @@ public class PRDSemanticDropTest extends SemanticDropTest {
         } else {
             graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, null, PRDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
         }
-        this.semanticDropOnDiagram(this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnDiagram(this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @Test
     public void testSemanticDropMetaclassOnDiagram() {
         ElementImport elementToDrop = (ElementImport) this.createSemanticElement(this.getRootSemanticElement(), UML.getNamespace_ElementImport(), UML.getElementImport(), "");
-        String elementToDropId = this.getObjectService().getId(elementToDrop);
+        String elementToDropId = this.getIdentityService().getId(elementToDrop);
         IEMFEditingContext editingContext = (IEMFEditingContext) this.getEditingContext();
         // Reload the elementToDrop from the current editing context.
-        Optional<Object> optObject = this.getObjectService().getObject(editingContext, elementToDropId);
+        Optional<Object> optObject = getObjectSearchService().getObject(editingContext, elementToDropId);
         assertThat(optObject).isPresent();
         assertThat(optObject.get()).isInstanceOf(EObject.class);
         elementToDrop = (ElementImport) optObject.get();
@@ -193,7 +193,7 @@ public class PRDSemanticDropTest extends SemanticDropTest {
         this.diagramEventSubscriptionRunner.createSubscription(this.editingContextId, this.representationId);
 
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, null, PRDMappingTypes.PRD_METACLASS, this.getCapturedNodes());
-        this.semanticDropOnDiagram(this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnDiagram(this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -218,7 +218,7 @@ public class PRDSemanticDropTest extends SemanticDropTest {
                     PRDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         }
-        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -243,7 +243,7 @@ public class PRDSemanticDropTest extends SemanticDropTest {
                     PRDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         }
-        this.semanticDropOnContent(PROFILE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(PROFILE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
 
     }
 
@@ -251,10 +251,10 @@ public class PRDSemanticDropTest extends SemanticDropTest {
     public void testSemanticDropMetaclassOnProfile() {
         this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getProfile()), PROFILE_CONTAINER);
         ElementImport elementToDrop = (ElementImport) this.createSemanticElement(this.findSemanticElementByName(PROFILE_CONTAINER), UML.getNamespace_ElementImport(), UML.getElementImport(), "");
-        String elementToDropId = this.getObjectService().getId(elementToDrop);
+        String elementToDropId = this.getIdentityService().getId(elementToDrop);
         EditingContext editingContext = (EditingContext) this.getEditingContext();
         // Reload the elementToDrop from the current editing context.
-        Optional<Object> optObject = this.getObjectService().getObject(editingContext, elementToDropId);
+        Optional<Object> optObject = getObjectSearchService().getObject(editingContext, elementToDropId);
         assertThat(optObject).isPresent();
         assertThat(optObject.get()).isInstanceOf(EObject.class);
         elementToDrop = (ElementImport) optObject.get();
@@ -270,7 +270,7 @@ public class PRDSemanticDropTest extends SemanticDropTest {
 
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROFILE_CONTAINER),
                 PRDMappingTypes.PRD_METACLASS_SHARED, this.getCapturedNodes());
-        this.semanticDropOnContent(PROFILE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(PROFILE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -289,7 +289,8 @@ public class PRDSemanticDropTest extends SemanticDropTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.getSubNode(CLASS_CONTAINER, compartmentName),
                 PRDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
-        this.semanticDropOnContentCompartment(CLASS_CONTAINER, compartmentName, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContentCompartment(CLASS_CONTAINER, compartmentName,
+                this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -308,7 +309,8 @@ public class PRDSemanticDropTest extends SemanticDropTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.getSubNode(STEREOTYPE_CONTAINER, compartmentName),
                 PRDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
-        this.semanticDropOnContentCompartment(STEREOTYPE_CONTAINER, compartmentName, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContentCompartment(STEREOTYPE_CONTAINER, compartmentName,
+                this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -327,7 +329,8 @@ public class PRDSemanticDropTest extends SemanticDropTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.getSubNode(DATA_TYPE_CONTAINER, compartmentName),
                 PRDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
-        this.semanticDropOnContentCompartment(DATA_TYPE_CONTAINER, compartmentName, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContentCompartment(DATA_TYPE_CONTAINER, compartmentName,
+                this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -339,7 +342,8 @@ public class PRDSemanticDropTest extends SemanticDropTest {
         String compartmentName = ENUMERATION_LITERAL_COMPARTMENT;
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.getSubNode(ENUMERATION_CONTAINER, compartmentName),
                 PRDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
-        this.semanticDropOnContentCompartment(ENUMERATION_CONTAINER, compartmentName, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContentCompartment(ENUMERATION_CONTAINER, compartmentName,
+                this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest

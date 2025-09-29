@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,7 +18,6 @@ import java.util.List;
 import org.eclipse.papyrus.web.application.pathmap.services.StaticPathmapResourceRegistry;
 import org.eclipse.papyrus.web.application.pathmap.services.api.IPathMapProvider;
 import org.eclipse.papyrus.web.application.pathmap.services.api.IStaticPathmapResourceRegistry;
-import org.eclipse.sirius.components.core.api.IObjectService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
 public class PathMapConfiguration {
 
     @Bean
-    public IStaticPathmapResourceRegistry pathmapDescriptionService(List<IPathMapProvider> pathmapProviders, IObjectService objectService) {
+    public IStaticPathmapResourceRegistry pathmapDescriptionService(List<IPathMapProvider> pathmapProviders) {
         StaticPathmapResourceRegistry registry = new StaticPathmapResourceRegistry();
         pathmapProviders.stream().flatMap(provider -> provider.getPathmaps().stream()).forEach(pathMap -> {
             registry.add(pathMap.getResourceURIOpaquePart(), pathMap.getLocalPath());

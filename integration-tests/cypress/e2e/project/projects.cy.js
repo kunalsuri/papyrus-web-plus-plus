@@ -10,7 +10,6 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
-
 const projectName = `Cypress Project - projects`;
 
 describe('/projects', () => {

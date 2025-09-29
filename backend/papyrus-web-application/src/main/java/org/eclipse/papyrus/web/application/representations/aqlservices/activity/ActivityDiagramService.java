@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -47,7 +47,9 @@ import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNode
 import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
@@ -102,13 +104,17 @@ public class ActivityDiagramService extends AbstractDiagramService {
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
 
     /**
      * Initializes the service with the provided parameters.
      *
-     * @param objectService
-     *            the service used to manipulate objects
+     * @param identityService
+     *            the service in charge of getting the identity of an object
+     * @param labelService
+     *            the service in charge of getting labels and images of an object
+     * @param objectSearchService
+     *            the service in charge of getting an object from its id
      * @param diagramNavigationService
      *            the service used to navigate in the diagram
      * @param diagramOperationsService
@@ -120,17 +126,21 @@ public class ActivityDiagramService extends AbstractDiagramService {
      * @param logger
      *            Logger used to report errors and warnings to the user
      */
-    public ActivityDiagramService(IObjectService objectService, IDiagramNavigationService diagramNavigationService, IDiagramOperationsService diagramOperationsService,
+    // CHECKSTYLE:OFF Injected parameters
+    public ActivityDiagramService(IIdentityService identityService, ILabelService labelService, IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService,
+            IDiagramOperationsService diagramOperationsService,
             IEditableChecker editableChecker, IViewDiagramDescriptionService viewDiagramService, ILogger logger) {
-        super(objectService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
+        // CHECKSTYLE:ON Injected parameters
+        super(identityService, labelService, objectSearchService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
         this.logger = logger;
     }
 
     @Override
     protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ActivitySemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ActivitySemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -139,8 +149,9 @@ public class ActivityDiagramService extends AbstractDiagramService {
     @Override
     protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ActivityGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ActivityGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -298,7 +309,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      *            the view on which the tool is applied
      * @param diagramContext
      *            the diagram context
-     * @param capturedNodeDescription
+     * @param capturedNodeDescriptions
      *            the {@link NodeDescription}s
      */
     public EObject createActivityNodeAD(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
@@ -385,7 +396,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
     /**
      * Find parent {@link Activity}.
      *
-     * @param editElement
+     * @param element
      *            {@link ActivityPartition} element
      * @return {@code null} if {@link Activity} not found
      */
@@ -579,7 +590,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      *
      * @param container
      *            the container that should contains the new object to create
-     * @param objectToCreate
+     * @param eClassToCreate
      *            the EClass defining the type of the object to create
      * @return {@code true} if the object can be created, {@code false} otherwise
      */
@@ -626,7 +637,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
                     .anyMatch(viewDeletionRequest -> Objects.equals(viewDeletionRequest.getElementId(), previousDecisionNode.get(0).getId()));
         }
         isCreatingDecisionNode = diagramContext.getViewCreationRequests().stream() //
-                .anyMatch(viewCreationRequest -> Objects.equals(viewCreationRequest.getTargetObjectId(), this.getObjectService().getId(decisionNode)));
+                .anyMatch(viewCreationRequest -> Objects.equals(viewCreationRequest.getTargetObjectId(), this.getIdentityService().getId(decisionNode)));
         boolean showDecisionNodeNote = false;
         if (!previousDecisionNode.isEmpty() && !isDeletingDecisionNode) {
             // The DecisionNode was already displayed on the diagram, and we aren't currently deleting it. In this case

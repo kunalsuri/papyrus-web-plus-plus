@@ -133,7 +133,7 @@ public class UCDSemanticDropTest extends SemanticDropTest {
             default -> new NodeCreationGraphicalChecker(this::getDiagram, null, UCDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
         };
 
-        this.semanticDropOnDiagram(this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnDiagram(this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -149,7 +149,7 @@ public class UCDSemanticDropTest extends SemanticDropTest {
             default -> new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER),
                     UCDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
         };
-        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -160,7 +160,7 @@ public class UCDSemanticDropTest extends SemanticDropTest {
         EObject elementToDrop = this.createSemanticElement(parentElement, containmentReference, elementType, elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(CLASS_CONTAINER),
                 UCDMappingTypes.getMappingTypeAsSubNode(elementType), this.getCapturedNodes());
-        this.semanticDropOnContent(CLASS_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(CLASS_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest

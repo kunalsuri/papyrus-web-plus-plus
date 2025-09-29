@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,10 +15,8 @@ package org.eclipse.papyrus.web.graphics.services.api;
 
 import java.util.Optional;
 
-import org.eclipse.sirius.components.core.api.IObjectService;
-
 /**
- * Service in charge of providing a way to override some image in the {@link IObjectService#getImagePath(Object)}.
+ * Service in charge of providing a way to override some imageq.
  *
  * @author Arthur Daussy
  */

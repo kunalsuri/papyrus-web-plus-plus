@@ -276,7 +276,7 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
         this.documentId = this.documentCreator.createDocument(this.editingContextId, this.documentName, UMLStereotypeProvider.EMPTY_UML);
         this.rootObjectId = this.rootElementCreator.createRootObject(UMLPackage.eNS_URI, this.rootElementEClass.getName(), this.documentId, this.editingContextId.toString());
         EObject intermediateRoot = this.createSemanticElement(this.getRootSemanticElement(), UML.getPackage_PackagedElement(), intermediateRootType, intermediateRootType.getName());
-        this.intermediateRootObjectId = this.getObjectService().getId(intermediateRoot);
+        this.intermediateRootObjectId = this.getIdentityService().getId(intermediateRoot);
         this.representationId = this.representationCreator.createRepresentation(this.editingContextId, this.intermediateRootObjectId, this.representationName, this.representationName);
         this.diagramEventSubscriptionRunner.createSubscription(this.editingContextId, this.representationId);
         this.applyEditLabelTool(this.getDiagram().getNodes().get(0).getInsideLabel().getId(), intermediateRootName);
@@ -421,7 +421,6 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      *            the identifier of the label to edit
      * @param newLabel
      *            the new value to set for the edited label
-     * @see Node#getLabel()
      * @see Edge#getCenterLabel()
      * @see PapyrusEditLabelMutationRunner
      */
@@ -578,7 +577,7 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      */
     public NamedElement findSemanticElementByName(String semanticElementName) {
         IEditingContext editingContext = this.getEditingContext();
-        Optional<Object> optObject = this.getObjectService().getObject(editingContext, this.rootObjectId.toString());
+        Optional<Object> optObject = this.getObjectSearchService().getObject(editingContext, this.rootObjectId);
         assertThat(optObject).isPresent();
         assertThat(optObject.get()).isInstanceOf(EObject.class);
         EObject rootEObject = (EObject) optObject.get();
@@ -614,7 +613,7 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      */
     public EObject findSemanticElementById(String semanticId) {
         IEditingContext editingContext = this.getEditingContext();
-        Optional<Object> optObject = this.getObjectService().getObject(editingContext, semanticId);
+        Optional<Object> optObject = this.getObjectSearchService().getObject(editingContext, semanticId);
         assertThat(optObject).as("The semantic model doesn't contain an element with id " + semanticId).isPresent();
         return (EObject) optObject.get();
     }
@@ -889,7 +888,8 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      */
     public EObject getRootSemanticElement() {
         IEditingContext editingContext = this.getEditingContext();
-        Optional<Object> optObject = this.getObjectService().getObject(editingContext, this.rootObjectId.toString());
+        Optional<Object> optObject = this.getObjectSearchService()
+                .getObject(editingContext, this.rootObjectId.toString());
         assertThat(optObject).isPresent();
         assertThat(optObject.get()).isInstanceOf(EObject.class);
         return (EObject) optObject.get();
@@ -1029,11 +1029,12 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      * @return the created element
      */
     protected EObject createSemanticElement(EObject parentElement, EReference containmentReference, EClass type, String name) {
-        String parentElementId = this.getObjectService().getId(parentElement);
+        String parentElementId = this.getIdentityService().getId(parentElement);
         int numberOfChildren = ((List<?>) parentElement.eGet(containmentReference)).size();
         this.applyCreateChildTool(parentElementId, containmentReference, type);
         IEditingContext editingContext = this.getEditingContext();
-        EObject updatedParentElement = (EObject) this.getObjectService().getObject(editingContext, parentElementId).get();
+        EObject updatedParentElement = (EObject) this.getObjectSearchService()
+                .getObject(editingContext, parentElementId).get();
         EObject createdObject = (EObject) ((List<?>) updatedParentElement.eGet(containmentReference)).get(numberOfChildren);
         if (createdObject instanceof NamedElement namedElement) {
             namedElement.setName(name);

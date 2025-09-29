@@ -182,7 +182,8 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
         } else {
             graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PACKAGE_CONTAINER));
         }
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + PACKAGE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -200,7 +201,8 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
         } else {
             graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalContentIfExistByLabel(PROFILE_CONTAINER));
         }
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PROFILE_CONTAINER), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + PROFILE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -217,7 +219,8 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
             compartmentMapping = null;
         }
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.getSubNode(CLASS_CONTAINER, compartmentMapping));
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(CLASS_CONTAINER), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + CLASS_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -234,7 +237,8 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
             compartmentMapping = null;
         }
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.getSubNode(STEREOTYPE_CONTAINER, compartmentMapping));
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(STEREOTYPE_CONTAINER), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + STEREOTYPE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -251,7 +255,8 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
             compartmentMapping = null;
         }
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.getSubNode(DATA_TYPE_CONTAINER, compartmentMapping));
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(DATA_TYPE_CONTAINER), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + DATA_TYPE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -261,7 +266,8 @@ public class PRDSubNodeGraphicalDeletionTest extends NodeDeletionTest {
     public void testDeleteGraphicalNodeInEnumeration(EClass elementType, EReference containmentReference) {
         final String compartmentMapping = ENUMERATION_LITERAL_COMPARTMENT;
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.getSubNode(ENUMERATION_CONTAINER, compartmentMapping));
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(ENUMERATION_CONTAINER), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + ENUMERATION_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }

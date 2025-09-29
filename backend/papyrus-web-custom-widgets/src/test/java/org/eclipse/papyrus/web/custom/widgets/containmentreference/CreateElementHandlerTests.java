@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.web.custom.widgets.IAQLInterpreterProvider;
 import org.eclipse.sirius.components.core.api.IEditService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
 import org.eclipse.sirius.components.view.emf.form.api.IViewFormDescriptionSearchService;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class CreateElementHandlerTests {
     @Test
     public void testCreateElementInReference() {
         String descriptionId = "siriusComponents://formElementDescription?kind=ContainmentReferenceWidgetDescription&sourceKind=view&sourceId=2a52b45a-ba2e-36b2-8b65-1784bc54e5c0&sourceElementId=40a866b8-aa89-4460-9193-04cc19216ff3";
-        ContainmentReferenceCreateElementHandler handler = new ContainmentReferenceCreateElementHandler(new IEMFKindService.NoOp(), new IEditService.NoOp(), new IObjectService.NoOp(),
+        ContainmentReferenceCreateElementHandler handler = new ContainmentReferenceCreateElementHandler(new IEMFKindService.NoOp(), new IEditService.NoOp(), new ILabelService.NoOp(),
                 new IViewFormDescriptionSearchService.NoOp(), new IAQLInterpreterProvider.NoOp(), (EObject instance, String featureName, Object value) -> null,
                 (EObject instance, String featureName) -> null);
 
@@ -47,7 +47,7 @@ public class CreateElementHandlerTests {
     @Test
     public void testCreateElementInReferenceInvalidSourceKind() {
         String descriptionId = "siriusComponents://formElementDescription?kind=ContainmentReferenceWidgetDescription&sourceKind=NOT_VIEW_MODEL&sourceId=2a52b45a-ba2e-36b2-8b65-1784bc54e5c0&sourceElementId=40a866b8-aa89-4460-9193-04cc19216ff3";
-        ContainmentReferenceCreateElementHandler handler = new ContainmentReferenceCreateElementHandler(new IEMFKindService.NoOp(), new IEditService.NoOp(), new IObjectService.NoOp(),
+        ContainmentReferenceCreateElementHandler handler = new ContainmentReferenceCreateElementHandler(new IEMFKindService.NoOp(), new IEditService.NoOp(), new ILabelService.NoOp(),
                 new IViewFormDescriptionSearchService.NoOp(), new IAQLInterpreterProvider.NoOp(), (EObject instance, String featureName, Object value) -> null,
                 (EObject instance, String featureName) -> null);
 
@@ -60,7 +60,7 @@ public class CreateElementHandlerTests {
     @Test
     public void testCreateElementInReferenceInvalidKind() {
         String descriptionId = "siriusComponents://formElementDescription?kind=UnknownWidgetDescription&sourceKind=view&sourceId=2a52b45a-ba2e-36b2-8b65-1784bc54e5c0&sourceElementId=40a866b8-aa89-4460-9193-04cc19216ff3";
-        ContainmentReferenceCreateElementHandler handler = new ContainmentReferenceCreateElementHandler(new IEMFKindService.NoOp(), new IEditService.NoOp(), new IObjectService.NoOp(),
+        ContainmentReferenceCreateElementHandler handler = new ContainmentReferenceCreateElementHandler(new IEMFKindService.NoOp(), new IEditService.NoOp(), new ILabelService.NoOp(),
                 new IViewFormDescriptionSearchService.NoOp(), new IAQLInterpreterProvider.NoOp(), (EObject instance, String featureName, Object value) -> null,
                 (EObject instance, String featureName) -> null);
 

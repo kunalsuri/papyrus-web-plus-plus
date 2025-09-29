@@ -39,7 +39,9 @@ import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
 import org.eclipse.sirius.components.diagrams.renderer.DiagramRenderingCache;
 import org.eclipse.sirius.components.representations.Element;
@@ -64,7 +66,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
 
     /**
      * Factory used to create UML elements.
@@ -74,8 +76,12 @@ public class ComponentDiagramService extends AbstractDiagramService {
     /**
      * Constructor.
      *
-     * @param objectService
-     *            service used to retrieve semantic object from a Diagram node
+     * @param identityService
+     *            the service in charge of getting the identity of an object
+     * @param labelService
+     *            the service in charge of getting labels and images of an object
+     * @param objectSearchService
+     *            the service in charge of getting an object from its id
      * @param diagramNavigationService
      *            helper that must introspect the current diagram's structure and its description
      * @param diagramOperationsService
@@ -88,17 +94,21 @@ public class ComponentDiagramService extends AbstractDiagramService {
      * @param logger
      *            Logger used to report errors and warnings to the user
      */
-    public ComponentDiagramService(IObjectService objectService, IDiagramNavigationService diagramNavigationService, IDiagramOperationsService diagramOperationsService,
+    // CHECKSTYLE:OFF Injected parameters
+    public ComponentDiagramService(IIdentityService identityService, ILabelService labelService, IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService,
+            IDiagramOperationsService diagramOperationsService,
             IEditableChecker editableChecker, IViewDiagramDescriptionService viewDiagramService, ILogger logger) {
-        super(objectService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
+        // CHECKSTYLE:ON Injected parameters
+        super(identityService, labelService, objectSearchService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
         this.logger = logger;
     }
 
     @Override
     protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ComponentSemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ComponentSemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -107,8 +117,9 @@ public class ComponentDiagramService extends AbstractDiagramService {
     @Override
     protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ComponentGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ComponentGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -150,7 +161,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the selected Graphical container
      * @param diagramContext
      *            the diagram context
-     * @param capturedNodeDescription
+     * @param capturedNodeDescriptions
      *            the {@link NodeDescription}s
      * @return the created {@link Port}
      */
@@ -168,7 +179,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the selected Graphical container
      * @param diagramContext
      *            the diagram context
-     * @param capturedNodeDescription
+     * @param capturedNodeDescriptions
      *            the {@link NodeDescription}s
      * @return the created {@link Port}
      */
@@ -186,7 +197,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the selected Graphical container
      * @param diagramContext
      *            the diagram context
-     * @param capturedNodeDescription
+     * @param capturedNodeDescriptions
      *            the {@link NodeDescription}s
      * @return the created {@link Property}
      */
@@ -206,7 +217,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the selected Graphical container
      * @param diagramContext
      *            the diagram context
-     * @param capturedNodeDescription
+     * @param capturedNodeDescriptions
      *            the {@link NodeDescription}s
      * @return the created {@link Property}
      */
@@ -297,8 +308,8 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the visual target of the edge candidate
      * @param cache
      *            the {@link DiagramRenderingCache}
-     * @param editableChecker
-     *            Object that check if an element can be edited
+     * @param editingContext
+     *            the editing context
      * @return {@code true} if the edge should be displayed, {@code false} otherwise
      */
     public boolean shouldDisplayConnector(Connector connector, EObject semanticSource, EObject semanticTarget, Element visualSource, Element visualTarget, DiagramRenderingCache cache,
@@ -319,7 +330,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
     private Optional<Object> getCommonVisualAncestor(Element visualSource, Element visualTarget, DiagramRenderingCache cache, IEditingContext editinContext) {
         return new DiagramElementHelper(visualSource).getCommonAncestor(new DiagramElementHelper(visualTarget), cache)//
                 .filter(element -> element.getId().isPresent())//
-                .flatMap(ancestor -> ancestor.getElementTarget(this.getObjectService(), editinContext));
+                .flatMap(ancestor -> ancestor.getElementTarget(this.getObjectSearchService(), editinContext));
     }
 
     /**
@@ -342,11 +353,11 @@ public class ComponentDiagramService extends AbstractDiagramService {
         if (partWithPortSource != null) {
             // connector source is a Port on a Property
             DiagramElementHelper visualSourceHelper = new DiagramElementHelper(visualElement);
-            Optional<Object> target = visualSourceHelper.getElementTarget(this.getObjectService(), editingContext);
+            Optional<Object> target = visualSourceHelper.getElementTarget(this.getObjectSearchService(), editingContext);
 
             if (target.isPresent() && target.get() instanceof Port) {
                 shouldDiplayConnector = visualSourceHelper.getParent(cache)//
-                        .flatMap(parent -> parent.getElementTarget(this.getObjectService(), editingContext))//
+                        .flatMap(parent -> parent.getElementTarget(this.getObjectSearchService(), editingContext))//
                         .map(sem -> sem == partWithPortSource).orElse(false);
             } else {
                 shouldDiplayConnector = false;

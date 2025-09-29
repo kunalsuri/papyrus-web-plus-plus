@@ -10,6 +10,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
+import { Project } from '../../../pages/Project';
 
 const projectName = 'Cypress Project - project-context-menu';
 
@@ -18,7 +19,7 @@ describe('/projects/:projectId/edit - Project Context Menu', () => {
     cy.deleteProjectByName(projectName);
     cy.createProject(projectName).then((res) => {
       const projectId = res.body.data.createProject.project.id;
-      cy.visit(`/projects/${projectId}/edit`);
+      new Project().visit(projectId);
     });
   });
 
@@ -27,17 +28,17 @@ describe('/projects/:projectId/edit - Project Context Menu', () => {
   });
 
   it('shows the project context menu and hides it by clicking outside', () => {
-    cy.getByTestId('more').click({ force: true });
-    cy.getByTestId('navbar-contextmenu').should('be.visible');
+    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    projectNavBar.getRenameButton().should('be.visible');
     cy.get('body').click();
-    cy.getByTestId('navbar-contextmenu').should('not.exist');
+    projectNavBar.getRenameButton().should('not.exist');
   });
 
   it('shows the project context menu and hides it by typing esc', () => {
-    cy.getByTestId('more').click({ force: true });
-    cy.getByTestId('navbar-contextmenu').should('be.visible');
-    cy.getByTestId('navbar-contextmenu').type('{esc}');
-    cy.getByTestId('navbar-contextmenu').should('not.exist');
+    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    projectNavBar.getRenameButton().should('be.visible');
+    cy.get('body').type('{esc}');
+    projectNavBar.getRenameButton().should('not.exist');
   });
 
   it('contains a download link', () => {
@@ -46,17 +47,16 @@ describe('/projects/:projectId/edit - Project Context Menu', () => {
   });
 
   it('can open the delete project modal', () => {
-    cy.getByTestId('more').click();
-    cy.getByTestId('navbar-contextmenu').findByTestId('delete').click();
+    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    projectNavBar.getDeleteButton().click();
 
     cy.get('.MuiDialog-container').should('be.visible');
   });
 
   it('can delete a project', () => {
-    cy.getByTestId('more').click();
-    cy.getByTestId('navbar-contextmenu').findByTestId('delete').click();
+    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    projectNavBar.getDeleteButton().click();
 
-    cy.getByTestId('delete-project').click();
     cy.url().should('match', new RegExp(Cypress.config().baseUrl + '/projects'));
   });
 });

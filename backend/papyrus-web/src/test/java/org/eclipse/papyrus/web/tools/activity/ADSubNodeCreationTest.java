@@ -476,7 +476,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
     public void testCreateNodeInActivity(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
         String mappingType = ADMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(expectedType, mappingType, ROOT_ACTIVITY);
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(ROOT_ACTIVITY), containmentReference);
         this.createSubNode(ROOT_ACTIVITY, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -496,7 +497,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
         } else {
             semanticOwnerLabel = ROOT_ACTIVITY;
         }
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(semanticOwnerLabel), containmentReference);
         this.createSubNode(ACTIVITY_PARTITION_LABEL, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -508,7 +510,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getConditionalNode()), CONDITIONAL_NODE_LABEL);
         String mappingType = ADMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(expectedType, mappingType, CONDITIONAL_NODE_LABEL);
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(CONDITIONAL_NODE_LABEL), containmentReference);
         this.createSubNode(CONDITIONAL_NODE_LABEL, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -526,7 +529,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
             mappingType = ADMappingTypes.getMappingTypeAsSubNode(expectedType);
         }
         NodeCreationGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(expectedType, mappingType, EXPANSION_REGION_LABEL);
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(EXPANSION_REGION_LABEL), containmentReference);
         this.createSubNode(EXPANSION_REGION_LABEL, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -546,7 +550,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
         } else {
             semanticOwnerLabel = ROOT_ACTIVITY;
         }
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(semanticOwnerLabel), containmentReference);
         this.createSubNode(INTERRUPTIBLE_ACTIVITY_REGION_LABEL, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -558,7 +563,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getLoopNode()), LOOP_NODE_LABEL);
         String mappingType = ADMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(expectedType, mappingType, LOOP_NODE_LABEL);
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(LOOP_NODE_LABEL), containmentReference);
         this.createSubNode(LOOP_NODE_LABEL, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -570,7 +576,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getSequenceNode()), SEQUENCE_NODE_LABEL);
         String mappingType = ADMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(expectedType, mappingType, SEQUENCE_NODE_LABEL);
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(SEQUENCE_NODE_LABEL), containmentReference);
         this.createSubNode(SEQUENCE_NODE_LABEL, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -582,7 +589,8 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.STRUCTURED_ACTIVITY_NODE, UML.getStructuredActivityNode()), STRUCTURED_ACTIVITY_NODE_LABEL);
         String mappingType = ADMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(expectedType, mappingType, STRUCTURED_ACTIVITY_NODE_LABEL);
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(STRUCTURED_ACTIVITY_NODE_LABEL), containmentReference);
         this.createSubNode(STRUCTURED_ACTIVITY_NODE_LABEL, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -594,7 +602,9 @@ public class ADSubNodeCreationTest extends NodeCreationTest {
         this.createNodeWithLabel(this.rootActivityId, parentCreationTool, parentLabel);
         String mappingType = ADMappingTypes.getMappingTypeAsSubNode(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(expectedType, mappingType, parentLabel);
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType, () -> this.findSemanticElementByName(parentLabel),
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
+                () -> this.findSemanticElementByName(parentLabel),
                 containmentReference);
         this.createSubNode(parentLabel, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }

@@ -13,27 +13,23 @@
  *******************************************************************************/
 package org.eclipse.papyrus.web.application.uml;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.ECrossReferenceAdapter;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.papyrus.uml.domain.services.IEditableChecker;
 import org.eclipse.papyrus.uml.domain.services.destroy.DestroyerStatus;
 import org.eclipse.papyrus.uml.domain.services.destroy.ElementDestroyer;
 import org.eclipse.papyrus.uml.domain.services.destroy.IDestroyer;
-import org.eclipse.papyrus.uml.domain.services.properties.ILogger;
 import org.eclipse.papyrus.uml.domain.services.status.State;
+import org.eclipse.sirius.components.core.api.ChildCreationDescription;
+import org.eclipse.sirius.components.core.api.IDefaultEditService;
 import org.eclipse.sirius.components.core.api.IEditService;
 import org.eclipse.sirius.components.core.api.IEditServiceDelegate;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
-import org.eclipse.sirius.components.core.api.IObjectService;
-import org.eclipse.sirius.components.emf.services.DefaultEditService;
-import org.eclipse.sirius.components.emf.services.ISuggestedRootObjectTypesProvider;
-import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
-import org.eclipse.sirius.components.emf.services.messages.IEMFMessageService;
 import org.eclipse.uml2.uml.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,21 +41,20 @@ import org.springframework.stereotype.Service;
  * @author Laurent Fasani
  */
 @Service
-public class UMLEditServiceDelegate extends DefaultEditService implements IEditServiceDelegate {
+public class UMLEditServiceDelegate implements IEditServiceDelegate {
+    
     private static final String ITEM_SEP = ",";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UMLEditServiceDelegate.class);
 
-    private final ILogger logger;
-
     private final IEditableChecker editableChecker;
 
+    private final IDefaultEditService defaultEditService;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
-    public UMLEditServiceDelegate(IEMFKindService emfKindService, ComposedAdapterFactory composedAdapterFactory, Optional<ISuggestedRootObjectTypesProvider> optionalSuggestedRootObjectsProvider,
-            IObjectService objectService, IFeedbackMessageService feedbackMessageService, IEMFMessageService messageService, ILogger logger, IEditableChecker editableChecker) {
-        super(emfKindService, composedAdapterFactory, optionalSuggestedRootObjectsProvider, objectService, feedbackMessageService, messageService);
-        this.logger = logger;
+    public UMLEditServiceDelegate(IEditableChecker editableChecker, IDefaultEditService defaultEditService) {
         this.editableChecker = editableChecker;
+        this.defaultEditService = defaultEditService;
     }
 
     @Override
@@ -73,6 +68,31 @@ public class UMLEditServiceDelegate extends DefaultEditService implements IEditS
     }
 
     @Override
+    public List<ChildCreationDescription> getRootCreationDescriptions(IEditingContext editingContext, String domainId,
+            boolean suggested, String referenceKind) {
+        return defaultEditService.getRootCreationDescriptions(editingContext, domainId, suggested, referenceKind);
+    }
+
+    @Override
+    public List<ChildCreationDescription> getChildCreationDescriptions(IEditingContext editingContext, String kind,
+            String referenceKind) {
+        return defaultEditService.getChildCreationDescriptions(editingContext, kind, referenceKind);
+    }
+
+    @Override
+    public Optional<Object> createChild(IEditingContext editingContext, Object object,
+            String childCreationDescriptionId) {
+        return defaultEditService.createChild(editingContext, object, childCreationDescriptionId);
+    }
+
+    @Override
+    public Optional<Object> createRootObject(IEditingContext editingContext, UUID documentId, String domainId,
+            String rootObjectCreationDescriptionId) {
+        return defaultEditService.createRootObject(editingContext, documentId, domainId,
+                rootObjectCreationDescriptionId);
+    }
+
+    @Override
     public void delete(Object semanticElement) {
         if (semanticElement instanceof EObject semanticEObject) {
             ECrossReferenceAdapter adapter = this.getECrossReferenceAdapter(semanticEObject);
@@ -83,20 +103,9 @@ public class UMLEditServiceDelegate extends DefaultEditService implements IEditS
                         .map(Object::toString)
                         .collect(Collectors.joining(ITEM_SEP));
                 String errorMessage = destroyerStatus.getMessage() + ": " + elements;
-                this.logWarnMessage(errorMessage);
+                LOGGER.warn(errorMessage);
             }
         }
-    }
-
-    /**
-     * Log a given message in developer logger and user interface.
-     *
-     * @param message
-     *         the message to display
-     */
-    private void logWarnMessage(String message) {
-        LOGGER.warn(message);
-        this.logger.log(message, ILogger.ILogLevel.WARNING);
     }
 
     private ECrossReferenceAdapter getECrossReferenceAdapter(EObject source) {

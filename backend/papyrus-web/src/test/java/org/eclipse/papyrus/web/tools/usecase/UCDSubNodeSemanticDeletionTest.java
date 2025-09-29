@@ -119,7 +119,8 @@ public class UCDSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("packageParameters")
     public void testDeleteSemanticNodeInPackage(EClass elementType, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER));
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), containmentReference);
         this.deleteSemanticNode(elementType.getName() + PACKAGE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -128,7 +129,8 @@ public class UCDSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("packageHolderParameters")
     public void testDeleteSemanticNodeHolderInPackage(EClass elementType, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker = new HolderDeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER));
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), containmentReference);
         this.deleteSemanticNode(elementType.getName() + PACKAGE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -137,7 +139,8 @@ public class UCDSubNodeSemanticDeletionTest extends NodeDeletionTest {
     @MethodSource("classParameters")
     public void testDeleteSemanticNodeInClass(EClass elementType, EReference containmentReference) {
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(CLASS_CONTAINER));
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(CLASS_CONTAINER), containmentReference);
         this.deleteSemanticNode(elementType.getName() + CLASS_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }

@@ -38,14 +38,19 @@ import org.eclipse.papyrus.web.application.explorer.PapyrusTreeFilterProvider;
 import org.eclipse.papyrus.web.application.readonly.services.api.IPapyrusReadOnlyChecker;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationImageProvider;
 import org.eclipse.sirius.components.core.CoreImageConstants;
+import org.eclipse.sirius.components.core.api.IContentService;
 import org.eclipse.sirius.components.core.api.IDefaultObjectSearchService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.core.api.IURLParser;
+import org.eclipse.sirius.components.core.api.labels.StyledString;
 import org.eclipse.sirius.components.domain.NamedElement;
 import org.eclipse.sirius.components.emf.ResourceMetadataAdapter;
 import org.eclipse.sirius.components.emf.services.JSONResourceFactory;
 import org.eclipse.sirius.components.emf.services.api.IEMFEditingContext;
+import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
 import org.eclipse.sirius.components.trees.TreeItem;
 import org.eclipse.sirius.web.application.UUIDParser;
 import org.eclipse.sirius.web.application.editingcontext.EditingContext;
@@ -102,7 +107,7 @@ public class UMLDefaultTreeServices {
 
     private final List<IRepresentationImageProvider> representationImageProviders;
 
-    private final IObjectService objectService;
+    private final ILabelService labelService;
 
     private final IPapyrusReadOnlyChecker readOnlyChecker;
 
@@ -110,13 +115,31 @@ public class UMLDefaultTreeServices {
 
     private final IDefaultObjectSearchService defaultObjectSearchService;
 
-    public UMLDefaultTreeServices(List<IRepresentationImageProvider> representationImageProviders, IObjectService objectService,
-            IPapyrusReadOnlyChecker readOnlyChecker, IURLParser urlParser, IDefaultObjectSearchService defaultObjectSearchService) {
+    private final IIdentityService identityService;
+
+    private final IContentService contentService;
+
+    private final IEMFKindService kindService;
+
+    private final IObjectSearchService objectSearchService;
+
+    // CHECKSTYLE:OFF Parameters required to be injected
+    public UMLDefaultTreeServices(List<IRepresentationImageProvider> representationImageProviders,
+            ILabelService labelService,
+            IPapyrusReadOnlyChecker readOnlyChecker, IURLParser urlParser,
+            IDefaultObjectSearchService defaultObjectSearchService, IIdentityService identityService,
+            IContentService contentService,
+            IEMFKindService kindService, IObjectSearchService objectSearchService) {
+        // CHECKSTYLE:ON
         this.representationImageProviders = Objects.requireNonNull(representationImageProviders);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.labelService = Objects.requireNonNull(labelService);
         this.readOnlyChecker = Objects.requireNonNull(readOnlyChecker);
         this.urlParser = Objects.requireNonNull(urlParser);
         this.defaultObjectSearchService = Objects.requireNonNull(defaultObjectSearchService);
+        this.identityService = Objects.requireNonNull(identityService);
+        this.contentService = Objects.requireNonNull(contentService);
+        this.kindService = Objects.requireNonNull(kindService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
     }
 
     /**
@@ -230,9 +253,13 @@ public class UMLDefaultTreeServices {
     private List<Object> getComputedChildren(Element element, List<String> ancestorsIds, int index) {
         final List<Object> result;
         if (element instanceof PackageImport pImport && pImport.getImportedPackage() != null) {
-            result = List.of(new ImportedElementTreeItem(pImport.getImportedPackage(), this.objectService.getId(pImport), this.computeUniqueId(ancestorsIds, index)));
+            result = List.of(
+                    new ImportedElementTreeItem(pImport.getImportedPackage(), this.identityService.getId(pImport),
+                            this.computeUniqueId(ancestorsIds, index)));
         } else if (element instanceof ElementImport eImport && eImport.getImportedElement() != null) {
-            result = List.of(new ImportedElementTreeItem(eImport.getImportedElement(), this.objectService.getId(eImport), this.computeUniqueId(ancestorsIds, index)));
+            result = List.of(
+                    new ImportedElementTreeItem(eImport.getImportedElement(), this.identityService.getId(eImport),
+                            this.computeUniqueId(ancestorsIds, index)));
         } else {
             result = List.of();
         }
@@ -241,7 +268,7 @@ public class UMLDefaultTreeServices {
     }
 
     private List<Object> getSemanticChildren(Element element) {
-        return this.filterNonUMLElement(this.objectService.getContents(element));
+        return this.filterNonUMLElement(this.contentService.getContents(element));
     }
 
     private String computeUniqueId(List<String> ancestorIds, int index) {
@@ -306,7 +333,7 @@ public class UMLDefaultTreeServices {
         } else if (self instanceof ImportedElementTreeItem) {
             kind = "ImportedElement";
         } else {
-            kind = this.objectService.getKind(self);
+            kind = this.identityService.getKind(self);
         }
         return kind;
     }
@@ -342,7 +369,7 @@ public class UMLDefaultTreeServices {
         boolean hasChildren = false;
         var optionalEditingContextId = new UUIDParser().parse(editingContext.getId());
         if (optionalEditingContextId.isPresent()) {
-            String id = this.objectService.getId(self);
+            String id = this.identityService.getId(self);
             hasChildren = this.findRepresentationsForTargetObjectId(existingRepresentations, id).findAny().isPresent();
         }
         return hasChildren;
@@ -362,7 +389,7 @@ public class UMLDefaultTreeServices {
         } else if (self instanceof Resource resource) {
             id = resource.getURI().path().substring(1);
         } else if (self instanceof EObject) {
-            id = this.objectService.getId(self);
+            id = this.identityService.getId(self);
         } else if (self instanceof ImportedElementTreeItem importElement) {
             id = this.getImporterElementId(importElement);
         }
@@ -371,7 +398,7 @@ public class UMLDefaultTreeServices {
 
     private String getImporterElementId(ImportedElementTreeItem importElement) {
         return UriComponentsBuilder.fromUriString(PAPYRUS_IMPORTED_ELEMENT_PREFIX)
-                .queryParam(IMPORTED_ELEMENT_ID, this.objectService.getId(importElement.importedElement()))
+                .queryParam(IMPORTED_ELEMENT_ID, this.identityService.getId(importElement.importedElement()))
                 .queryParam(PARENT_ID, importElement.parentElementId())
                 .queryParam(ITEM_ID, importElement.itemId())
                 .encode()
@@ -398,9 +425,17 @@ public class UMLDefaultTreeServices {
         } else if (self instanceof ImportedElementTreeItem importedElement) {
             label = this.getElementLabel(importedElement.importedElement());
         } else if (self instanceof EObject) {
-            label = this.objectService.getLabel(self);
+            label = this.getSimpleLabel(self);
         }
         return label;
+    }
+
+    private String getSimpleLabel(Object input) {
+        StyledString styledLabel = this.labelService.getStyledLabel(input);
+        if (styledLabel != null) {
+            return styledLabel.toString();
+        }
+        return "";
     }
 
     /**
@@ -411,16 +446,16 @@ public class UMLDefaultTreeServices {
      * @return a label
      */
     private String getElementLabel(Element element) {
-        String mainLabel;
+        String mainLabel = null;
 
         if (element instanceof ProfileApplication pApplication) {
-            mainLabel = "<Profile Application> " + this.objectService.getLabel(pApplication.getAppliedProfile());
+            mainLabel = "<Profile Application> " + this.getSimpleLabel(pApplication.getAppliedProfile());
         } else if (element instanceof PackageImport packageImport) {
-            mainLabel = "<Package Import> " + this.objectService.getLabel(packageImport.getImportedPackage());
+            mainLabel = "<Package Import> " + this.getSimpleLabel(packageImport.getImportedPackage());
         } else if (element instanceof ElementImport elementImport) {
-            mainLabel = "<Element Import> " + this.objectService.getLabel(elementImport.getImportedElement());
+            mainLabel = "<Element Import> " + this.getSimpleLabel(elementImport.getImportedElement());
         } else {
-            mainLabel = this.objectService.getLabel(element);
+            mainLabel = this.getSimpleLabel(element);
             // Fallback for elements which are not NamedElement and not properly handled by the Edit framework
             if ((mainLabel == null || mainLabel.isEmpty()) && !(element instanceof NamedElement)) {
                 mainLabel = "<" + splitCamelCase(element.eClass().getName() + ">");
@@ -541,7 +576,7 @@ public class UMLDefaultTreeServices {
             var optionalObject = this.defaultObjectSearchService.getObject(editingContext, treeItemId);
             if (optionalObject.isEmpty()) {
                 // Slow path: fallback to the full algorithm
-                optionalObject = this.objectService.getObject(editingContext, treeItemId);
+                optionalObject = this.objectSearchService.getObject(editingContext, treeItemId);
             }
 
             if (optionalObject.isPresent()) {
@@ -606,7 +641,7 @@ public class UMLDefaultTreeServices {
     private Optional<Element> toElement(Map<String, List<String>> parameters, IEditingContext editingContext) {
         List<String> id = parameters.get(UMLDefaultTreeServices.IMPORTED_ELEMENT_ID);
         if (this.isNonEmpty(id)) {
-            return this.objectService.getObject(editingContext, id.get(0))
+            return this.objectSearchService.getObject(editingContext, id.get(0))
                     .filter(Element.class::isInstance)
                     .map(Element.class::cast);
         }
@@ -627,16 +662,16 @@ public class UMLDefaultTreeServices {
     public List<String> getIconURLs(Object self) {
         List<String> imageURL = List.of(CoreImageConstants.DEFAULT_SVG);
         if (self instanceof EObject) {
-            imageURL = this.objectService.getImagePath(self);
+            imageURL = this.labelService.getImagePaths(self);
         } else if (self instanceof RepresentationMetadata representationMetadata) {
             imageURL = this.representationImageProviders.stream()
                     .map(representationImageProvider -> representationImageProvider.getImageURL(representationMetadata.getKind()))
                     .flatMap(Optional::stream)
                     .toList();
         } else if (self instanceof Resource) {
-            imageURL = List.of("/explorer/Resource.svg");
+            imageURL = List.of("/icons/Resource.svg");
         } else if (self instanceof ImportedElementTreeItem importedElement) {
-            imageURL = this.objectService.getImagePath(importedElement.importedElement());
+            imageURL = this.labelService.getImagePaths(importedElement.importedElement());
         }
         return imageURL;
     }
@@ -678,7 +713,8 @@ public class UMLDefaultTreeServices {
         Object result = null;
 
         if (self instanceof RepresentationMetadata representationMetadata) {
-            result = this.objectService.getObject(editingContext, representationMetadata.getTargetObjectId());
+            result = this.defaultObjectSearchService.getObject(editingContext,
+                    representationMetadata.getTargetObjectId());
         } else if (self instanceof EObject eObject) {
             Object semanticContainer = eObject.eContainer();
             if (semanticContainer == null) {
@@ -687,7 +723,7 @@ public class UMLDefaultTreeServices {
             result = semanticContainer;
         } else if (self instanceof ImportedElementTreeItem importedItem) {
             String parentId = importedItem.parentElementId();
-            result = this.objectService.getObject(editingContext, parentId).orElse(null);
+            result = this.defaultObjectSearchService.getObject(editingContext, parentId).orElse(null);
             // For the moment we only handle imported elements below the PackageImport or the ElementImport
             // Nested imported element can't return a parent here because we can't build the parent
             // ImportedElementTreeItem only from the parentId

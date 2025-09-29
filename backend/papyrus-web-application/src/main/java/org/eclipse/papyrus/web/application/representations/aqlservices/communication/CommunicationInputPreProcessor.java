@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.communication;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.papyrus.uml.domain.services.labels.ElementDefaultNameProvider;
@@ -22,8 +23,9 @@ import org.eclipse.sirius.components.collaborative.api.ChangeKind;
 import org.eclipse.sirius.components.collaborative.api.IInputPreProcessor;
 import org.eclipse.sirius.components.collaborative.dto.CreateRepresentationInput;
 import org.eclipse.sirius.components.core.api.IEditingContext;
+import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.IInput;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.uml2.uml.BehavioredClassifier;
 import org.eclipse.uml2.uml.Interaction;
 import org.eclipse.uml2.uml.Package;
@@ -40,28 +42,32 @@ import reactor.core.publisher.Sinks.Many;
 @Service
 public class CommunicationInputPreProcessor implements IInputPreProcessor {
 
-    private IObjectService objectService;
+    private final IObjectSearchService objectSearchService;
+
+    private final IIdentityService identityService;
 
     /**
      * The constructor.
      *
-     * @param objectService
+     * @param objectSearchService
      *            service used to retrieve semantic target according to node id
      *
      */
-    public CommunicationInputPreProcessor(IObjectService objectService) {
-        this.objectService = objectService;
+    public CommunicationInputPreProcessor(IObjectSearchService objectSearchService, IIdentityService identityService) {
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
+        this.identityService = Objects.requireNonNull(identityService);
     }
 
     @Override
     public IInput preProcess(IEditingContext editingContext, IInput input, Many<ChangeDescription> changeDescriptionSink) {
         if (input instanceof CreateRepresentationInput createRepresentationInput) {
             if (CODDiagramDescriptionBuilder.COD_REP_NAME.equals(createRepresentationInput.representationName())) {
-                Optional<Object> optionalTarget = this.objectService.getObject(editingContext, createRepresentationInput.objectId());
+                Optional<Object> optionalTarget = this.objectSearchService.getObject(editingContext,
+                        createRepresentationInput.objectId());
                 if (this.shouldCreateIntermediateInteraction(optionalTarget)) {
                     Interaction newInteraction = this.createIntermediateInteraction(optionalTarget.get());
                     changeDescriptionSink.tryEmitNext(new ChangeDescription(ChangeKind.SEMANTIC_CHANGE, editingContext.getId(), input));
-                    String interactionIdExplorer = this.objectService.getId(newInteraction);
+                    String interactionIdExplorer = this.identityService.getId(newInteraction);
                     return new CreateRepresentationInput(createRepresentationInput.id(), createRepresentationInput.editingContextId(), createRepresentationInput.representationDescriptionId(),
                             interactionIdExplorer, createRepresentationInput.representationName());
                 }

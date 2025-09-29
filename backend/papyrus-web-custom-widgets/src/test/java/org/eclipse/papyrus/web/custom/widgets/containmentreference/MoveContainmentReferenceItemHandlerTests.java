@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -34,7 +34,7 @@ import org.eclipse.sirius.components.collaborative.forms.api.IFormQueryService;
 import org.eclipse.sirius.components.collaborative.forms.messages.ICollaborativeFormMessageService;
 import org.eclipse.sirius.components.core.api.ErrorPayload;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.core.api.IPayload;
 import org.eclipse.sirius.components.core.api.SuccessPayload;
 import org.eclipse.sirius.components.forms.AbstractWidget;
@@ -133,14 +133,16 @@ public class MoveContainmentReferenceItemHandlerTests {
             }
         };
 
-        IObjectService objectService = new IObjectService.NoOp() {
+        IObjectSearchService objectSearchService = new IObjectSearchService() {
             @Override
             public Optional<Object> getObject(IEditingContext editingContext, String objectId) {
                 return Optional.of(refWidget);
             }
         };
 
-        MoveContainmentReferenceItemEventHandler handler = new MoveContainmentReferenceItemEventHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry(), objectService);
+        MoveContainmentReferenceItemEventHandler handler = new MoveContainmentReferenceItemEventHandler(
+                formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry(),
+                objectSearchService);
         assertThat(handler.canHandle(input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
@@ -216,7 +218,9 @@ public class MoveContainmentReferenceItemHandlerTests {
             }
         };
 
-        MoveContainmentReferenceItemEventHandler handler = new MoveContainmentReferenceItemEventHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry(), new IObjectService.NoOp());
+        MoveContainmentReferenceItemEventHandler handler = new MoveContainmentReferenceItemEventHandler(
+                formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry(),
+                new IObjectSearchService.NoOp());
         assertThat(handler.canHandle(input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();

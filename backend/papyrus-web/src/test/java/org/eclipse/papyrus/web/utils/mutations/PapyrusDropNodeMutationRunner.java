@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -102,6 +102,5 @@ public class PapyrusDropNodeMutationRunner {
                 })))
                 .build();
         ExecutionResult executionResult = this.graphQL.execute(executionInput);
-        assertThat(executionResult.getErrors().isEmpty());
     }
 }

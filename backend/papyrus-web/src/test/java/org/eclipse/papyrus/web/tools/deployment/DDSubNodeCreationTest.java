@@ -133,7 +133,8 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
             graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ARTIFACT_CONTAINER), mappingType,
                     this.getCapturedNodes());
         }
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(ARTIFACT_CONTAINER), expectedContainmentReference);
         this.createSubNode(ARTIFACT_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -151,7 +152,8 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
                     this.getCapturedNodes());
         }
 
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(DEVICE_CONTAINER), expectedContainmentReference);
         this.createSubNode(DEVICE_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -169,7 +171,8 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
                     this.getCapturedNodes());
         }
 
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(EXECUTION_ENVIRONMENT_CONTAINER), expectedContainmentReference);
         this.createSubNode(EXECUTION_ENVIRONMENT_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -185,7 +188,8 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
                     this.getCapturedNodes());
         };
 
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(MODEL_CONTAINER), expectedContainmentReference);
         this.createSubNode(MODEL_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -204,7 +208,8 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
                     this.getCapturedNodes());
         }
 
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(NODE_CONTAINER), expectedContainmentReference);
         this.createSubNode(NODE_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -221,7 +226,8 @@ public class DDSubNodeCreationTest extends NodeCreationTest {
                     this.getCapturedNodes());
         };
 
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), expectedContainmentReference);
         this.createSubNode(PACKAGE_CONTAINER, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }

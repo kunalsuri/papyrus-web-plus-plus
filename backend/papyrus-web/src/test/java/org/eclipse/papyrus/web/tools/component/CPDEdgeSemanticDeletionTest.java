@@ -226,7 +226,8 @@ public class CPDEdgeSemanticDeletionTest extends EdgeDeletionTest {
             oldOwnerSupplier = () -> this.findSemanticElementByName(oldOwnerLabel);
         }
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, null);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, oldOwnerSupplier, oldContainmentReference);
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext, oldOwnerSupplier, oldContainmentReference);
         this.deleteSemanticEdge(edge, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 }

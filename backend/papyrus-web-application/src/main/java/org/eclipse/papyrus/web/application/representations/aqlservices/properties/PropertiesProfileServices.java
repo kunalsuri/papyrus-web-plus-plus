@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -40,7 +40,7 @@ import org.eclipse.papyrus.web.application.profile.dto.UMLProfileMetadata;
 import org.eclipse.papyrus.web.application.profile.services.api.IUMLProfileService;
 import org.eclipse.sirius.components.core.api.ErrorPayload;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.IPayload;
 import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Package;
@@ -59,14 +59,15 @@ public class PropertiesProfileServices {
 
     private final IUMLProfileService profileService;
 
-    private final IObjectService objectService;
+    private final IIdentityService identityService;
 
     private final ILogger logger;
 
-    public PropertiesProfileServices(IUMLProfileService profileService, IObjectService objectService, ILogger logger) {
+    public PropertiesProfileServices(IUMLProfileService profileService, IIdentityService identityService,
+            ILogger logger) {
         super();
         this.profileService = profileService;
-        this.objectService = objectService;
+        this.identityService = identityService;
         this.logger = logger;
     }
 
@@ -154,8 +155,8 @@ public class PropertiesProfileServices {
      *
      * @param self
      *            the package on which the profile is applied.
-     * @param profile
-     *            the profile
+     * @param uriPath
+     *            the URI path
      * @return a label
      */
     // self is not used here but we need to keep it to match the same signature
@@ -221,7 +222,8 @@ public class PropertiesProfileServices {
      * @return the package
      */
     public EObject applyProfile(org.eclipse.uml2.uml.Package self, IEditingContext editingContext, String uriPath) {
-        var input = new ApplyProfileInput(UUID.randomUUID(), editingContext.getId(), this.objectService.getId(self), uriPath);
+        var input = new ApplyProfileInput(UUID.randomUUID(), editingContext.getId(), this.identityService.getId(self),
+                uriPath);
         IPayload payload = this.profileService.applyProfile(editingContext, input);
         if (payload instanceof ErrorPayload error) {
             this.logger.log(error.message(), ILogLevel.ERROR);

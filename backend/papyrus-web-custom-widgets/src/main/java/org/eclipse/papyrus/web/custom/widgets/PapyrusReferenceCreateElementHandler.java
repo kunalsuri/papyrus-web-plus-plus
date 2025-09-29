@@ -35,7 +35,7 @@ import org.eclipse.sirius.components.core.URLParser;
 import org.eclipse.sirius.components.core.api.ChildCreationDescription;
 import org.eclipse.sirius.components.core.api.IEditService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.core.api.SemanticKindConstants;
 import org.eclipse.sirius.components.emf.services.api.IEMFEditingContext;
 import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
@@ -69,8 +69,8 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
     private final IEMFKindService emfKindService;
 
     private final IEditService editService;
+    private final ILabelService labelService;
 
-    private final IObjectService objectService;
 
     private final IViewFormDescriptionSearchService viewFormSearchService;
 
@@ -80,11 +80,11 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
 
     private final IClearExecutor clearExecutor;
 
-    public PapyrusReferenceCreateElementHandler(IEMFKindService emfKindService, IEditService editService, IObjectService objectService, IViewFormDescriptionSearchService viewFormSearchService,
+    public PapyrusReferenceCreateElementHandler(IEMFKindService emfKindService, IEditService editService, ILabelService labelService, IViewFormDescriptionSearchService viewFormSearchService,
             IAQLInterpreterProvider interpreterProvider, IAddExecutor addExecutor, IClearExecutor clearExecutor) {
         this.emfKindService = Objects.requireNonNull(emfKindService);
         this.editService = Objects.requireNonNull(editService);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.labelService = Objects.requireNonNull(labelService);
         this.viewFormSearchService = Objects.requireNonNull(viewFormSearchService);
         this.interpreterProvider = Objects.requireNonNull(interpreterProvider);
         this.addExecutor = addExecutor;
@@ -119,7 +119,7 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
 
     private List<ChildCreationDescription> createChildCreationDescription(EClass eClass, List<EClass> childrenTypes) {
         return eClass.getEAllReferences().stream()//
-                .filter(EReference::isContainment).flatMap(ref -> this.createChildCreationDescription(ref, childrenTypes).stream()).sorted(Comparator.comparing(ChildCreationDescription::getLabel))
+                .filter(EReference::isContainment).flatMap(ref -> this.createChildCreationDescription(ref, childrenTypes).stream()).sorted(Comparator.comparing(ChildCreationDescription::label))
                 .toList();
     }
 
@@ -129,7 +129,7 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
             if (ref.getEReferenceType().isSuperTypeOf(child)) {
                 EObject instance = child.getEPackage().getEFactoryInstance().create(child);
                 ChildCreationDescription description = new ChildCreationDescription(ref.getName() + CHILD_CREATION_DESCRIPTION_ID_SEPARATOR + child.getName(),
-                        child.getName() + " (in " + ref.getName() + ")", this.objectService.getImagePath(instance));
+                        child.getName() + " (in " + ref.getName() + ")", this.labelService.getImagePaths(instance));
                 children.add(description);
             }
         }

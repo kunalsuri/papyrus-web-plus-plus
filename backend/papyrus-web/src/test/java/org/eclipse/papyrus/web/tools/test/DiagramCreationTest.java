@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -80,7 +80,7 @@ public class DiagramCreationTest extends AbstractPapyrusWebTest {
      */
     protected void testDiagramCreationOnParentElement(EClass parentElementType, EReference parentContainmentReference) {
         EObject parentElement = this.createSemanticElement(this.getRootSemanticElement(), parentContainmentReference, parentElementType, "Container");
-        String parentElementId = this.getObjectService().getId(parentElement);
+        String parentElementId = this.getIdentityService().getId(parentElement);
         this.createRepresentation(parentElementId);
         // Reload the element from the EditingContext to make sure it is updated.
         parentElement = this.findSemanticElementById(parentElementId);
@@ -115,7 +115,7 @@ public class DiagramCreationTest extends AbstractPapyrusWebTest {
     protected void testDiagramCreationOnParentElementWithIntermediateElementCreation(EClass parentElementType, EReference parentContainmentReference, EClass intermediateElementType,
             EReference intermediateContainmentReference) {
         EObject parentElement = this.createSemanticElement(this.getRootSemanticElement(), parentContainmentReference, parentElementType, "Container");
-        String parentElementId = this.getObjectService().getId(parentElement);
+        String parentElementId = this.getIdentityService().getId(parentElement);
         this.createRepresentation(parentElementId);
         // Reload the element from the EditingContext to make sure it is updated.
         parentElement = this.findSemanticElementById(parentElementId);
@@ -144,7 +144,7 @@ public class DiagramCreationTest extends AbstractPapyrusWebTest {
     private void assertThatRepresentationTargetsSemanticElement(EObject semanticElement) {
         Optional<IRepresentation> optRepresentation = this.representationSearchService.findById(this.getEditingContext(), this.representationId, IRepresentation.class);
         assertTrue(optRepresentation.isPresent());
-        assertEquals(this.getObjectService().getId(semanticElement), optRepresentation.get().getTargetObjectId());
+        assertEquals(this.getIdentityService().getId(semanticElement), optRepresentation.get().getTargetObjectId());
     }
 
 }

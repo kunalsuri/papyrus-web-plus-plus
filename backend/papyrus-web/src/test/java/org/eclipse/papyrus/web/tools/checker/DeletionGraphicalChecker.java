@@ -93,7 +93,6 @@ public class DeletionGraphicalChecker implements Checker {
         } else {
             removedElement = this.findGraphicalElementFromDiagram(element);
         }
-        assertThat(removedElement.isEmpty());
     }
 
     protected void checkNumberOfRemovedElement(final IDiagramElement element) {

@@ -24,7 +24,8 @@ import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.MultiReferenceWidge
 import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription;
 import org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveRadioWidgetDescription;
 import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
 import org.eclipse.sirius.components.forms.description.AbstractWidgetDescription;
 import org.eclipse.sirius.components.interpreter.AQLInterpreter;
@@ -42,8 +43,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class PapyrusWidgetsConverterProvider implements IWidgetDescriptionConverter {
 
-    private final IObjectService objectService;
-
     private final IOperationExecutor operationExecutor;
 
     private final IFeedbackMessageService feedbackMessageService;
@@ -52,13 +51,18 @@ public class PapyrusWidgetsConverterProvider implements IWidgetDescriptionConver
 
     private final IEMFKindService emfKindService;
 
-    public PapyrusWidgetsConverterProvider(IObjectService objectService, IOperationExecutor operationExecutor, IFeedbackMessageService feedbackMessageService, IFormIdProvider formIdProvider,
-            IEMFKindService emfKindService) {
-        this.objectService = Objects.requireNonNull(objectService);
+    private final ILabelService labelService;
+    
+    private final IIdentityService identityService;
+
+    public PapyrusWidgetsConverterProvider(IOperationExecutor operationExecutor, IFeedbackMessageService feedbackMessageService, IFormIdProvider formIdProvider,
+            IEMFKindService emfKindService, ILabelService labelService, IIdentityService identityService) {
         this.operationExecutor = Objects.requireNonNull(operationExecutor);
         this.feedbackMessageService = Objects.requireNonNull(feedbackMessageService);
         this.formIdProvider = Objects.requireNonNull(formIdProvider);
         this.emfKindService = Objects.requireNonNull(emfKindService);
+        this.labelService = Objects.requireNonNull(labelService);
+        this.identityService = Objects.requireNonNull(identityService);
     }
 
     @Override
@@ -75,8 +79,8 @@ public class PapyrusWidgetsConverterProvider implements IWidgetDescriptionConver
 
     @Override
     public Optional<AbstractWidgetDescription> convert(WidgetDescription viewWidgetDescription, AQLInterpreter interpreter) {
-        PapyrusWidgetsConverterSwitch papyrusWidgetsConverterSwitch = new PapyrusWidgetsConverterSwitch(interpreter, this.objectService, this.operationExecutor, this.feedbackMessageService,
-                this.formIdProvider, this.emfKindService);
+        PapyrusWidgetsConverterSwitch papyrusWidgetsConverterSwitch = new PapyrusWidgetsConverterSwitch(interpreter, labelService, this.operationExecutor, this.feedbackMessageService,
+                this.formIdProvider, this.emfKindService, this.identityService);
 
         Optional<AbstractWidgetDescription> result = Optional.empty();
         if (viewWidgetDescription instanceof ContainmentReferenceWidgetDescription containmentReferenceWidgetDescription) {

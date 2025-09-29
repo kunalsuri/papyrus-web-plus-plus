@@ -84,7 +84,8 @@ public class UCDTopNodeCreationTest extends NodeCreationTest {
     public void testCreateNode(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = UCDMappingTypes.getMappingType(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, null, mappingType, this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType, this::getRootSemanticElement,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType, this::getRootSemanticElement,
                 expectedContainmentReference);
         this.createTopNode(nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -94,7 +95,8 @@ public class UCDTopNodeCreationTest extends NodeCreationTest {
     public void testCreateHolderNode(CreationTool nodeCreationTool, EClass expectedType, EReference expectedContainmentReference) {
         String mappingType = UCDMappingTypes.getMappingType(expectedType);
         NodeCreationGraphicalChecker graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, null, mappingType, this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType, this::getRootSemanticElement,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType, this::getRootSemanticElement,
                 expectedContainmentReference);
         this.createTopNode(nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }

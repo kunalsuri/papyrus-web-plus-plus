@@ -86,8 +86,10 @@ public class UMLProfileServiceTests extends AbstractWebUMLTest {
         umlResource.getContents().add(model);
 
         this.editingDomain.getResourceSet().getResource(URI.createURI("pathmap://UML_PROFILES/Standard.profile.uml"), true);
-        IPayload payload = this.profileService.applyProfile(this.getEditingContext(), new ApplyProfileInput(UUID.randomUUID(), this.getEditingContext().getId(), this.getObjectService().getId(model),
-                URI.createURI("pathmap://UML_PROFILES/Standard.profile.uml#_0").toString()));
+        IPayload payload = this.profileService.applyProfile(this.getEditingContext(),
+                new ApplyProfileInput(UUID.randomUUID(), this.getEditingContext().getId(),
+                        this.getIdentityService().getId(model),
+                        URI.createURI("pathmap://UML_PROFILES/Standard.profile.uml#_0").toString()));
         assertTrue(payload instanceof ApplyProfileSuccessPayload);
 
         EList<ProfileApplication> appliedProfiles = model.getProfileApplications();
@@ -140,11 +142,13 @@ public class UMLProfileServiceTests extends AbstractWebUMLTest {
         umlResource.getContents().add(model);
 
         IPayload payload = this.profileService.applyProfile(this.getEditingContext(),
-                new ApplyProfileInput(UUID.randomUUID(), this.getEditingContext().getId(), this.getObjectService().getId(model), URI.createURI("fake:/tot").toString()));
+                new ApplyProfileInput(UUID.randomUUID(), this.getEditingContext().getId(),
+                        this.getIdentityService().getId(model), URI.createURI("fake:/tot").toString()));
         assertTrue(payload instanceof ErrorPayload);
 
         payload = this.profileService.applyProfile(this.getEditingContext(),
-                new ApplyProfileInput(UUID.randomUUID(), this.getEditingContext().getId(), this.getObjectService().getId(model), URI.createURI("fake/test").toString()));
+                new ApplyProfileInput(UUID.randomUUID(), this.getEditingContext().getId(),
+                        this.getIdentityService().getId(model), URI.createURI("fake/test").toString()));
         assertTrue(payload instanceof ErrorPayload);
     }
 
@@ -208,7 +212,9 @@ public class UMLProfileServiceTests extends AbstractWebUMLTest {
         umlResource.getContents().add(model);
 
         IPayload applyPayload = this.profileService.applyProfile(this.getEditingContext(), new ApplyProfileInput(UUID.randomUUID(), this.getEditingContext().getId(),
-                this.getObjectService().getId(model), URI.createURI("pathmap://WEB_DYNAMIC_PROFILE/" + profileResourceEntity.get().getId().toString() + "#" + profileId).toString()));
+                this.getIdentityService().getId(model), URI.createURI(
+                        "pathmap://WEB_DYNAMIC_PROFILE/" + profileResourceEntity.get().getId().toString() + "#" + profileId)
+                        .toString()));
         assertTrue(applyPayload instanceof ApplyProfileSuccessPayload);
 
         // Check that the NS URI has been added to the Package Registry

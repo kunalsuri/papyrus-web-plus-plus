@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -251,7 +251,7 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Edge matchingEdge = this.getDiagramHelper()//
                 .getMatchingEdge(//
                         Optional.of(ID_BUILDER.getDomainBaseEdgeId(UML.getPackageMerge())), //
-                        Optional.of(this.getObjectService().getId(packageMerge)), //
+                        Optional.of(this.getIdentityService().getId(packageMerge)), //
                         Optional.of(sourceNode.getId()), Optional.of(targetNode.getId()));
 
         assertNotNull(matchingEdge);
@@ -303,7 +303,7 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Edge matchingEdge = this.getDiagramHelper()//
                 .getMatchingEdge(//
                         Optional.of(ID_BUILDER.getDomainBaseEdgeId(UML.getDependency())), //
-                        Optional.of(this.getObjectService().getId(dependency)), //
+                        Optional.of(this.getIdentityService().getId(dependency)), //
                         Optional.of(sourceNode.getId()), Optional.of(targetNode.getId()));
 
         assertNotNull(matchingEdge);
@@ -355,7 +355,7 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Edge matchingEdge = this.getDiagramHelper()//
                 .getMatchingEdge(//
                         Optional.of(PAD_ABSTRACTION), //
-                        Optional.of(this.getObjectService().getId(abstraction)), //
+                        Optional.of(this.getIdentityService().getId(abstraction)), //
                         Optional.of(sourceNode.getId()), Optional.of(targetNode.getId()));
 
         assertNotNull(matchingEdge);
@@ -405,7 +405,7 @@ public class PackageDiagramTests extends AbstractDiagramTest {
         Edge matchingEdge = this.getDiagramHelper()//
                 .getMatchingEdge(//
                         Optional.of(ID_BUILDER.getDomainBaseEdgeId(UML.getPackageImport())), //
-                        Optional.of(this.getObjectService().getId(packageImport)), //
+                        Optional.of(this.getIdentityService().getId(packageImport)), //
                         Optional.of(sourceNode.getId()), Optional.of(targetNode.getId()));
 
         assertNotNull(matchingEdge);
@@ -485,7 +485,9 @@ public class PackageDiagramTests extends AbstractDiagramTest {
 
     @Override
     protected AbstractDiagramService buildService() {
-        return new PackageDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new PackageDiagramService(this.getIdentityService(), this.getLabelService(),
+                this.getObjectSearchService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(),
+                e -> true, this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

@@ -180,7 +180,8 @@ public class DDSubNodeEdgeCreationTest extends EdgeCreationTest {
             expectedSemanticOwnerSupplier = () -> this.findSemanticElementByName(expectedSemanticOwnerName);
         }
         EdgeCreationGraphicalChecker graphicalChecker = new EdgeCreationGraphicalChecker(this::getDiagram, null, DDMappingTypes.getMappingType(edgeType), this.getCapturedEdges());
-        EdgeCreationSemanticChecker semanticChecker = new EdgeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, edgeType, expectedSemanticOwnerSupplier,
+        EdgeCreationSemanticChecker semanticChecker = new EdgeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, edgeType, expectedSemanticOwnerSupplier,
                 expectedContainmentReference);
         this.createEdge(sourceElementLabel, targetElementLabel, new CreationTool(ToolSections.EDGES, edgeType), new CombinedChecker(graphicalChecker, semanticChecker));
     }

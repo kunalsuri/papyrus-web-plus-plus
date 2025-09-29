@@ -96,7 +96,8 @@ public class CODEditLabelTest extends EditLabelTest {
             default -> NEW_LABEL;
         };
         LabelGraphicalChecker graphicalChecker = new LabelGraphicalChecker(expectedGraphicalLabel);
-        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectService(), this::getEditingContext, NEW_LABEL);
+        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectSearchService(),
+                this::getEditingContext, NEW_LABEL);
         this.editLabel(elementName, NEW_LABEL, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 }

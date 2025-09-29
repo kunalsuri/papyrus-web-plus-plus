@@ -35,8 +35,11 @@ import org.eclipse.sirius.components.collaborative.browser.ModelBrowserDescripti
 import org.eclipse.sirius.components.collaborative.browser.api.IModelBrowserRootCandidateSearchProvider;
 import org.eclipse.sirius.components.core.CoreImageConstants;
 import org.eclipse.sirius.components.core.URLParser;
+import org.eclipse.sirius.components.core.api.IContentService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.core.api.IURLParser;
 import org.eclipse.sirius.components.core.api.SemanticKindConstants;
 import org.eclipse.sirius.components.core.api.labels.StyledString;
@@ -82,7 +85,10 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
 
     private static final String TARGET_TYPE = "targetType";
 
-    private final IObjectService objectService;
+    private final ILabelService labelService;
+    private final IIdentityService identityService;
+    private final IContentService contentService;
+    private final IObjectSearchService objectSearchService;
 
     private final ModelBrowserDefaultCandidateSearchProvider defaultCandidateProvider;
 
@@ -94,10 +100,13 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
 
     private IURLParser urlParser = new URLParser();
 
-    public ReferenceModelBrowerDescriptionOverrider(IObjectService objectService, IEMFKindService emfKindService, List<IModelBrowserRootCandidateSearchProvider> candidateProviders,
-            ModelBrowserDescriptionProvider modelBrowserDescriptionProvider) {
+    public ReferenceModelBrowerDescriptionOverrider(ILabelService labelService, IEMFKindService emfKindService, List<IModelBrowserRootCandidateSearchProvider> candidateProviders,
+            ModelBrowserDescriptionProvider modelBrowserDescriptionProvider, IIdentityService identityService, IContentService contentService, IObjectSearchService objectSearchService) {
         super();
-        this.objectService = objectService;
+        this.labelService = Objects.requireNonNull(labelService);
+        this.identityService = Objects.requireNonNull(identityService);
+        this.contentService = Objects.requireNonNull(contentService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.defaultCandidateProvider = new ModelBrowserDefaultCandidateSearchProvider();
         this.emfKindService = emfKindService;
         this.candidateProviders = candidateProviders;
@@ -145,7 +154,7 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
         var optionalEditingContext = variableManager.get(IEditingContext.EDITING_CONTEXT, IEditingContext.class);
         var optionalId = variableManager.get(TreeDescription.ID, String.class);
         if (optionalId.isPresent() && optionalEditingContext.isPresent()) {
-            var optionalObject = this.objectService.getObject(optionalEditingContext.get(), optionalId.get());
+            var optionalObject = this.objectSearchService.getObject(optionalEditingContext.get(), optionalId.get());
             if (optionalObject.isPresent()) {
                 result = optionalObject.get();
             } else {
@@ -219,7 +228,7 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
                 if (self instanceof Resource resource) {
                     result.addAll(resource.getContents());
                 } else if (self instanceof EObject) {
-                    List<Object> contents = this.objectService.getContents(self);
+                    List<Object> contents = this.contentService.getContents(self);
                     result.addAll(contents);
                 }
             }
@@ -250,7 +259,7 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
         if (self instanceof Resource resource) {
             id = resource.getURI().path().substring(1);
         } else if (self instanceof EObject) {
-            id = this.objectService.getId(self);
+            id = this.identityService.getId(self);
         }
         return id;
     }
@@ -259,7 +268,7 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
         Object self = variableManager.getVariables().get(VariableManager.SELF);
         List<String> imageURL = List.of(CoreImageConstants.DEFAULT_SVG);
         if (self instanceof EObject) {
-            imageURL = this.objectService.getImagePath(self);
+            imageURL = this.labelService.getImagePaths(self);
         } else if (self instanceof Resource) {
             imageURL = List.of("/reference-widget-images/Resource.svg");
         }
@@ -281,7 +290,7 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
         if (self instanceof Resource) {
             kind = DOCUMENT_KIND;
         } else {
-            kind = this.objectService.getKind(self);
+            kind = this.identityService.getKind(self);
         }
         return kind;
     }
@@ -292,11 +301,11 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
         if (self instanceof Resource resource) {
             label = this.getResourceLabel(resource);
         } else if (self instanceof EObject) {
-            StyledString styledString = this.objectService.getStyledLabel(self);
+            StyledString styledString = this.labelService.getStyledLabel(self);
             if (!styledString.toString().isBlank()) {
                 return styledString;
             } else {
-                var kind = this.objectService.getKind(self);
+                var kind = this.identityService.getKind(self);
                 label = this.urlParser.getParameterValues(kind).get(SemanticKindConstants.ENTITY_ARGUMENT).get(0);
             }
         }
@@ -407,7 +416,7 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
             Map<String, List<String>> parameters = new URLParser().getParameterValues(optionalTreeId.get());
             String ownerId = parameters.get("ownerId").get(0);
 
-            return this.objectService.getObject(optionalEditingContext.get(), ownerId).filter(EObject.class::isInstance).map(EObject.class::cast);
+            return this.objectSearchService.getObject(optionalEditingContext.get(), ownerId).filter(EObject.class::isInstance).map(EObject.class::cast);
         } else {
             return Optional.empty();
         }
@@ -420,7 +429,7 @@ public class ReferenceModelBrowerDescriptionOverrider implements IRepresentation
             Map<String, List<String>> parameters = new URLParser().getParameterValues(optionalTreeId.get());
             String descriptionId = parameters.get("descriptionId").get(0);
             String ownerId = parameters.get("ownerId").get(0);
-            var semanticOwner = this.objectService.getObject(optionalEditingContext.get(), ownerId).get();
+            var semanticOwner = this.objectSearchService.getObject(optionalEditingContext.get(), ownerId).get();
 
             return this.candidateProviders.stream().filter(provider -> provider.canHandle(descriptionId)).findFirst().orElse(this.defaultCandidateProvider).getRootElementsForReference(semanticOwner,
                     descriptionId, optionalEditingContext.get());

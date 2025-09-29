@@ -122,7 +122,8 @@ public class ADReconnectEdgeSourceTest extends ReconnectEdgeSourceTest {
         EditingContext editingContext = (EditingContext) this.getEditingContext();
         for (String elementLabel : elementLabels) {
             String semanticTargetId = ((Node) this.findGraphicalElementExcludingContentByLabel(elementLabel)).getTargetObjectId();
-            ObjectNode objectNode = (ObjectNode) this.getObjectService().getObject(editingContext, semanticTargetId).get();
+            ObjectNode objectNode = (ObjectNode) this.getObjectSearchService()
+                    .getObject(editingContext, semanticTargetId).get();
             objectNode.setIsControlType(true);
         }
         this.persistenceService.persist(new ICause.NoOp(), editingContext);

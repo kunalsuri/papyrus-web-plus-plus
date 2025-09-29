@@ -274,6 +274,18 @@ image::deletion-dialog.png[Semantic Deletion Dialog,300, align="center"]
 This preference is stored in the browser's local storage. You can reset it by deleting the Papyrus Web data in your browser's cache.
 ====
 
+===== Appearance
+
+Since Sirius web 2025.6.0, diagram elements appearance can be customized by using the contextual palette:
+
+image::appearance.png[Node appearance,400, align="center"]
+
+[NOTE]
+====
+This is not yet implemented for nodes specific to Papyrus Web (The Cuboid node for instance):
+
+image::appearanceOnCuboid.png[Cuboid appearance,400, align="center"]
+====
 ==== Symbols
 
 The goal of the sympbol support in Papyrus web is to give users access to some custom representations. They can use their own representation, i.e. their own svg and png files, in their diagrams, so the model can be easily read and understood. 

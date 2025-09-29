@@ -198,7 +198,8 @@ public class ADSubNodeEdgeCreationTest extends EdgeCreationTest {
         EditingContext editingContext = (EditingContext) this.getEditingContext();
         for (String elementLabel : elementLabels) {
             String semanticTargetId = ((Node) this.findGraphicalElementExcludingContentByLabel(elementLabel)).getTargetObjectId();
-            ObjectNode objectNode = (ObjectNode) this.getObjectService().getObject(editingContext, semanticTargetId).get();
+            ObjectNode objectNode = (ObjectNode) this.getObjectSearchService()
+                    .getObject(editingContext, semanticTargetId).get();
             objectNode.setIsControlType(true);
         }
     }
@@ -219,11 +220,14 @@ public class ADSubNodeEdgeCreationTest extends EdgeCreationTest {
         final EdgeCreationSemanticChecker semanticChecker;
         if (sourceElementLabel.equals(EXPANSION_NODE_SOURCE) && targetElementLabel.equals(EXPANSION_NODE_TARGET)) {
             Supplier<EObject> expectedSemanticOwnerSupplier = () -> this.findSemanticElementByName(EXPANSION_REGION_CONTAINER);
-            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, UML.getControlFlow(), expectedSemanticOwnerSupplier,
+            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectSearchService(), this.getIdentityService(),
+                    this::getEditingContext, UML.getControlFlow(), expectedSemanticOwnerSupplier,
                     UML.getStructuredActivityNode_Edge());
         } else {
             Supplier<EObject> expectedSemanticOwnerSupplier = () -> this.findSemanticElementByName(ROOT_ACTIVITY);
-            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, UML.getControlFlow(), expectedSemanticOwnerSupplier, UML.getActivity_Edge());
+            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectSearchService(), this.getIdentityService(),
+                    this::getEditingContext, UML.getControlFlow(), expectedSemanticOwnerSupplier,
+                    UML.getActivity_Edge());
         }
         this.createEdge(sourceElementLabel, targetElementLabel, new ADCreationTool(ADToolSections.EDGES, UML.getControlFlow()), new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -248,11 +252,14 @@ public class ADSubNodeEdgeCreationTest extends EdgeCreationTest {
         EdgeCreationSemanticChecker semanticChecker;
         if (sourceElementLabel.equals(EXPANSION_NODE_SOURCE) && targetElementLabel.equals(EXPANSION_NODE_TARGET)) {
             Supplier<EObject> expectedSemanticOwnerSupplier = () -> this.findSemanticElementByName(EXPANSION_REGION_CONTAINER);
-            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, UML.getObjectFlow(), expectedSemanticOwnerSupplier,
+            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectSearchService(), this.getIdentityService(),
+                    this::getEditingContext, UML.getObjectFlow(), expectedSemanticOwnerSupplier,
                     UML.getStructuredActivityNode_Edge());
         } else {
             Supplier<EObject> expectedSemanticOwnerSupplier = () -> this.findSemanticElementByName(ROOT_ACTIVITY);
-            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, UML.getObjectFlow(), expectedSemanticOwnerSupplier, UML.getActivity_Edge());
+            semanticChecker = new EdgeCreationSemanticChecker(this.getObjectSearchService(), this.getIdentityService(),
+                    this::getEditingContext, UML.getObjectFlow(), expectedSemanticOwnerSupplier,
+                    UML.getActivity_Edge());
         }
         this.createEdge(sourceElementLabel, targetElementLabel, new ADCreationTool(ADToolSections.EDGES, UML.getObjectFlow()), new CombinedChecker(graphicalChecker, semanticChecker));
     }

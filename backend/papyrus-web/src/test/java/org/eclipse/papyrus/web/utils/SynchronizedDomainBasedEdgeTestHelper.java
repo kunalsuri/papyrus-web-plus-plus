@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technolgies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technolgies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.web.application.representations.view.IdBuilder;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.diagrams.Edge;
 
 /**
@@ -32,23 +32,23 @@ import org.eclipse.sirius.components.diagrams.Edge;
  */
 public final class SynchronizedDomainBasedEdgeTestHelper {
 
-    private IdBuilder idBuilder;
+    private final IdBuilder idBuilder;
 
-    private DiagramTestHelper representationHelper;
+    private final DiagramTestHelper representationHelper;
 
-    private IObjectService objectService;
+    private final IIdentityService identityService;
 
-    private EObject source;
+    private final EObject source;
 
-    private EObject target;
+    private final EObject target;
 
-    private EObject domainBasedEdge;
+    private final EObject domainBasedEdge;
 
-    private String sourceNodeDescriptionName;
+    private final String sourceNodeDescriptionName;
 
-    private String targetNodeDescriptionName;
+    private final String targetNodeDescriptionName;
 
-    private String domainBasedEdgeDescriptionName;
+    private final String domainBasedEdgeDescriptionName;
 
     private String sourceNodeId;
 
@@ -57,7 +57,7 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
     private SynchronizedDomainBasedEdgeTestHelper(Builder builder) {
         this.idBuilder = builder.idBuilder;
         this.representationHelper = builder.representationHelper;
-        this.objectService = builder.objectService;
+        this.identityService = builder.identityService;
         this.source = builder.source;
         this.target = builder.target;
         this.domainBasedEdge = builder.domainBasedEdge;
@@ -126,7 +126,8 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
         Objects.requireNonNull(this.targetNodeId, "No target node found. Did you update the diagram before assert");
 
         Edge edge = this.representationHelper.getMatchingEdge(Optional.of(this.getDomainBasedEdgeDescriptionName()), //
-                Optional.of(this.objectService.getId(this.domainBasedEdge)), Optional.of(this.sourceNodeId), Optional.of(this.targetNodeId));
+                Optional.of(this.identityService.getId(this.domainBasedEdge)), Optional.of(this.sourceNodeId),
+                Optional.of(this.targetNodeId));
 
         assertNotNull(edge);
 
@@ -148,7 +149,7 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
 
         private DiagramTestHelper representationHelper;
 
-        private IObjectService objectService;
+        private IIdentityService identityService;
 
         private EObject source;
 
@@ -196,12 +197,12 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
         /**
          * Builder with object service.
          *
-         * @param objectService
-         *            the object service
+         * @param identityService
+         *            the identity service
          * @return the builder
          */
-        public Builder withObjectService(IObjectService objectService) {
-            this.objectService = objectService;
+        public Builder withIdentityService(IIdentityService identityService) {
+            this.identityService = identityService;
             return this;
         }
 
@@ -289,7 +290,7 @@ public final class SynchronizedDomainBasedEdgeTestHelper {
             Objects.requireNonNull(this.source);
             Objects.requireNonNull(this.target);
             Objects.requireNonNull(this.representationHelper);
-            Objects.requireNonNull(this.objectService);
+            Objects.requireNonNull(this.identityService);
             return new SynchronizedDomainBasedEdgeTestHelper(this);
         }
     }

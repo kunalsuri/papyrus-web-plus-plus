@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2023 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,9 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.ServiceLo
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,9 +32,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class GenericDiagramService extends AbstractDiagramService {
 
-    public GenericDiagramService(IObjectService objectService, IDiagramNavigationService diagramNavigationService, IDiagramOperationsService diagramOperationsService, IEditableChecker editableChecker,
+    //CHECKSTYLE:OFF Injected parameters
+    public GenericDiagramService(IIdentityService identityService, ILabelService labelService,
+            IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService,
+            IDiagramOperationsService diagramOperationsService, IEditableChecker editableChecker,
             IViewDiagramDescriptionService viewDiagramService, ServiceLogger logger) {
-        super(objectService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
+        //CHECKSTYLE:ON Injected parameters
+        super(identityService, labelService, objectSearchService, diagramNavigationService, diagramOperationsService,
+                editableChecker, viewDiagramService, logger);
     }
 
 }

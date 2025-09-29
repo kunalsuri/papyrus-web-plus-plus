@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 205 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.utils.Gra
 import org.eclipse.papyrus.web.application.representations.aqlservices.utils.IViewHelper;
 import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Node;
 
 /**
@@ -41,13 +41,13 @@ public class ComponentGraphicalDropBehaviorProvider implements IWebInternalSourc
 
     private final IViewHelper viewHelper;
 
-    private final IObjectService objectService;
-
     private final ECrossReferenceAdapter crossRef;
 
     private final IEditableChecker editableChecker;
 
     private final DiagramNavigator diagramNavigator;
+
+    private final IObjectSearchService objectSearchService;
 
     /**
      * Logger used to report errors and warnings to the user.
@@ -61,7 +61,7 @@ public class ComponentGraphicalDropBehaviorProvider implements IWebInternalSourc
      *            editing context used to retrieve semantic target
      * @param viewHelper
      *            the helper used to create element on a diagram
-     * @param objectService
+     * @param objectSearchService
      *            service used to retrieve semantic target according to node id
      * @param crossRef
      *            An adapter used to get inverse references
@@ -72,14 +72,14 @@ public class ComponentGraphicalDropBehaviorProvider implements IWebInternalSourc
      * @param logger
      *            Logger used to report errors and warnings to the user
      */
-    public ComponentGraphicalDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper, IObjectService objectService, ECrossReferenceAdapter crossRef,
+    public ComponentGraphicalDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper, IObjectSearchService objectSearchService, ECrossReferenceAdapter crossRef,
             IEditableChecker editableChecker, DiagramNavigator diagramNavigator, ILogger logger) {
         this.diagramNavigator = Objects.requireNonNull(diagramNavigator);
         this.crossRef = Objects.requireNonNull(crossRef);
         this.editableChecker = Objects.requireNonNull(editableChecker);
         this.editionContext = Objects.requireNonNull(editionContext);
         this.viewHelper = Objects.requireNonNull(viewHelper);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.logger = logger;
     }
 
@@ -110,7 +110,7 @@ public class ComponentGraphicalDropBehaviorProvider implements IWebInternalSourc
     }
 
     private Object getSemanticObject(String id) {
-        return this.objectService.getObject(this.editionContext, id).orElse(null);
+        return this.objectSearchService.getObject(this.editionContext, id).orElse(null);
     }
 
 }

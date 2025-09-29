@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2019, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2019, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -40,7 +40,9 @@ import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
 import org.eclipse.sirius.components.diagrams.renderer.DiagramRenderingCache;
 import org.eclipse.sirius.components.representations.Element;
@@ -60,19 +62,27 @@ public class CompositeStructureDiagramService extends AbstractDiagramService {
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
 
-    public CompositeStructureDiagramService(IObjectService objectService, IDiagramNavigationService diagramNavigationService, IDiagramOperationsService diagramOperationsService,
+    //CHECKSTYLE:OFF Injected parameters
+    public CompositeStructureDiagramService(IIdentityService identityService, ILabelService labelService,
+            IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService,
+            IDiagramOperationsService diagramOperationsService,
             IEditableChecker editableChecker, IViewDiagramDescriptionService viewDiagramService, ILogger logger) {
-        super(objectService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
+        //CHECKSTYLE:ON Injected parameters
+        super(identityService, labelService, objectSearchService, diagramNavigationService, diagramOperationsService,
+                editableChecker, viewDiagramService, logger);
         this.logger = logger;
     }
 
     @Override
     protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new CompositeStructureGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
+                this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new CompositeStructureGraphicalDropBehaviorProvider(
+                editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -81,8 +91,11 @@ public class CompositeStructureDiagramService extends AbstractDiagramService {
     @Override
     protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new CompositeStructureSemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
+                this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new CompositeStructureSemanticDropBehaviorProvider(
+                editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -132,7 +145,7 @@ public class CompositeStructureDiagramService extends AbstractDiagramService {
     private Optional<Object> getCommonVisualAncestor(Element visualSource, Element visualTarget, DiagramRenderingCache cache, IEditingContext editinContext) {
         return new DiagramElementHelper(visualSource).getCommonAncestor(new DiagramElementHelper(visualTarget), cache)//
                 .filter(element -> element.getId().isPresent())//
-                .flatMap(ancestor -> ancestor.getElementTarget(this.getObjectService(), editinContext));
+                .flatMap(ancestor -> ancestor.getElementTarget(this.getObjectSearchService(), editinContext));
     }
 
     /**
@@ -155,11 +168,12 @@ public class CompositeStructureDiagramService extends AbstractDiagramService {
         if (partWithPortSource != null) {
             // connector source is a Port on a Property
             DiagramElementHelper visualSourceHelper = new DiagramElementHelper(visualElement);
-            Optional<Object> target = visualSourceHelper.getElementTarget(this.getObjectService(), editingContext);
+            Optional<Object> target = visualSourceHelper.getElementTarget(this.getObjectSearchService(),
+                    editingContext);
 
             if (target.isPresent() && target.get() instanceof Port) {
                 shouldDiplayConnector = visualSourceHelper.getParent(cache)//
-                        .flatMap(parent -> parent.getElementTarget(this.getObjectService(), editingContext))//
+                        .flatMap(parent -> parent.getElementTarget(this.getObjectSearchService(), editingContext))//
                         .map(sem -> sem == partWithPortSource).orElse(false);
             } else {
                 shouldDiplayConnector = false;

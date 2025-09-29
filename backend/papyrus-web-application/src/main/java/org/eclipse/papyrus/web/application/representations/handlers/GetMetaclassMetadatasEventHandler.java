@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,8 +29,9 @@ import org.eclipse.sirius.components.collaborative.api.IEditingContextEventHandl
 import org.eclipse.sirius.components.collaborative.messages.ICollaborativeMessageService;
 import org.eclipse.sirius.components.core.api.ErrorPayload;
 import org.eclipse.sirius.components.core.api.IEditingContext;
+import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.IInput;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.core.api.IPayload;
 import org.eclipse.sirius.components.graphql.api.URLConstants;
 import org.eclipse.uml2.uml.Class;
@@ -53,19 +54,22 @@ public class GetMetaclassMetadatasEventHandler implements IEditingContextEventHa
 
     private final ProfileDiagramService profileDiagramService;
 
-    private final IObjectService objectService;
+    private final ILabelService labelService;
 
     private final ICollaborativeMessageService messageService;
 
     private final Counter counter;
+    private final IIdentityService identityService;
 
-    public GetMetaclassMetadatasEventHandler(ICollaborativeMessageService messageService, MeterRegistry meterRegistry, ProfileDiagramService profileDiagramService, IObjectService objectService) {
+    public GetMetaclassMetadatasEventHandler(ICollaborativeMessageService messageService, MeterRegistry meterRegistry, ProfileDiagramService profileDiagramService, ILabelService labelService,
+            IIdentityService identityService) {
         this.messageService = Objects.requireNonNull(messageService);
-        this.profileDiagramService = profileDiagramService;
-        this.objectService = objectService;
+        this.profileDiagramService = Objects.requireNonNull(profileDiagramService);
+        this.labelService = Objects.requireNonNull(labelService);
         this.counter = Counter.builder(Monitoring.EVENT_HANDLER)
                 .tag(Monitoring.NAME, this.getClass().getSimpleName())
                 .register(meterRegistry);
+        this.identityService = Objects.requireNonNull(identityService);
     }
 
     @Override
@@ -83,7 +87,7 @@ public class GetMetaclassMetadatasEventHandler implements IEditingContextEventHa
 
             List<? extends Class> metaclasses = this.profileDiagramService.getMetaclasses(editingContext);
             List<UMLMetaclassMetadata> metaclassMetadatas = metaclasses.stream() //
-                    .map(metaclass -> new UMLMetaclassMetadata(this.objectService.getId(metaclass), metaclass.getName(), this.getMetaclassImagePath(metaclass))) //
+                    .map(metaclass -> new UMLMetaclassMetadata(this.identityService.getId(metaclass), metaclass.getName(), this.getMetaclassImagePath(metaclass))) //
                     .toList();
             payload = new GetMetaclassMetadatasSuccessPayload(input.id(), metaclassMetadatas);
         }
@@ -98,7 +102,7 @@ public class GetMetaclassMetadatasEventHandler implements IEditingContextEventHa
             if (!metaclassEClass.isAbstract() && !metaclassEClass.isInterface()) {
                 // Copied from org.eclipse.papyrus.uml.tools.providers.UMLEClassLabelProvider
                 final EObject instance = UMLFactory.eINSTANCE.create(metaclassEClass);
-                List<String> metaclassImagePaths = this.objectService.getImagePath(instance);
+                List<String> metaclassImagePaths = this.labelService.getImagePaths(instance);
                 if (!metaclassImagePaths.isEmpty()) {
                     // Return the first path, we don't want to display decorators here.
                     return URLConstants.IMAGE_BASE_PATH + metaclassImagePaths.get(0);

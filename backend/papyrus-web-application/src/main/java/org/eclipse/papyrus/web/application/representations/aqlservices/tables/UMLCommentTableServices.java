@@ -30,7 +30,8 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.uml.domain.services.properties.ILogger;
 import org.eclipse.papyrus.web.application.tables.comment.UMLCommentTableRepresentationDescriptionBuilder;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.labels.StyledString;
 import org.eclipse.sirius.components.tables.ColumnFilter;
 import org.eclipse.sirius.components.tables.ColumnSort;
 import org.eclipse.uml2.uml.Comment;
@@ -49,13 +50,13 @@ public class UMLCommentTableServices {
 
     private final ILogger logger;
 
-    private final IObjectService objectService;
 
     private final ObjectMapper objectMapper;
+    private final ILabelService labelService;
 
-    public UMLCommentTableServices(ILogger logger, IObjectService objectService, ObjectMapper objectMapper) {
+    public UMLCommentTableServices(ILogger logger, ILabelService labelService, ObjectMapper objectMapper) {
         this.logger = Objects.requireNonNull(logger);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.labelService = Objects.requireNonNull(labelService);
         this.objectMapper = Objects.requireNonNull(objectMapper);
     }
 
@@ -67,7 +68,11 @@ public class UMLCommentTableServices {
      * @return a String that is the label of the given element
      */
     public String getElementLabel(EObject element) {
-        String label = this.objectService.getLabel(element);
+        StyledString styledLabel = this.labelService.getStyledLabel(element);
+        String label = null;
+        if (styledLabel != null) {
+            label = styledLabel.toString();
+        }
         // Fallback for elements which are not NamedElement and not properly handled by the Edit framework
         if (label == null || label.isBlank()) {
             label = "<" + this.splitCamelCase(element.eClass().getName() + ">");
@@ -118,7 +123,7 @@ public class UMLCommentTableServices {
      * @return the list of all paths associated to the given element
      */
     public List<String> getElementIconPath(Element element) {
-        return this.objectService.getImagePath(element);
+        return this.labelService.getImagePaths(element);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -223,7 +223,7 @@ public class StateMachineDiagramTests extends AbstractDiagramTest {
         Edge transitionEdge = this.getDiagramHelper()//
                 .getMatchingEdge(//
                         Optional.of(SMD_TRANSITION_EDGE_NAME), //
-                        Optional.of(this.getObjectService().getId(this.transition)), //
+                        Optional.of(this.getIdentityService().getId(this.transition)), //
                         Optional.of(entryPointOnSMNode.getId()), Optional.of(state1Node.getId()));
 
         assertNotNull(transitionEdge);
@@ -359,7 +359,9 @@ public class StateMachineDiagramTests extends AbstractDiagramTest {
 
     @Override
     protected AbstractDiagramService buildService() {
-        return new StateMachineDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new StateMachineDiagramService(this.getIdentityService(), this.getLabelService(),
+                this.getObjectSearchService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(),
+                e -> true, this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

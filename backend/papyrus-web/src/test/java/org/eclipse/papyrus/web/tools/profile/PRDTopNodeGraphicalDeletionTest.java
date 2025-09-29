@@ -107,7 +107,9 @@ public class PRDTopNodeGraphicalDeletionTest extends NodeDeletionTest {
         } else {
             graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, null);
         }
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, this::getRootSemanticElement,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
+                this::getRootSemanticElement,
                 containmentReference);
         this.deleteGraphicalNode(elementName, new CombinedChecker(graphicalChecker, semanticChecker));
     }

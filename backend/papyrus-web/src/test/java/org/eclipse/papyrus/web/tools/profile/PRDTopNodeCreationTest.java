@@ -89,7 +89,8 @@ public class PRDTopNodeCreationTest extends NodeCreationTest {
         } else {
             graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, null, mappingType, this.getCapturedNodes());
         }
-        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType, this::getRootSemanticElement,
+        NodeCreationSemanticChecker semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(),
+                this.getIdentityService(), this::getEditingContext, expectedType, this::getRootSemanticElement,
                 expectedContainmentReference);
         this.createTopNode(nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));
     }

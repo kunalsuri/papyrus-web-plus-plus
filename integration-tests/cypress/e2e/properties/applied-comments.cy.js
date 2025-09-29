@@ -34,7 +34,9 @@ describe('Applied Comments tests', () => {
     cy.get('.MuiAutocomplete-popper')
       .find('ul')
       .find('li')
-      .contains('Class')
+      .filter((index, li) => {
+        return Cypress.$(li).text().trim() === 'Class'; // Strictly matching the text 'Class'
+      })
       .scrollIntoView()
       .should('be.visible')
       .click();
@@ -109,10 +111,10 @@ describe('Applied Comments tests', () => {
     cy.get('@dialog').findByTestId('create-object').should('be.visible').should('not.be.disabled').click();
     // check that empty comment has been created
     cy.getByTestId('Applied comments').should('be.visible').find('.MuiChip-root').should('have.length', 1);
-    cy.getByTestId('Applied comments').findByTestId('reference-value-').click();
+    cy.getByTestId('Applied comments').findByTestId('reference-value-Comment').click();
 
     // click on new Comment
-    cy.getByTestId('reference-value-').click();
+    cy.getByTestId('reference-value-Comment').click();
     // Set a body to the comment
     cy.getByTestId('input-Body').type('Comment{downArrow}{enter}');
     // check that Activity has a new child

@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.elements.DiagramElementProps;
 import org.eclipse.sirius.components.diagrams.elements.EdgeElementProps;
 import org.eclipse.sirius.components.diagrams.elements.NodeElementProps;
@@ -84,8 +84,8 @@ public class DiagramElementHelper {
         return this.getId().map(cache::getAncestors).map(ancestors -> ancestors.stream().map(DiagramElementHelper::new).toList()).orElse(Collections.emptyList());
     }
 
-    public Optional<Object> getElementTarget(IObjectService objectService, IEditingContext context) {
-        return this.getTargetId().flatMap(id -> objectService.getObject(context, id));
+    public Optional<Object> getElementTarget(IObjectSearchService objectSearchService, IEditingContext context) {
+        return this.getTargetId().flatMap(id -> objectSearchService.getObject(context, id));
     }
 
     public Optional<DiagramElementHelper> getParent(DiagramRenderingCache cache) {

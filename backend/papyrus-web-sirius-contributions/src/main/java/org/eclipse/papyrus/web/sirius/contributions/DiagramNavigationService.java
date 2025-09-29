@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.springframework.stereotype.Service;
@@ -40,10 +40,11 @@ public class DiagramNavigationService implements IDiagramNavigationService {
 
     private final IEMFNavigationService emfNavigationService;
 
-    private final IObjectService objectService;
+    private final IObjectSearchService objectSearchService;
 
-    public DiagramNavigationService(IEMFNavigationService emfNavigationService, IObjectService objectService) {
-        this.objectService = Objects.requireNonNull(objectService);
+    public DiagramNavigationService(IEMFNavigationService emfNavigationService,
+            IObjectSearchService objectSearchService) {
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.emfNavigationService = Objects.requireNonNull(emfNavigationService);
     }
 
@@ -99,7 +100,7 @@ public class DiagramNavigationService implements IDiagramNavigationService {
     }
 
     private Supplier<Object> buildSemanticProvider(IEditingContext editingContext, Node node) {
-        return () -> this.objectService.getObject(editingContext, node.getTargetObjectId()).orElse(null);
+        return () -> this.objectSearchService.getObject(editingContext, node.getTargetObjectId()).orElse(null);
     }
 
     private List<Node> getChildren(Object parent, BorderNodeStatus borderNodeStatus) {

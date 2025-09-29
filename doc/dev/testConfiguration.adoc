@@ -44,11 +44,10 @@ From the root folder of the project (`papyrus`) run the following commands:
 
 ==== Step 2 Prepare and run the Docker image
 
-For demonstration purpose, let say that the current version of Papyrus-web is `2023.12.0`, in the project root folder run the following commands:
+For demonstration purpose, in the project root folder run the following commands:
 
- 1. `sed -e "s|VERSION|2023.12.0|" backend/papyrus-web-application/Dockerfile.template > backend/papyrus-web-application/Dockerfile`
- 2. `docker build -t papyrusweb backend/papyrus-web-application`
- 3. `docker-compose -f backend/papyrus-web-application/docker-compose.yml up -d`
+ 1. `docker build -t papyrusweb backend/papyrus-web`
+ 2. `docker-compose -f backend/papyrus-web/docker-compose.yml up -d`
 
 The current version should be adapted in the first command.
 

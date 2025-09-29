@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.uml.domain.services.IViewQuerier;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.Node;
 
@@ -33,16 +33,17 @@ public class WebRepresentationQuerier implements IViewQuerier {
 
     private final Diagram diagram;
 
-    private final IObjectService objectService;
 
     private final IEditingContext editingContext;
 
     private final IDiagramNavigationService diagramNavigationService;
 
-    public WebRepresentationQuerier(Diagram diagram, IObjectService objectService, IDiagramNavigationService diagramNavigationService, IEditingContext editingContext) {
+    private final IObjectSearchService objectSearchService;
+
+    public WebRepresentationQuerier(Diagram diagram, IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService, IEditingContext editingContext) {
         super();
         this.diagram = diagram;
-        this.objectService = objectService;
+        this.objectSearchService = objectSearchService;
         this.editingContext = editingContext;
         this.diagramNavigationService = diagramNavigationService;
     }
@@ -73,7 +74,7 @@ public class WebRepresentationQuerier implements IViewQuerier {
             semanticElementID = null;
         }
         if (semanticElementID != null) {
-            return this.objectService.getObject(this.editingContext, semanticElementID) //
+            return this.objectSearchService.getObject(this.editingContext, semanticElementID) //
                     .filter(e -> e instanceof EObject) //
                     .map(e -> (EObject) e) //
                     .orElse(null);

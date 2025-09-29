@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -165,7 +165,8 @@ public class DDEdgeSemanticDeletionTest extends EdgeDeletionTest {
             oldOwnerSupplier = () -> this.findSemanticElementByName(oldOwnerLabel);
         }
         DeletionGraphicalChecker graphicalChecker = new DeletionGraphicalChecker(this::getDiagram, null);
-        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext, oldOwnerSupplier, oldContainmentReference);
+        NodeSemanticDeletionSemanticChecker semanticChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext, oldOwnerSupplier, oldContainmentReference);
         this.deleteSemanticEdge(edge, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 }

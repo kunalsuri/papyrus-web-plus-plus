@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.emf.ecore.EClass;
@@ -27,8 +28,10 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.aqlservices.AbstractDiagramService;
 import org.eclipse.papyrus.web.application.representations.view.IdBuilder;
 import org.eclipse.papyrus.web.tests.utils.UMLTestHelper;
+import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
@@ -45,18 +48,23 @@ public class DiagramServiceTestHelper {
 
     private final AbstractDiagramService diagramService;
 
-    private IEditingContext editingContext;
+    private final IEditingContext editingContext;
+
+    private final IIdentityService identityService;
+
+    private final IObjectSearchService objectSearchService;
 
     private final UMLTestHelper umlHelper = new UMLTestHelper();
 
-    private IObjectService objectService;
-
-    public DiagramServiceTestHelper(DiagramTestHelper diagramHelper, AbstractDiagramService diagramService, IEditingContext editingContext, IObjectService objectService) {
+    public DiagramServiceTestHelper(DiagramTestHelper diagramHelper, AbstractDiagramService diagramService,
+            IEditingContext editingContext, IIdentityService identityService,
+            IObjectSearchService objectSearchService) {
         super();
         this.diagramHelper = diagramHelper;
         this.diagramService = diagramService;
         this.editingContext = editingContext;
-        this.objectService = objectService;
+        this.identityService = identityService;
+        this.objectSearchService = objectSearchService;
     }
 
     /**
@@ -70,7 +78,7 @@ public class DiagramServiceTestHelper {
      * @param containmentRef
      *            the containment reference
      * @param nodeDescriptionName
-     *            the name of the {@link org.eclipse.sirius.components.view.NodeDescription}
+     *            the name of the {@link org.eclipse.sirius.components.view.diagram.NodeDescription}
      */
     public void assertChildAndSiblingCreation(Node parent, EClass type, EReference containmentRef, String nodeDescriptionName) {
         Node labelNode = this.assertChildCreation(parent, type, containmentRef, nodeDescriptionName);
@@ -86,7 +94,7 @@ public class DiagramServiceTestHelper {
      * <p>
      * This code use the
      * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
-     * service to create a new element on a Node. Then check the the semantic creation occurred and the a new node has
+     * service to create a new element on a Node. Then check the semantic creation occurred and a new node has
      * been added inside the parent node with given EReference.
      * </p>
      *
@@ -94,14 +102,16 @@ public class DiagramServiceTestHelper {
      *            the visual parent
      * @param type
      *            the type of the element to be created
-     * @param containementRef
+     * @param containmentRef
      *            the containment reference
      * @param expectedNodeDescriptionId
      *            the name of the {@link NodeDescription} used to new {@link Node}
      * @return the newly created node
      */
-    public Node assertChildCreation(Node visualParent, EClass type, EReference containementRef, String expectedNodeDescriptionId) {
-        return this.assertChildCreation(visualParent, type, containementRef, expectedNodeDescriptionId, this.diagramHelper.getSemanticElement(visualParent));
+    public Node assertChildCreation(Node visualParent, EClass type, EReference containmentRef,
+            String expectedNodeDescriptionId) {
+        return this.assertChildCreation(visualParent, type, containmentRef, expectedNodeDescriptionId,
+                this.diagramHelper.getSemanticElement(visualParent));
     }
 
     /**
@@ -110,7 +120,7 @@ public class DiagramServiceTestHelper {
      * <p>
      * This code use the
      * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
-     * service to create a new element on a Node. Then check the the semantic creation occurred and the a new node has
+     * service to create a new element on a Node. Then check the semantic creation occurred and a new node has
      * been added inside the parent node with given EReference.
      * </p>
      *
@@ -118,7 +128,7 @@ public class DiagramServiceTestHelper {
      *            the visual parent
      * @param type
      *            the type of the element to be created
-     * @param containementRef
+     * @param containmentRef
      *            the containment reference
      * @param expectedNodeDescriptionId
      *            the name of the {@link NodeDescription} used to new {@link Node}
@@ -126,10 +136,12 @@ public class DiagramServiceTestHelper {
      *            expected semantic owner of the creation
      * @return the newly created node
      */
-    public Node assertChildCreation(Node visualParent, EClass type, EReference containementRef, String expectedNodeDescriptionId, EObject expectedSemanticOwner) {
+    public Node assertChildCreation(Node visualParent, EClass type, EReference containmentRef,
+            String expectedNodeDescriptionId, EObject expectedSemanticOwner) {
         EObject semanticOwner = this.diagramHelper.getSemanticElement(visualParent);
 
-        return this.assertChildCreation(visualParent, semanticOwner, type, containementRef, expectedNodeDescriptionId, expectedSemanticOwner);
+        return this.assertChildCreation(visualParent, semanticOwner, type, containmentRef, expectedNodeDescriptionId,
+                expectedSemanticOwner);
     }
 
     /**
@@ -138,7 +150,7 @@ public class DiagramServiceTestHelper {
      * <p>
      * This code use the
      * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
-     * service to create a new element on a Node. Then check the the semantic creation occurred and the a new node has
+     * service to create a new element on a Node. Then check the semantic creation occurred and a new node has
      * been added inside the parent node with given EReference.
      * </p>
      *
@@ -202,11 +214,11 @@ public class DiagramServiceTestHelper {
      * a new node has been added aside the sibling node with given EReference.
      * </p>
      *
-     * @param visualSinling
+     * @param visualSibling
      *            the visual sibling
      * @param type
      *            the type of the element to be created
-     * @param containementRef
+     * @param containmentRef
      *            the containment reference
      * @param expectedNodeDescriptionId
      *            the name of the {@link NodeDescription} used to new {@link Node}
@@ -214,17 +226,19 @@ public class DiagramServiceTestHelper {
      *            expected semantic owner of the creation
      * @return the newly created node
      */
-    public Node assertSiblingCreation(Node visualSibling, EClass type, EReference containementRef, String expectedNodeDescriptionId, EObject expectedSemanticOwner) {
+    public Node assertSiblingCreation(Node visualSibling, EClass type, EReference containmentRef,
+            String expectedNodeDescriptionId, EObject expectedSemanticOwner) {
         EObject semanticSibling = this.diagramHelper.getSemanticElement(visualSibling);
 
         EObject newElement = this.diagramHelper.modify(context -> {
-            EObject aNewElement = this.diagramService.createSibling(semanticSibling, type.getName(), containementRef.getName(), visualSibling, context, this.diagramHelper.getConvertedNodes());
+            EObject aNewElement = this.diagramService.createSibling(semanticSibling, type.getName(),
+                    containmentRef.getName(), visualSibling, context, this.diagramHelper.getConvertedNodes());
             assertTrue(type.isInstance(aNewElement));
             assertEquals(semanticSibling.eContainer(), aNewElement.eContainer());
-            if (containementRef.isMany()) {
-                assertTrue(((Collection<?>) expectedSemanticOwner.eGet(containementRef)).contains(aNewElement));
+            if (containmentRef.isMany()) {
+                assertTrue(((Collection<?>) expectedSemanticOwner.eGet(containmentRef)).contains(aNewElement));
             } else {
-                assertEquals(expectedSemanticOwner.eGet(containementRef), aNewElement);
+                assertEquals(expectedSemanticOwner.eGet(containmentRef), aNewElement);
 
             }
             return aNewElement;
@@ -240,7 +254,7 @@ public class DiagramServiceTestHelper {
      * <p>
      * This code use the
      * {@link AbstractDiagramService#createSibling(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
-     * service to create a new element as a sibling of on a Node. Then check the the semantic creation occurred and the
+     * service to create a new element as a sibling of on a Node. Then check the semantic creation occurred and the
      * a new node has been added aside the sibling node with given EReference. The expected semantic owner is expected
      * to be the semantic element of the visual parent
      * </p>
@@ -293,7 +307,7 @@ public class DiagramServiceTestHelper {
     }
 
     /**
-     * Uses the {@link AbstractDiagramService#drop(...)} and then checks that the drop was properly handled.
+     * Uses the {@link AbstractDiagramService#semanticDrop(EObject, Node, IEditingContext, IDiagramContext, Map)} and then checks that the drop was properly handled.
      *
      * @param expectedNodeDescriptionName
      *            the expected NodeDescription of the dropped element
@@ -311,7 +325,7 @@ public class DiagramServiceTestHelper {
     }
 
     /**
-     * Uses the {@link AbstractDiagramService#drop(...)} and then checks that the drop was properly handled. Here the
+     * Uses the {@link AbstractDiagramService#semanticDrop (...)} and then checks that the drop was properly handled. Here the
      * expected behavior is that the new element is created as a sibling of the target view
      *
      * @param expectedNodeDescriptionName
@@ -376,7 +390,7 @@ public class DiagramServiceTestHelper {
         Node targetNode = this.diagramHelper.assertGetUniqueMatchingNode(oldTargetNode.getDescriptionId(), oldTargetNode.getSemanticElement());
         Node target2Node = this.diagramHelper.assertGetUniqueMatchingNode(newTargetNode.getDescriptionId(), newTargetNode.getSemanticElement());
 
-        Optional<String> semanticEdgeId = Optional.of(this.objectService.getId(edgeMatchet.getSemanticElement()));
+        Optional<String> semanticEdgeId = Optional.of(this.identityService.getId(edgeMatchet.getSemanticElement()));
 
         Edge oldMatchingEdge = this.diagramHelper.getMatchingEdge(Optional.of(edgeMatchet.getDescriptionId()), semanticEdgeId, Optional.of(sourceNode.getId()), Optional.of(targetNode.getId()));
 
@@ -392,7 +406,7 @@ public class DiagramServiceTestHelper {
     /**
      * Asserts a reconnection of source.
      *
-     * @param edgeMatchet
+     * @param semanticEdge
      *            an edge matcher to select the edge to reconnect
      * @param oldSourceNode
      *            an ElementMatcher to select the old source node
@@ -414,7 +428,7 @@ public class DiagramServiceTestHelper {
         Node targetNode = this.diagramHelper.assertGetUniqueMatchingNode(target.getDescriptionId(), target.getSemanticElement());
         Node source2Node = this.diagramHelper.assertGetUniqueMatchingNode(newSourceNode.getDescriptionId(), newSourceNode.getSemanticElement());
 
-        Optional<String> semanticEdgeId = Optional.of(this.objectService.getId(semanticEdge.getSemanticElement()));
+        Optional<String> semanticEdgeId = Optional.of(this.identityService.getId(semanticEdge.getSemanticElement()));
 
         Edge oldMatchingEdge = this.diagramHelper.getMatchingEdge(Optional.of(semanticEdge.getDescriptionId()), semanticEdgeId, Optional.of(sourceNode.getId()), Optional.of(targetNode.getId()));
 
@@ -462,7 +476,7 @@ public class DiagramServiceTestHelper {
         return SynchronizedDomainBasedEdgeCreationTestHelper.builder()//
                 .withDiagramService(this.diagramService)//
                 .withEditingContext(this.editingContext)//
-                .withObjectService(this.objectService)//
+                .withObjectSearchService(this.objectSearchService)//
                 .withIdBuilder(idBuilder)//
                 .withRepresentationHelper(this.diagramHelper);
     }
@@ -477,7 +491,7 @@ public class DiagramServiceTestHelper {
     public SynchronizedDomainBasedEdgeTestHelper.Builder buildDomainBasedEdgeTestHelper(IdBuilder idBuilder) {
         return SynchronizedDomainBasedEdgeTestHelper.builder()//
                 .withIdBuilder(idBuilder)//
-                .withObjectService(this.objectService)//
+                .withIdentityService(this.identityService)//
                 .withRepresentationHelper(this.diagramHelper);
     }
 

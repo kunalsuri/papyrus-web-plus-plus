@@ -27,7 +27,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.web.application.representations.nodes.CustomImageNodeStyleProvider;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.diagrams.ArrangeLayoutDirection;
 import org.eclipse.sirius.components.diagrams.EdgeStyle;
 import org.eclipse.sirius.components.diagrams.FreeFormLayoutStrategy;
@@ -40,6 +41,7 @@ import org.eclipse.sirius.components.diagrams.LabelTextAlign;
 import org.eclipse.sirius.components.diagrams.ListLayoutStrategy;
 import org.eclipse.sirius.components.diagrams.OutsideLabelLocation;
 import org.eclipse.sirius.components.diagrams.UserResizableDirection;
+import org.eclipse.sirius.components.diagrams.components.LabelIdProvider;
 import org.eclipse.sirius.components.diagrams.description.DiagramDescription;
 import org.eclipse.sirius.components.diagrams.description.EdgeDescription;
 import org.eclipse.sirius.components.diagrams.description.EdgeLabelKind;
@@ -86,10 +88,10 @@ import org.eclipse.sirius.components.view.emf.diagram.IViewNodeDeleteHandler;
 import org.eclipse.sirius.components.view.emf.diagram.RelationBasedSemanticElementsProvider;
 import org.eclipse.sirius.components.view.emf.diagram.StylesFactory;
 import org.eclipse.sirius.components.view.emf.diagram.TargetProvider;
-import org.eclipse.sirius.components.view.emf.diagram.ToolConverter;
 import org.eclipse.sirius.components.view.emf.diagram.ToolFinder;
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverter;
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverterContext;
+import org.eclipse.sirius.components.view.emf.diagram.api.IToolConverter;
 import org.eclipse.sirius.components.view.emf.diagram.tools.api.IToolExecutor;
 import org.springframework.stereotype.Service;
 
@@ -111,7 +113,11 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private static final String DEFAULT_DIAGRAM_LABEL = "Diagram";
 
-    private final IObjectService objectService;
+    private final IIdentityService identityService;
+
+    private final ILabelService labelService;
+
+    private final IToolConverter toolConverter;
 
     private final IToolExecutor toolExecutor;
 
@@ -125,15 +131,17 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private final List<INodeStyleProvider> nodeStyleProviders;
 
-    public PapyrusViewDiagramDescriptionConverter(IObjectService objectService, IToolExecutor toolExecutor, List<INodeStyleProvider> nodeStyleProviders, IDiagramIdProvider diagramIdProvider) {
-        super(objectService, toolExecutor, nodeStyleProviders, diagramIdProvider);
-        this.objectService = Objects.requireNonNull(objectService);
+    public PapyrusViewDiagramDescriptionConverter(IIdentityService identityService, ILabelService labelService, IToolConverter toolConverter, IToolExecutor toolExecutor, List<INodeStyleProvider> nodeStyleProviders, IDiagramIdProvider diagramIdProvider) {
+        super(identityService, labelService, toolConverter, toolExecutor, nodeStyleProviders, diagramIdProvider);
+        this.identityService = Objects.requireNonNull(identityService);
+        this.labelService = Objects.requireNonNull(labelService);
+        this.toolConverter = Objects.requireNonNull(toolConverter);
         this.toolExecutor = Objects.requireNonNull(toolExecutor);
         this.diagramIdProvider = Objects.requireNonNull(diagramIdProvider);
         this.nodeStyleProviders = Objects.requireNonNull(nodeStyleProviders);
-        this.semanticTargetIdProvider = variableManager -> this.self(variableManager).map(this.objectService::getId).orElse(null);
-        this.semanticTargetKindProvider = variableManager -> this.self(variableManager).map(this.objectService::getKind).orElse(null);
-        this.semanticTargetLabelProvider = variableManager -> this.self(variableManager).map(this.objectService::getLabel).orElse(null);
+        this.semanticTargetIdProvider = variableManager -> this.self(variableManager).map(this.identityService::getId).orElse(null);
+        this.semanticTargetKindProvider = variableManager -> this.self(variableManager).map(this.identityService::getKind).orElse(null);
+        this.semanticTargetLabelProvider = variableManager -> this.self(variableManager).map(this.labelService::getStyledLabel).map(Object::toString).orElse(null);
     }
 
     @Override
@@ -145,7 +153,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
     public IRepresentationDescription convert(RepresentationDescription viewRepresentationDescription, List<RepresentationDescription> allRepresentationDescriptions, AQLInterpreter interpreter) {
         final org.eclipse.sirius.components.view.diagram.DiagramDescription viewDiagramDescription = (org.eclipse.sirius.components.view.diagram.DiagramDescription) viewRepresentationDescription;
         ViewDiagramDescriptionConverterContext converterContext = new ViewDiagramDescriptionConverterContext(interpreter);
-        StylesFactory stylesFactory = new StylesFactory(Objects.requireNonNull(this.nodeStyleProviders), this.objectService, interpreter);
+        StylesFactory stylesFactory = new StylesFactory(this.nodeStyleProviders, this.labelService, interpreter);
 
         // Nodes must be fully converted first.
         List<NodeDescription> nodeDescriptions = viewDiagramDescription.getNodeDescriptions().stream().map(node -> this.convert(node, converterContext, stylesFactory)).toList();
@@ -158,8 +166,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
         // Edges that have a node as source or target must be fully converted first
         List<EdgeDescription> edgeDescriptions = Stream.concat(edgeDescriptionsWithNodesAsSourceOrTarget.stream(), edgeDescriptionsWithAnotherEdgeAsSourceOrTarget.stream())
                 .map(edge -> this.convert(edge, converterContext, stylesFactory)).toList();
-
-        var toolConverter = new ToolConverter(this.objectService, this.toolExecutor, this.diagramIdProvider);
 
         var builder = DiagramDescription.newDiagramDescription(this.diagramIdProvider.getId(viewDiagramDescription))
                 .label(Optional.ofNullable(viewDiagramDescription.getName()).orElse(DEFAULT_DIAGRAM_LABEL))
@@ -180,7 +186,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .targetObjectIdProvider(this.semanticTargetIdProvider)
                 .nodeDescriptions(nodeDescriptions)
                 .edgeDescriptions(edgeDescriptions)
-                .palettes(toolConverter.createPaletteBasedToolSections(viewDiagramDescription, converterContext))
+                .palettes(this.toolConverter.createPaletteBasedToolSections(viewDiagramDescription, converterContext))
                 .dropHandler(this.createDiagramDropHandler(viewDiagramDescription, converterContext))
                 .iconURLsProvider(new ViewIconURLsProvider(interpreter, viewDiagramDescription.getIconExpression()));
 
@@ -305,9 +311,9 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 childrenLayoutStrategy = new FreeFormLayoutStrategy();
             }
             if (effectiveStyle instanceof CustomImageNodeStyleDescription) {
-                return provider.createNodeStyle(effectiveStyle, optionalEditingContextId, variableManager, interpreter,childrenLayoutStrategy).get();
+                return provider.createNodeStyle(effectiveStyle, optionalEditingContextId, variableManager, interpreter, childrenLayoutStrategy).get();
             }
-            return stylesFactory.createNodeStyle(effectiveStyle, optionalEditingContextId,childrenLayoutStrategy);
+            return stylesFactory.createNodeStyle(effectiveStyle, optionalEditingContextId, childrenLayoutStrategy);
         };
         /* Modified Code End */
 
@@ -423,11 +429,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             return null;
         }
 
-        Function<VariableManager, String> labelIdProvider = variableManager -> {
-            Object parentId = variableManager.get(InsideLabelDescription.OWNER_ID, Object.class).orElse(null);
-            return parentId + InsideLabelDescription.INSIDE_LABEL_SUFFIX;
-        };
-
         Function<VariableManager, LabelStyleDescription> styleDescriptionProvider = variableManager -> {
             var effectiveStyle = this.findEffectiveInsideLabelStyle(viewInsideLabelDescription, interpreter, variableManager);
             return stylesFactory.createInsideLabelStyle(effectiveStyle);
@@ -449,8 +450,8 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             return HeaderSeparatorDisplayMode.NEVER;
         };
 
-        return InsideLabelDescription.newInsideLabelDescription(EcoreUtil.getURI(viewNodeDescription).toString() + InsideLabelDescription.INSIDE_LABEL_SUFFIX)
-                .idProvider(labelIdProvider)
+
+        return InsideLabelDescription.newInsideLabelDescription(EcoreUtil.getURI(viewNodeDescription).toString() + LabelIdProvider.INSIDE_LABEL_SUFFIX)
                 .textProvider(variableManager -> this.evaluateString(interpreter, variableManager, viewInsideLabelDescription.getLabelExpression()))
                 .styleDescriptionProvider(styleDescriptionProvider)
                 .isHeaderProvider(isHeaderProvider)
@@ -463,10 +464,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private List<OutsideLabelDescription> getOutsideLabelDescriptions(org.eclipse.sirius.components.view.diagram.NodeDescription viewNodeDescription, AQLInterpreter interpreter, StylesFactory stylesFactory) {
         return viewNodeDescription.getOutsideLabels().stream().map(outsideLabelDescription -> {
-            Function<VariableManager, String> labelIdProvider = variableManager -> {
-                Object parentId = variableManager.get(OutsideLabelDescription.OWNER_ID, Object.class).orElse(null);
-                return parentId + OutsideLabelDescription.OUTSIDE_LABEL_SUFFIX + outsideLabelDescription.getPosition().getLiteral();
-            };
 
             Function<VariableManager, LabelStyleDescription> styleDescriptionProvider = variableManager -> {
                 var effectiveStyle = this.findEffectiveOutsideLabelStyle(outsideLabelDescription, interpreter, variableManager);
@@ -474,8 +471,7 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             };
 
             return OutsideLabelDescription.newOutsideLabelDescription(EcoreUtil.getURI(viewNodeDescription)
-                            .toString() + OutsideLabelDescription.OUTSIDE_LABEL_SUFFIX + outsideLabelDescription.getPosition().getLiteral())
-                    .idProvider(labelIdProvider)
+                            .toString() + LabelIdProvider.OUTSIDE_LABEL_SUFFIX + outsideLabelDescription.getPosition().getLiteral())
                     .textProvider(variableManager -> this.evaluateString(interpreter, variableManager, outsideLabelDescription.getLabelExpression()))
                     .styleDescriptionProvider(styleDescriptionProvider)
                     .outsideLabelLocation(OutsideLabelLocation.BOTTOM_MIDDLE)
@@ -505,11 +501,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
             return Optional.empty();
         }
 
-        Function<VariableManager, String> labelIdProvider = variableManager -> {
-            Object parentId = variableManager.get(LabelDescription.OWNER_ID, Object.class).orElse(null);
-            return parentId + labelSuffix;
-        };
-
         Function<VariableManager, LabelStyleDescription> styleDescriptionProvider = variableManager -> {
             var effectiveStyle = viewEdgeDescription.getConditionalStyles().stream()
                     .filter(style -> this.matches(interpreter, style.getCondition(), variableManager))
@@ -521,7 +512,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
         };
 
         return Optional.of(LabelDescription.newLabelDescription(EcoreUtil.getURI(viewEdgeDescription).toString() + labelSuffix)
-                .idProvider(labelIdProvider)
                 .textProvider(variableManager -> this.evaluateString(interpreter, variableManager, labelExpression))
                 .styleDescriptionProvider(styleDescriptionProvider)
                 .build());
@@ -620,10 +610,12 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .styleProvider(styleProvider)
                 .deleteHandler(this.createDeleteHandler(viewEdgeDescription, converterContext));
 
-        this.getSpecificEdgeLabelDescription(viewEdgeDescription, viewEdgeDescription.getBeginLabelExpression(), "_beginlabel", interpreter, stylesFactory).ifPresent(builder::beginLabelDescription);
-        this.getSpecificEdgeLabelDescription(viewEdgeDescription, viewEdgeDescription.getCenterLabelExpression(), "_centerlabel", interpreter, stylesFactory)
+        this.getSpecificEdgeLabelDescription(viewEdgeDescription, viewEdgeDescription.getBeginLabelExpression(), LabelIdProvider.EDGE_BEGIN_LABEL_SUFFIX, interpreter, stylesFactory)
+                .ifPresent(builder::beginLabelDescription);
+        this.getSpecificEdgeLabelDescription(viewEdgeDescription, viewEdgeDescription.getCenterLabelExpression(), LabelIdProvider.EDGE_CENTER_LABEL_SUFFIX, interpreter, stylesFactory)
                 .ifPresent(builder::centerLabelDescription);
-        this.getSpecificEdgeLabelDescription(viewEdgeDescription, viewEdgeDescription.getEndLabelExpression(), "_endlabel", interpreter, stylesFactory).ifPresent(builder::endLabelDescription);
+        this.getSpecificEdgeLabelDescription(viewEdgeDescription, viewEdgeDescription.getEndLabelExpression(), LabelIdProvider.EDGE_END_LABEL_SUFFIX, interpreter, stylesFactory)
+                .ifPresent(builder::endLabelDescription);
         new ToolFinder().findEdgeLabelEditTool(viewEdgeDescription)
                 .ifPresent(labelEditTool -> builder.labelEditHandler(this.createEdgeLabelEditHandler(viewEdgeDescription, converterContext)));
         EdgeDescription result = builder.build();

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -1493,7 +1493,8 @@ public class ClassDiagramTests extends AbstractDiagramTest {
 
         for (Edge edge : edges) {
             // Check arrow style
-            Association association = (Association) this.getObjectService().getObject(this.getEditingContext(), edge.getTargetObjectId()).get();
+            Association association = (Association) this.getObjectSearchService()
+                    .getObject(this.getEditingContext(), edge.getTargetObjectId()).get();
             assertEquals(this.getExpectedArrowStyle(association, false), edge.getStyle().getSourceArrow(), "Invalid begin style for association " + association.getName());
             assertEquals(this.getExpectedArrowStyle(association, true), edge.getStyle().getTargetArrow(), "Invalid end style for association " + association.getName());
 
@@ -1538,7 +1539,9 @@ public class ClassDiagramTests extends AbstractDiagramTest {
 
     @Override
     protected ClassDiagramService buildService() {
-        return new ClassDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new ClassDiagramService(this.getIdentityService(), this.getLabelService(), this.getObjectSearchService(),
+                this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true,
+                this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

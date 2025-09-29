@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,8 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.utils.Vie
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
 
@@ -37,7 +38,9 @@ import org.eclipse.sirius.components.diagrams.description.NodeDescription;
  */
 public class WebDiagramElementCreator {
 
-    private final IObjectService objectService;
+    private final IIdentityService identityService;
+
+    private final ILabelService labelService;
 
     private final IViewDiagramDescriptionService viewDiagramNavigationService;
 
@@ -45,20 +48,25 @@ public class WebDiagramElementCreator {
 
     private final ICreator elementCreator;
 
-    public WebDiagramElementCreator(ICreator elementCreator, IObjectService objectService, IViewDiagramDescriptionService diagramNavigationService,
+    public WebDiagramElementCreator(ICreator elementCreator, IIdentityService identityService,
+            ILabelService labelService, IViewDiagramDescriptionService diagramNavigationService,
             IDiagramOperationsService diagramOperationsService) {
         super();
         this.elementCreator = Objects.requireNonNull(elementCreator);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.identityService = Objects.requireNonNull(identityService);
+        this.labelService = Objects.requireNonNull(labelService);
         this.viewDiagramNavigationService = Objects.requireNonNull(diagramNavigationService);
         this.diagramOperationsService = Objects.requireNonNull(diagramOperationsService);
     }
 
-    public CreationStatus handleCreation(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
+    public CreationStatus handleCreation(EObject parent, String type, String referenceName, Node targetView,
+            IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
 
         if (parent == null || type == null || referenceName == null) {
-            return CreationStatus.createFailingStatus(MessageFormat.format("Invalid input for creation (parent ={0} type ={1} referenceName = {2})", parent, type, referenceName));
+            return CreationStatus.createFailingStatus(
+                    MessageFormat.format("Invalid input for creation (parent ={0} type ={1} referenceName = {2})",
+                            parent, type, referenceName));
         }
 
         CreationStatus status = this.elementCreator.create(parent, type, referenceName);
@@ -66,7 +74,9 @@ public class WebDiagramElementCreator {
         if (status.getState() == State.DONE) {
             EObject semanticElement = status.getElement();
             if (semanticElement != null) {
-                IViewHelper createViewHelper = ViewHelper.create(this.objectService, this.viewDiagramNavigationService, this.diagramOperationsService, diagramContext, capturedNodeDescriptions);
+                IViewHelper createViewHelper = ViewHelper.create(this.identityService, this.labelService,
+                        this.viewDiagramNavigationService, this.diagramOperationsService, diagramContext,
+                        capturedNodeDescriptions);
                 if (targetView == null) {
                     createViewHelper.createRootView(semanticElement);
                 } else {

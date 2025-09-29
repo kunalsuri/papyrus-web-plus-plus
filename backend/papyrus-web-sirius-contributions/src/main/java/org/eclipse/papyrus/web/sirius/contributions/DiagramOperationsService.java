@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.ViewCreationRequest;
 import org.eclipse.sirius.components.diagrams.ViewDeletionRequest;
@@ -32,15 +32,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DiagramOperationsService implements IDiagramOperationsService {
-    private final IObjectService objectService;
 
-    public DiagramOperationsService(IObjectService objectService) {
-        this.objectService = Objects.requireNonNull(objectService);
+    private final IIdentityService identityService;
+
+    public DiagramOperationsService(IIdentityService identityService) {
+        this.identityService = Objects.requireNonNull(identityService);
     }
 
     @Override
     public void createView(IDiagramContext diagramContext, EObject semanticElement, Optional<Node> optionalParentNode, NodeDescription nodeDescription, NodeContainmentKind containmentKind) {
-        String targetObjectId = this.objectService.getId(semanticElement);
+        String targetObjectId = this.identityService.getId(semanticElement);
         String parentElementId = optionalParentNode.map(Node::getId).orElseGet(() -> diagramContext.getDiagram().getId());
         ViewCreationRequest viewCreationRequest = ViewCreationRequest.newViewCreationRequest()
                 .parentElementId(parentElementId)

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -40,7 +40,9 @@ import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNode
 import org.eclipse.sirius.components.collaborative.api.IRepresentationSearchService;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.core.api.IRepresentationDescriptionSearchService;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.Node;
@@ -65,22 +67,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProfileDiagramService extends AbstractDiagramService {
 
-    private IRepresentationSearchService representationSearchService;
+    private final IRepresentationSearchService representationSearchService;
 
-    private IRepresentationDescriptionSearchService representationDescriptionSearchService;
+    private final IRepresentationDescriptionSearchService representationDescriptionSearchService;
 
-    private PapyrusRepresentationDescriptionRegistry papyrusRepresentationRegistry;
+    private final PapyrusRepresentationDescriptionRegistry papyrusRepresentationRegistry;
 
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
 
     /**
      * Constructor.
      *
-     * @param objectService
-     *            service used to retrieve semantic object from a Diagram node
+     * @param identityService
+     *         the service in charge of getting the identity of an object
+     * @param labelService
+     *         the service in charge of getting labels and images of an object
+     * @param objectSearchService
+     *         the service in charge of getting an object from its id
      * @param diagramNavigationService
      *            helper that must introspect the current diagram's structure and its description
      * @param diagramOperationsService
@@ -100,11 +106,14 @@ public class ProfileDiagramService extends AbstractDiagramService {
      *            Logger used to report errors and warnings to the user
      */
     // CHECKSTYLE:OFF
-    public ProfileDiagramService(IObjectService objectService, IDiagramNavigationService diagramNavigationService, IDiagramOperationsService diagramOperationsService, IEditableChecker editableChecker,
+    public ProfileDiagramService(IIdentityService identityService, ILabelService labelService,
+            IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService,
+            IDiagramOperationsService diagramOperationsService, IEditableChecker editableChecker,
             IViewDiagramDescriptionService viewDiagramService, IRepresentationSearchService representationSearchService, IRepresentationDescriptionSearchService representationDescriptionSearchService,
             PapyrusRepresentationDescriptionRegistry papyrusRepresentationRegistry, ILogger logger) {
         // CHECKSTYLE:ON
-        super(objectService, diagramNavigationService, diagramOperationsService, editableChecker, viewDiagramService, logger);
+        super(identityService, labelService, objectSearchService, diagramNavigationService, diagramOperationsService,
+                editableChecker, viewDiagramService, logger);
         this.representationSearchService = representationSearchService;
         this.representationDescriptionSearchService = representationDescriptionSearchService;
         this.papyrusRepresentationRegistry = papyrusRepresentationRegistry;
@@ -114,8 +123,11 @@ public class ProfileDiagramService extends AbstractDiagramService {
     @Override
     protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ProfileSemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
+                this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ProfileSemanticDropBehaviorProvider(
+                editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -124,8 +136,11 @@ public class ProfileDiagramService extends AbstractDiagramService {
     @Override
     protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
-        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ProfileGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectService(),
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
+                this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
+        IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ProfileGraphicalDropBehaviorProvider(
+                editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
                 new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
@@ -146,7 +161,8 @@ public class ProfileDiagramService extends AbstractDiagramService {
             Optional<Diagram> optDiagram = this.representationSearchService.findById(editingContext, representationId, Diagram.class);
             if (optDiagram.isPresent()) {
                 Optional<IRepresentationDescription> optDescription = this.representationDescriptionSearchService.findById(editingContext, optDiagram.get().getDescriptionId());
-                EObject eObject = (EObject) this.getObjectService().getObject(editingContext, optDiagram.get().getTargetObjectId()).orElse(null);
+                EObject eObject = (EObject) this.getObjectSearchService()
+                        .getObject(editingContext, optDiagram.get().getTargetObjectId()).orElse(null);
                 result = optDescription.isPresent() && Objects.equals(optDescription.get().getLabel(), PRDDiagramDescriptionBuilder.PRD_REP_NAME) && this.isProfileModel(eObject);
             }
         }
@@ -241,7 +257,8 @@ public class ProfileDiagramService extends AbstractDiagramService {
             }
             if (optProfile.isPresent()) {
                 Profile profile = optProfile.get();
-                Optional<Class> optMetaclass = this.getObjectService().getObject(editingContext, metaclassId).map(Class.class::cast);
+                Optional<Class> optMetaclass = this.getObjectSearchService().getObject(editingContext, metaclassId)
+                        .map(Class.class::cast);
                 ElementImport elementImport = null;
                 if (optMetaclass.isPresent()) {
                     Optional<ElementImport> optionalElementImport = this.getImportElementForMetaclass(profile, optMetaclass.get());
@@ -291,7 +308,8 @@ public class ProfileDiagramService extends AbstractDiagramService {
         Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> convertedNodes = this.papyrusRepresentationRegistry
                 .getConvertedNode(PRDDiagramDescriptionBuilder.PRD_REP_NAME);
 
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, convertedNodes);
+        IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
+                this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext, convertedNodes);
         if (parentNode == null) {
             result = createViewHelper.createRootView(elementImport.getImportedElement(), PRDDiagramDescriptionBuilder.PRD_METACLASS);
         } else {
@@ -317,7 +335,7 @@ public class ProfileDiagramService extends AbstractDiagramService {
     private Optional<Profile> getProfile(IEditingContext editingContext, String objectId) {
         Objects.requireNonNull(editingContext);
         Objects.requireNonNull(objectId);
-        return this.getObjectService().getObject(editingContext, objectId)//
+        return this.getObjectSearchService().getObject(editingContext, objectId)//
                 .filter(Profile.class::isInstance)//
                 .map(Profile.class::cast);
     }

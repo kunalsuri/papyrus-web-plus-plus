@@ -754,7 +754,9 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     @Override
     protected ComponentDiagramService buildService() {
-        return new ComponentDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new ComponentDiagramService(this.getIdentityService(), this.getLabelService(),
+                this.getObjectSearchService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(),
+                e -> true, this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

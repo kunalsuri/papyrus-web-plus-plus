@@ -145,11 +145,11 @@ describe('Comment table tests', () => {
     getCellAtPosition(2, 2).contains('4th row');
     getCellAtPosition(3, 1).contains('4th row');
 
-    // clear the name of an annotated element => <Class> should be visible in the table cell
+    // clear the name of an annotated element => Class should be visible in the table cell
     getCellAtPosition(0, 0).contains('1').click();
     cy.activateDetailsTabAndWaitForElement('UML', 'reference-value-ClassA').click();
     cy.activateDetailsTabAndWaitForElement('UML', 'input-Name').clear().type('{enter}');
-    getCellAtPosition(0, 2).contains('<Class>');
+    getCellAtPosition(0, 2).contains('Class');
 
     // check that by default navigation buttons are disabled
     getPreviousPageButton().should('be.disabled');

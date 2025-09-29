@@ -318,7 +318,9 @@ public class CommunicationDiagramServiceTests extends AbstractDiagramTest {
 
     @Override
     protected CommunicationDiagramService buildService() {
-        return new CommunicationDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new CommunicationDiagramService(this.getIdentityService(), this.getLabelService(),
+                this.getObjectSearchService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(),
+                e -> true, this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

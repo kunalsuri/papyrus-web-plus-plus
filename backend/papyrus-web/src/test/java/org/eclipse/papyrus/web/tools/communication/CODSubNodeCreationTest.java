@@ -76,9 +76,12 @@ public class CODSubNodeCreationTest extends NodeCreationTest {
 
         NodeCreationSemanticChecker semanticChecker;
         if (UML.getDurationObservation().isSuperTypeOf(expectedType) || UML.getTimeObservation().isSuperTypeOf(expectedType)) {
-            semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType, () -> this.getRootSemanticElement(), expectedContainmentReference);
+            semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(), this.getIdentityService(),
+                    this::getEditingContext, expectedType, () -> this.getRootSemanticElement(),
+                    expectedContainmentReference);
         } else {
-            semanticChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType, () -> this.findSemanticElementByName(ROOT_INTERACTION),
+            semanticChecker = new NodeCreationSemanticChecker(this.getObjectSearchService(), this.getIdentityService(),
+                    this::getEditingContext, expectedType, () -> this.findSemanticElementByName(ROOT_INTERACTION),
                     expectedContainmentReference);
         }
         this.createSubNode(ROOT_INTERACTION, nodeCreationTool, new CombinedChecker(graphicalChecker, semanticChecker));

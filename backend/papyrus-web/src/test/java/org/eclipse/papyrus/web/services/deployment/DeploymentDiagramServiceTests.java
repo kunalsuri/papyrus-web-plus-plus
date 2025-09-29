@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -247,7 +247,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
     }
 
     /**
-     * Test {@link DeploymentDiagramService#getDeviceCandidates(org.eclipse.uml2.uml.Element)} from {@link Package} with
+     * Test {@link DeploymentDiagramService#getDeviceCandidatesDD(org.eclipse.uml2.uml.Element)} from {@link Package} with
      * no {@link Device}.
      */
     @Test
@@ -257,7 +257,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
     }
 
     /**
-     * Test {@link DeploymentDiagramService#getDeviceCandidates(org.eclipse.uml2.uml.Element)} from a {@code null}
+     * Test {@link DeploymentDiagramService#getDeviceCandidatesDD(org.eclipse.uml2.uml.Element)} from a {@code null}
      * element.
      */
     @Test
@@ -266,7 +266,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
     }
 
     /**
-     * Test {@link DeploymentDiagramService#getDeviceCandidates(org.eclipse.uml2.uml.Element)} from container with
+     * Test {@link DeploymentDiagramService#getDeviceCandidatesDD(org.eclipse.uml2.uml.Element)} from container with
      * {@link Device}.
      */
     @Test
@@ -629,7 +629,9 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     @Override
     protected DeploymentDiagramService buildService() {
-        return new DeploymentDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new DeploymentDiagramService(this.getIdentityService(), this.getLabelService(),
+                this.getObjectSearchService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(),
+                e -> true, this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

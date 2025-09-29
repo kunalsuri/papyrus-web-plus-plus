@@ -56,7 +56,9 @@ import org.eclipse.papyrus.web.custom.widgets.primitiveradio.PrimitiveRadioDescr
 import org.eclipse.sirius.components.collaborative.api.ChangeKind;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.labels.StyledString;
 import org.eclipse.sirius.components.emf.services.api.IEMFEditingContext;
 import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
 import org.eclipse.sirius.components.forms.ListStyle;
@@ -87,7 +89,8 @@ import org.eclipse.sirius.components.widget.reference.ReferenceWidgetDescription
 import org.eclipse.sirius.components.widget.reference.ReferenceWidgetStyle;
 
 /**
- * Converts all view-based Papyrus widget description into its API equivalent.<br> Each custom widget has it own method caseXXX
+ * Converts all view-based Papyrus widget description into its API equivalent.<br>
+ * Each custom widget has it own method caseXXX
  *
  * @author Jerome Gout
  */
@@ -101,11 +104,13 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
 
     private final AQLInterpreter interpreter;
 
+    private final ILabelService labelService;
+
+    private final IIdentityService identityService;
+
     private final IFeedbackMessageService feedbackMessageService;
 
     private final Function<VariableManager, String> semanticTargetIdProvider;
-
-    private final IObjectService objectService;
 
     private final IOperationExecutor operationExecutor;
 
@@ -113,11 +118,14 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
 
     private final IEMFKindService emfKindService;
 
-    public PapyrusWidgetsConverterSwitch(AQLInterpreter interpreter, IObjectService objectService, IOperationExecutor operationExecutor, IFeedbackMessageService feedbackMessageService,
-            IFormIdProvider widgetIdProvider, IEMFKindService emfKindService) {
+    public PapyrusWidgetsConverterSwitch(AQLInterpreter interpreter, ILabelService labelService,
+            IOperationExecutor operationExecutor, IFeedbackMessageService feedbackMessageService,
+            IFormIdProvider widgetIdProvider, IEMFKindService emfKindService, IIdentityService identityService) {
         this.interpreter = Objects.requireNonNull(interpreter);
-        this.semanticTargetIdProvider = variableManager -> variableManager.get(VariableManager.SELF, Object.class).map(objectService::getId).orElse(null);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.labelService = Objects.requireNonNull(labelService);
+        this.identityService = Objects.requireNonNull(identityService);
+        this.semanticTargetIdProvider = variableManager -> variableManager.get(VariableManager.SELF, Object.class)
+                .map(identityService::getId).orElse(null);
         this.operationExecutor = Objects.requireNonNull(operationExecutor);
         this.feedbackMessageService = Objects.requireNonNull(feedbackMessageService);
         this.widgetIdProvider = Objects.requireNonNull(widgetIdProvider);
@@ -126,45 +134,54 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
     }
 
     @Override
-    public Optional<AbstractWidgetDescription> caseCustomImageWidgetDescription(CustomImageWidgetDescription customImageDescription) {
+    public Optional<AbstractWidgetDescription> caseCustomImageWidgetDescription(
+            CustomImageWidgetDescription customImageDescription) {
         String descriptionId = this.getDescriptionId(customImageDescription);
 
-        var builder = org.eclipse.papyrus.web.custom.widgets.customimage.CustomImageDescription.newCustomImageDescription(descriptionId) //
+        var builder = org.eclipse.papyrus.web.custom.widgets.customimage.CustomImageDescription.newCustomImageDescription(
+                descriptionId) //
                 .idProvider(new WidgetIdProvider()) //
                 .labelProvider(variableManager -> this.getCustomImageLabel(customImageDescription, variableManager))//
                 .iconURLProvider(variableManager -> List.of()) //
                 .currentUuidProvider(this.getStringValueProvider(customImageDescription.getUuidExpression()))
-                .newUuidHandler(
-                        this.handleOperation(customImageDescription.getSelectImageOperation(), SelectImageOperation::getBody, "Something went wrong while updating the image's uuid."))
-                .removeUuidHandler(
-                        this.handleOperation(customImageDescription.getRemoveImageOperation(), RemoveImageOperation::getBody, "Something went wrong while removing the image's uuid."))
+                .newUuidHandler(this.handleOperation(customImageDescription.getSelectImageOperation(),
+                        SelectImageOperation::getBody, "Something went wrong while updating the image's uuid."))
+                .removeUuidHandler(this.handleOperation(customImageDescription.getRemoveImageOperation(),
+                        RemoveImageOperation::getBody, "Something went wrong while removing the image's uuid."))
                 .targetObjectIdProvider(this.semanticTargetIdProvider) //
                 .isReadOnlyProvider(this.getReadOnlyValueProvider("true"));
         // .isReadOnlyProvider(this.getReadOnlyValueProvider(customImageDescription.getIsEnabledExpression()));
 
-        if (customImageDescription.getHelpExpression() != null && !customImageDescription.getHelpExpression().isBlank()) {
+        if (customImageDescription.getHelpExpression() != null && !customImageDescription.getHelpExpression()
+                .isBlank()) {
             builder.helpTextProvider(this.getStringValueProvider(customImageDescription.getHelpExpression()));
         }
 
         return Optional.of(builder.build());
     }
 
-    private String getCustomImageLabel(CustomImageWidgetDescription customImageDescription, VariableManager variableManager) {
-        return new StringValueProvider(this.interpreter, customImageDescription.getLabelExpression()).apply(variableManager);
+    private String getCustomImageLabel(CustomImageWidgetDescription customImageDescription,
+            VariableManager variableManager) {
+        return new StringValueProvider(this.interpreter, customImageDescription.getLabelExpression()).apply(
+                variableManager);
     }
 
     @Override
-    public Optional<AbstractWidgetDescription> caseLanguageExpressionWidgetDescription(LanguageExpressionWidgetDescription languageExpressionDescription) {
+    public Optional<AbstractWidgetDescription> caseLanguageExpressionWidgetDescription(
+            LanguageExpressionWidgetDescription languageExpressionDescription) {
         String descriptionId = this.getDescriptionId(languageExpressionDescription);
 
         var builder = LanguageExpressionDescription.newLanguageExpressionDescription(descriptionId) //
                 .idProvider(new WidgetIdProvider()) //
-                .labelProvider(variableManager -> this.getLanguageExpressionLabel(languageExpressionDescription, variableManager))//
+                .labelProvider(variableManager -> this.getLanguageExpressionLabel(languageExpressionDescription,
+                        variableManager))//
                 .iconURLProvider(variableManager -> List.of()) //
                 .targetObjectIdProvider(this.semanticTargetIdProvider) //
-                .isReadOnlyProvider(this.getReadOnlyValueProvider(languageExpressionDescription.getIsEnabledExpression()));
+                .isReadOnlyProvider(
+                        this.getReadOnlyValueProvider(languageExpressionDescription.getIsEnabledExpression()));
 
-        if (languageExpressionDescription.getHelpExpression() != null && !languageExpressionDescription.getHelpExpression().isBlank()) {
+        if (languageExpressionDescription.getHelpExpression() != null
+                && !languageExpressionDescription.getHelpExpression().isBlank()) {
             builder.helpTextProvider(this.getStringValueProvider(languageExpressionDescription.getHelpExpression()));
         }
 
@@ -175,25 +192,31 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
         return this.widgetIdProvider.getFormElementDescriptionId(description);
     }
 
-    private String getLanguageExpressionLabel(LanguageExpressionWidgetDescription languageExpressionDescription, VariableManager variableManager) {
-        return new StringValueProvider(this.interpreter, languageExpressionDescription.getLabelExpression()).apply(variableManager);
+    private String getLanguageExpressionLabel(LanguageExpressionWidgetDescription languageExpressionDescription,
+            VariableManager variableManager) {
+        return new StringValueProvider(this.interpreter, languageExpressionDescription.getLabelExpression()).apply(
+                variableManager);
     }
 
     @Override
-    public Optional<AbstractWidgetDescription> casePrimitiveRadioWidgetDescription(PrimitiveRadioWidgetDescription primitiveRadioDescription) {
+    public Optional<AbstractWidgetDescription> casePrimitiveRadioWidgetDescription(
+            PrimitiveRadioWidgetDescription primitiveRadioDescription) {
         String descriptionId = this.getDescriptionId(primitiveRadioDescription);
 
         var builder = PrimitiveRadioDescription.newPrimitiveRadioDescription(descriptionId)//
                 .idProvider(new WidgetIdProvider()) //
                 .targetObjectIdProvider(this.semanticTargetIdProvider) //
-                .labelProvider(variableManager -> this.getPrimitiveRadioLabel(primitiveRadioDescription, variableManager)) //
+                .labelProvider(
+                        variableManager -> this.getPrimitiveRadioLabel(primitiveRadioDescription, variableManager)) //
                 .iconURLProvider(variableManager -> List.of()) //
-                .isReadOnlyProvider(this.getReadOnlyValueProvider(primitiveRadioDescription.getIsEnabledExpression())) //
+                .isReadOnlyProvider(
+                        this.getReadOnlyValueProvider(primitiveRadioDescription.getIsEnabledExpression())) //
                 .candidateValueProvider(this.getStringValueProvider(primitiveRadioDescription.getValueExpression())) //
                 .candidateListProvider(this.getOptionsProvider(primitiveRadioDescription.getCandidatesExpression())) //
                 .newValueHandler(this.getOperationsHandler(primitiveRadioDescription.getBody()));
 
-        if (primitiveRadioDescription.getHelpExpression() != null && !primitiveRadioDescription.getHelpExpression().isBlank()) {
+        if (primitiveRadioDescription.getHelpExpression() != null && !primitiveRadioDescription.getHelpExpression()
+                .isBlank()) {
             builder.helpTextProvider(this.getStringValueProvider(primitiveRadioDescription.getHelpExpression()));
         }
 
@@ -209,19 +232,26 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
     }
 
     @Override
-    public Optional<AbstractWidgetDescription> casePrimitiveListWidgetDescription(org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription) {
+    public Optional<AbstractWidgetDescription> casePrimitiveListWidgetDescription(
+            org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription) {
         String descriptionId = this.getDescriptionId(viewListDescription);
         StringValueProvider labelProvider = this.getStringValueProvider(viewListDescription.getLabelExpression());
-        Function<VariableManager, Boolean> isReadOnlyProvider = this.getReadOnlyValueProvider(viewListDescription.getIsEnabledExpression());
-        Function<VariableManager, List<?>> valueProvider = this.getValuesProvider(viewListDescription.getValueExpression());
-        Function<VariableManager, String> displayProvider = this.getItemLabelProvider(viewListDescription.getDisplayExpression());
+        Function<VariableManager, Boolean> isReadOnlyProvider = this.getReadOnlyValueProvider(
+                viewListDescription.getIsEnabledExpression());
+        Function<VariableManager, List<?>> valueProvider = this.getValuesProvider(
+                viewListDescription.getValueExpression());
+        Function<VariableManager, String> displayProvider = this.getItemLabelProvider(
+                viewListDescription.getDisplayExpression());
         Function<VariableManager, Boolean> isDeletableProvider = variableManager -> viewListDescription.getDeleteOperation() != null;
         Function<VariableManager, String> itemIdProvider = this::getPrimitiveListItemId;
         Function<VariableManager, String> itemKindProvider = variableManger -> "unknown";
-        Function<VariableManager, IStatus> itemDeleteHandlerProvider = this.handleOperation(viewListDescription.getDeleteOperation(), PrimitiveListDeleteOperation::getBody, DELETION_ERROR_MSG);
-        Function<VariableManager, IStatus> itemActionHandlerProvider = this.handleOperation(viewListDescription.getItemActionOperation(), PrimitiveListItemActionOperation::getBody,
+        Function<VariableManager, IStatus> itemDeleteHandlerProvider = this.handleOperation(
+                viewListDescription.getDeleteOperation(), PrimitiveListDeleteOperation::getBody, DELETION_ERROR_MSG);
+        Function<VariableManager, IStatus> itemActionHandlerProvider = this.handleOperation(
+                viewListDescription.getItemActionOperation(), PrimitiveListItemActionOperation::getBody,
                 ITEM_ACTION_ERROR_MSG);
-        BiFunction<VariableManager, String, IStatus> newValueHandlerProvider = this.getNewValueHandler(viewListDescription.getAddOperation());
+        BiFunction<VariableManager, String, IStatus> newValueHandlerProvider = this.getNewValueHandler(
+                viewListDescription.getAddOperation());
 
         Function<VariableManager, ListStyle> styleProvider = variableManager -> {
             var effectiveStyle = viewListDescription.getConditionalStyles().stream()//
@@ -233,7 +263,8 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
             return new ListStyleProvider(effectiveStyle).apply(variableManager);
         };
 
-        PrimitiveListWidgetDescription.Builder builder = PrimitiveListWidgetDescription.newPrimitiveListDescription(descriptionId)//
+        PrimitiveListWidgetDescription.Builder builder = PrimitiveListWidgetDescription.newPrimitiveListDescription(
+                descriptionId)//
                 .idProvider(new WidgetIdProvider())//
                 .labelProvider(labelProvider)//
                 .iconURLProvider(variableManager -> List.of())//
@@ -254,8 +285,9 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
             builder.helpTextProvider(this.getStringValueProvider(viewListDescription.getHelpExpression()));
         }
         if (viewListDescription.getReorderOperation() != null) {
-            builder.reorderHandlerProvider(
-                    this.handleOperation(viewListDescription.getReorderOperation(), PrimitiveListReorderOperation::getBody, "Something went wrong while handling list items reordering."));
+            builder.reorderHandlerProvider(this.handleOperation(viewListDescription.getReorderOperation(),
+                    PrimitiveListReorderOperation::getBody,
+                    "Something went wrong while handling list items reordering."));
         }
         if (newValueHandlerProvider != null) {
             builder.newValueHandler(newValueHandlerProvider);
@@ -268,32 +300,40 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
         return Optional.of(builder.build());
     }
 
-    private void configureItemAction(org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription,
-            Function<VariableManager, IStatus> itemActionHandlerProvider, PrimitiveListWidgetDescription.Builder builder) {
+    private void configureItemAction(
+            org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription,
+            Function<VariableManager, IStatus> itemActionHandlerProvider,
+            PrimitiveListWidgetDescription.Builder builder) {
         PrimitiveListItemActionOperation itemActionOperation = viewListDescription.getItemActionOperation();
         if (itemActionOperation != null) {
             builder.itemActionHandlerProvider(itemActionHandlerProvider);
             builder.itemActionIconURLProvider(this.getStringValueProvider(itemActionOperation.getIconURLExpression()));
             if (itemActionOperation.getPreconditionExpression() != null) {
-                builder.itemActionPreconditionHandler(this.getBooleanValueProvider(itemActionOperation.getPreconditionExpression()));
+                builder.itemActionPreconditionHandler(
+                        this.getBooleanValueProvider(itemActionOperation.getPreconditionExpression()));
             }
         }
     }
 
-    private Function<VariableManager, List<PrimitiveListCandidate>> getCandidatesProvider(org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription) {
+    private Function<VariableManager, List<PrimitiveListCandidate>> getCandidatesProvider(
+            org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription) {
         return (variableManager) -> {
 
             final List<Object> candidates = Optional.ofNullable(viewListDescription.getCandidatesExpression())//
-                    .map(safeExpression -> this.interpreter.evaluateExpression(variableManager.getVariables(), safeExpression).asObjects()//
+                    .map(safeExpression -> this.interpreter.evaluateExpression(variableManager.getVariables(),
+                            safeExpression).asObjects()//
                             .orElse(List.of()))
                     .orElse(List.of());
 
-            return candidates.stream().map(candidate -> this.toPrimitiveCandate(viewListDescription, variableManager, candidate)).toList();
+            return candidates.stream()
+                    .map(candidate -> this.toPrimitiveCandate(viewListDescription, variableManager, candidate))
+                    .toList();
         };
     }
 
-    private PrimitiveListCandidate toPrimitiveCandate(org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription, VariableManager variableManager,
-            Object candidate) {
+    private PrimitiveListCandidate toPrimitiveCandate(
+            org.eclipse.papyrus.web.custom.widgets.papyruswidgets.PrimitiveListWidgetDescription viewListDescription,
+            VariableManager variableManager, Object candidate) {
         if (viewListDescription.getDisplayExpression() != null) {
             VariableManager child = variableManager.createChild();
             child.put(PrimitiveListWidgetComponent.CANDIDATE_VARIABLE, candidate);
@@ -304,7 +344,8 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
         }
     }
 
-    private <T extends EObject> Function<VariableManager, IStatus> handleOperation(T operationOwner, Function<T, EList<Operation>> bodyProvider, String errorMessage) {
+    private <T extends EObject> Function<VariableManager, IStatus> handleOperation(T operationOwner,
+            Function<T, EList<Operation>> bodyProvider, String errorMessage) {
         if (operationOwner == null || bodyProvider.apply(operationOwner).isEmpty()) {
             return variableManager -> new Success();
         }
@@ -312,7 +353,8 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
     }
 
     private boolean matches(String condition, VariableManager variableManager) {
-        return this.interpreter.evaluateExpression(variableManager.getVariables(), condition).asBoolean().orElse(Boolean.FALSE);
+        return this.interpreter.evaluateExpression(variableManager.getVariables(), condition).asBoolean()
+                .orElse(Boolean.FALSE);
     }
 
     private <T> BiFunction<VariableManager, T, IStatus> getNewValueHandler(PrimitiveListAddOperation addOperation) {
@@ -325,7 +367,8 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
 
             var result = this.operationExecutor.execute(this.interpreter, childVariableManager, addOperation.getBody());
             if (result.status() == OperationExecutionStatus.FAILURE) {
-                return this.buildFailureWithFeedbackMessages("Something went wrong while handling the widget new value.");
+                return this.buildFailureWithFeedbackMessages(
+                        "Something went wrong while handling the widget new value.");
             } else {
                 return this.buildSuccessWithSemanticChangeAndFeedbackMessages();
             }
@@ -360,13 +403,16 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
             return this.getStringValueProvider(valueExpression);
         } else {
             return variableManager -> {
-                return variableManager.get(PrimitiveListWidgetComponent.CANDIDATE_VARIABLE, Object.class).map(Object::toString).orElse("");
+                return variableManager.get(PrimitiveListWidgetComponent.CANDIDATE_VARIABLE, Object.class)
+                        .map(Object::toString).orElse("");
             };
         }
     }
 
-    private String getPrimitiveRadioLabel(PrimitiveRadioWidgetDescription primitiveRadioDescription, VariableManager variableManager) {
-        return new StringValueProvider(this.interpreter, primitiveRadioDescription.getLabelExpression()).apply(variableManager);
+    private String getPrimitiveRadioLabel(PrimitiveRadioWidgetDescription primitiveRadioDescription,
+            VariableManager variableManager) {
+        return new StringValueProvider(this.interpreter, primitiveRadioDescription.getLabelExpression()).apply(
+                variableManager);
     }
 
     private Function<VariableManager, List<?>> getOptionsProvider(String expression) {
@@ -375,7 +421,8 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
             if (safeExpression.isBlank()) {
                 return List.of();
             } else {
-                return this.interpreter.evaluateExpression(variableManager.getVariables(), safeExpression).asObjects().orElse(List.of());
+                return this.interpreter.evaluateExpression(variableManager.getVariables(), safeExpression).asObjects()
+                        .orElse(List.of());
             }
         };
     }
@@ -386,7 +433,8 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
             if (safeExpression.isBlank()) {
                 return List.of();
             } else {
-                return this.interpreter.evaluateExpression(variableManager.getVariables(), safeExpression).asObjects().orElse(List.of());
+                return this.interpreter.evaluateExpression(variableManager.getVariables(), safeExpression).asObjects()
+                        .orElse(List.of());
             }
         };
     }
@@ -396,7 +444,8 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
             var result = this.operationExecutor.execute(this.interpreter, variableManager, operations);
             if (result.status() == OperationExecutionStatus.FAILURE) {
                 List<Message> errorMessages = new ArrayList<>();
-                errorMessages.add(new Message("Something went wrong while handling the widget operations execution.", MessageLevel.ERROR));
+                errorMessages.add(new Message("Something went wrong while handling the widget operations execution.",
+                        MessageLevel.ERROR));
                 errorMessages.addAll(this.feedbackMessageService.getFeedbackMessages());
                 return new Failure(errorMessages);
             } else {
@@ -426,14 +475,16 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
     }
 
     @Override
-    public Optional<AbstractWidgetDescription> caseMonoReferenceWidgetDescription(MonoReferenceWidgetDescription referenceDescription) {
+    public Optional<AbstractWidgetDescription> caseMonoReferenceWidgetDescription(
+            MonoReferenceWidgetDescription referenceDescription) {
         String descriptionId = this.getDescriptionId(referenceDescription);
 
         var builder = ReferenceWidgetDescription.newReferenceWidgetDescription(descriptionId) //
                 .targetObjectIdProvider(this.semanticTargetIdProvider) //
                 .isReadOnlyProvider(this.getReadOnlyValueProvider(referenceDescription.getIsEnabledExpression()))//
                 .idProvider(new WidgetIdProvider()) //
-                .labelProvider(variableManager -> new StringValueProvider(this.interpreter, referenceDescription.getLabelExpression()).apply(variableManager)) //
+                .labelProvider(variableManager -> new StringValueProvider(this.interpreter,
+                        referenceDescription.getLabelExpression()).apply(variableManager)) //
                 .optionsProvider(this.getOptionsProvider(referenceDescription.getDropdownOptionsExpression())) //
                 .iconURLProvider(variableManager -> List.of()) //
                 .itemsProvider(this.getValuesProvider(referenceDescription.getValueExpression())) //
@@ -445,15 +496,22 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
                 .referenceKindProvider(this.getReferenceKindProvider(referenceDescription.getType())) //
                 .isContainmentProvider(variableManager -> false) // containment reference are not handled by this widget
                 .isManyProvider(variableManager -> false) // Mono!
-                .styleProvider(variableManager -> this.getStyleProvider(variableManager, referenceDescription.getConditionalStyles(), referenceDescription.getStyle())) //
-                .ownerIdProvider(variableManager -> this.getOwnerId(variableManager, referenceDescription.getOwnerExpression())) //
+                .styleProvider(variableManager -> this.getStyleProvider(variableManager,
+                        referenceDescription.getConditionalStyles(), referenceDescription.getStyle())) //
+                .ownerIdProvider(variableManager -> this.getOwnerId(variableManager,
+                        referenceDescription.getOwnerExpression())) //
                 .diagnosticsProvider(variableManager -> List.of()) //
                 .kindProvider(object -> "") //
                 .messageProvider(object -> "") //
-                .clearHandlerProvider(this.handleOperation(referenceDescription.getClearOperation(), ClearReferenceOperation::getBody, "Something went wrong while clearing the reference.")) //
-                .itemRemoveHandlerProvider(
-                        this.handleOperation(referenceDescription.getUnsetOperation(), MonoReferenceUnsetOperation::getBody, "Something went wrong while unsetting reference value.")) //
-                .setHandlerProvider(this.handleOperation(referenceDescription.getSetOperation(), MonoReferenceSetOperation::getBody, "Something went wrong while setting the reference value.")) //
+                .clearHandlerProvider(
+                        this.handleOperation(referenceDescription.getClearOperation(), ClearReferenceOperation::getBody,
+                                "Something went wrong while clearing the reference.")) //
+                .itemRemoveHandlerProvider(this.handleOperation(referenceDescription.getUnsetOperation(),
+                        MonoReferenceUnsetOperation::getBody,
+                        "Something went wrong while unsetting reference value.")) //
+                .setHandlerProvider(
+                        this.handleOperation(referenceDescription.getSetOperation(), MonoReferenceSetOperation::getBody,
+                                "Something went wrong while setting the reference value.")) //
                 .addHandlerProvider(variableManager -> null) // not available in mono
                 .moveHandlerProvider(variableManager -> null); // not available in mono;
 
@@ -464,14 +522,16 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
     }
 
     @Override
-    public Optional<AbstractWidgetDescription> caseMultiReferenceWidgetDescription(MultiReferenceWidgetDescription referenceDescription) {
+    public Optional<AbstractWidgetDescription> caseMultiReferenceWidgetDescription(
+            MultiReferenceWidgetDescription referenceDescription) {
         String descriptionId = this.getDescriptionId(referenceDescription);
 
         var builder = ReferenceWidgetDescription.newReferenceWidgetDescription(descriptionId) //
                 .targetObjectIdProvider(this.semanticTargetIdProvider) //
                 .idProvider(new WidgetIdProvider()) //
                 .isReadOnlyProvider(this.getReadOnlyValueProvider(referenceDescription.getIsEnabledExpression()))//
-                .labelProvider(variableManager -> new StringValueProvider(this.interpreter, referenceDescription.getLabelExpression()).apply(variableManager)) //
+                .labelProvider(variableManager -> new StringValueProvider(this.interpreter,
+                        referenceDescription.getLabelExpression()).apply(variableManager)) //
                 .optionsProvider(this.getOptionsProvider(referenceDescription.getDropdownOptionsExpression())) //
                 .iconURLProvider(variableManager -> List.of()) //
                 .itemsProvider(this.getValuesProvider(referenceDescription.getValueExpression())) //
@@ -483,17 +543,24 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
                 .referenceKindProvider(this.getReferenceKindProvider(referenceDescription.getType())) //
                 .isContainmentProvider(variableManager -> false) // containment reference are not handled by this widget
                 .isManyProvider(variableManager -> true) // Multi!
-                .styleProvider(variableManager -> this.getStyleProvider(variableManager, referenceDescription.getConditionalStyles(), referenceDescription.getStyle())) //
-                .ownerIdProvider(variableManager -> this.getOwnerId(variableManager, referenceDescription.getOwnerExpression())) //
+                .styleProvider(variableManager -> this.getStyleProvider(variableManager,
+                        referenceDescription.getConditionalStyles(), referenceDescription.getStyle())) //
+                .ownerIdProvider(variableManager -> this.getOwnerId(variableManager,
+                        referenceDescription.getOwnerExpression())) //
                 .diagnosticsProvider(variableManager -> List.of()) //
                 .kindProvider(object -> "") //
                 .messageProvider(object -> "") //
-                .clearHandlerProvider(this.handleOperation(referenceDescription.getClearOperation(), ClearReferenceOperation::getBody, "Something went wrong while clearing the reference.")) //
-                .itemRemoveHandlerProvider(this.handleOperation(referenceDescription.getRemoveOperation(), MultiReferenceRemoveOperation::getBody, DELETION_ERROR_MSG)) //
+                .clearHandlerProvider(
+                        this.handleOperation(referenceDescription.getClearOperation(), ClearReferenceOperation::getBody,
+                                "Something went wrong while clearing the reference.")) //
+                .itemRemoveHandlerProvider(this.handleOperation(referenceDescription.getRemoveOperation(),
+                        MultiReferenceRemoveOperation::getBody, DELETION_ERROR_MSG)) //
                 .setHandlerProvider(variableManager -> null) // not available in multi
-                .addHandlerProvider(this.handleOperation(referenceDescription.getAddOperation(), MultiReferenceAddOperation::getBody, "Something went wrong while handling item addition."))//
-                .moveHandlerProvider(
-                        this.handleOperation(referenceDescription.getReorderOperation(), MultiReferenceReorderOperation::getBody, "Something went wrong while handling items reordering."));
+                .addHandlerProvider(this.handleOperation(referenceDescription.getAddOperation(),
+                        MultiReferenceAddOperation::getBody, "Something went wrong while handling item addition."))//
+                .moveHandlerProvider(this.handleOperation(referenceDescription.getReorderOperation(),
+                        MultiReferenceReorderOperation::getBody,
+                        "Something went wrong while handling items reordering."));
 
         if (referenceDescription.getHelpExpression() != null && !referenceDescription.getHelpExpression().isBlank()) {
             builder.helpTextProvider(this.getStringValueProvider(referenceDescription.getHelpExpression()));
@@ -501,9 +568,12 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
         return Optional.of(builder.build());
     }
 
-    private ReferenceWidgetStyle getStyleProvider(VariableManager variableManager, EList<ConditionalReferenceWidgetDescriptionStyle> conditionalStyles, ReferenceWidgetDescriptionStyle style) {
+    private ReferenceWidgetStyle getStyleProvider(VariableManager variableManager,
+            EList<ConditionalReferenceWidgetDescriptionStyle> conditionalStyles,
+            ReferenceWidgetDescriptionStyle style) {
         var effectiveStyle = conditionalStyles.stream()
-                .filter(condStyle -> this.interpreter.evaluateExpression(variableManager.getVariables(), condStyle.getCondition()).asBoolean().orElse(Boolean.FALSE))
+                .filter(condStyle -> this.interpreter.evaluateExpression(variableManager.getVariables(),
+                        condStyle.getCondition()).asBoolean().orElse(Boolean.FALSE))
                 .map(ReferenceWidgetDescriptionStyle.class::cast).findFirst().orElse(style);
         if (effectiveStyle == null) {
             return null;
@@ -516,19 +586,27 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
     }
 
     private String getItemLabel(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getLabel).orElse("");
+        return this.getItem(variableManager).map(this::getLabel).orElse("");
+    }
+
+    private String getLabel(Object input) {
+        StyledString styledString = this.labelService.getStyledLabel(input);
+        if (styledString != null) {
+            return styledString.toString();
+        }
+        return "";
     }
 
     private List<String> getItemIconURL(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getImagePath).orElse(List.of());
+        return this.getItem(variableManager).map(this.labelService::getImagePaths).orElse(List.of());
     }
 
     private String getItemKind(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getKind).orElse("");
+        return this.getItem(variableManager).map(this.identityService::getKind).orElse("");
     }
 
     private String getItemId(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getId).orElse("");
+        return this.getItem(variableManager).map(this.identityService::getId).orElse("");
     }
 
     private EObject getReferenceOwner(VariableManager variableManager, String referenceOwnerExpression) {
@@ -536,14 +614,15 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
         EObject referenceOwner = variableManager.get(VariableManager.SELF, EObject.class).orElse(null);
         if (!safeValueExpression.isBlank()) {
             Result result = this.interpreter.evaluateExpression(variableManager.getVariables(), safeValueExpression);
-            referenceOwner = result.asObject().filter(EObject.class::isInstance).map(EObject.class::cast).orElse(referenceOwner);
+            referenceOwner = result.asObject().filter(EObject.class::isInstance).map(EObject.class::cast)
+                    .orElse(referenceOwner);
         }
         return referenceOwner;
     }
 
     private String getOwnerId(VariableManager variableManager, String ownerExpression) {
         EObject owner = this.getReferenceOwner(variableManager, ownerExpression);
-        return this.objectService.getId(owner);
+        return this.identityService.getId(owner);
     }
 
     private Function<VariableManager, String> getOwnerKindProvider(String ownerExpression) {
@@ -554,9 +633,12 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
 
     private Function<VariableManager, String> getReferenceKindProvider(String domainTypeExpression) {
         return variableManager -> {
-            var editingDomain = variableManager.get(IEditingContext.EDITING_CONTEXT, IEMFEditingContext.class).map(IEMFEditingContext::getDomain);
-            String type = this.interpreter.evaluateExpression(variableManager.getVariables(), domainTypeExpression).asString().orElse("");
-            return editingDomain.flatMap(ed -> this.resolveType(ed, type)).flatMap(eclass -> Optional.of(this.emfKindService.getKind(eclass))).orElse("");
+            var editingDomain = variableManager.get(IEditingContext.EDITING_CONTEXT, IEMFEditingContext.class)
+                    .map(IEMFEditingContext::getDomain);
+            String type = this.interpreter.evaluateExpression(variableManager.getVariables(), domainTypeExpression)
+                    .asString().orElse("");
+            return editingDomain.flatMap(ed -> this.resolveType(ed, type))
+                    .flatMap(eclass -> Optional.of(this.emfKindService.getKind(eclass))).orElse("");
         };
     }
 
@@ -577,13 +659,16 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
     }
 
     @Override
-    public Optional<AbstractWidgetDescription> caseContainmentReferenceWidgetDescription(ContainmentReferenceWidgetDescription description) {
+    public Optional<AbstractWidgetDescription> caseContainmentReferenceWidgetDescription(
+            ContainmentReferenceWidgetDescription description) {
         String descriptionId = this.getDescriptionId(description);
 
-        var builder = org.eclipse.papyrus.web.custom.widgets.containmentreference.ContainmentReferenceWidgetDescription.newContainmentReferenceWidgetDescription(descriptionId) //
+        var builder = org.eclipse.papyrus.web.custom.widgets.containmentreference.ContainmentReferenceWidgetDescription.newContainmentReferenceWidgetDescription(
+                descriptionId) //
                 .targetObjectIdProvider(this.semanticTargetIdProvider) //
                 .idProvider(new WidgetIdProvider()) //
-                .labelProvider(variableManager -> new StringValueProvider(this.interpreter, description.getLabelExpression()).apply(variableManager)) //
+                .labelProvider(variableManager -> new StringValueProvider(this.interpreter,
+                        description.getLabelExpression()).apply(variableManager)) //
                 .iconURLProvider(variableManager -> List.of()) //
                 .itemsProvider(this.getValuesProvider(description.getValueExpression())) //
                 .itemIdProvider(this::getItemId) //
@@ -592,16 +677,24 @@ public class PapyrusWidgetsConverterSwitch extends PapyrusWidgetsSwitch<Optional
                 .itemIconURLProvider(this::getItemIconURL) //
                 .ownerKindProvider(this.getOwnerKindProvider(description.getOwnerExpression())) //
                 .referenceKindProvider(this.getReferenceKindProvider(description.getType())) //
-                .isManyProvider(variableManager -> description.isMany())
-                .styleProvider(variableManager -> this.getStyleProvider(variableManager, description.getConditionalStyles(), description.getStyle())) //
-                .ownerIdProvider(variableManager -> this.getOwnerId(variableManager, description.getOwnerExpression())) //
+                .isManyProvider(variableManager -> description.isMany()).styleProvider(
+                        variableManager -> this.getStyleProvider(variableManager, description.getConditionalStyles(),
+                                description.getStyle())) //
+                .ownerIdProvider(
+                        variableManager -> this.getOwnerId(variableManager, description.getOwnerExpression())) //
                 .diagnosticsProvider(variableManager -> List.of()) //
                 .kindProvider(object -> "") //
                 .messageProvider(object -> "") //
-                .itemClickHandlerProvider(this.handleOperation(description.getClickOperation(), ClickReferenceValueOperation::getBody, CLICKING_ERROR_MSG)) //
-                .itemRemoveHandlerProvider(this.handleOperation(description.getRemoveOperation(), MultiReferenceRemoveOperation::getBody, DELETION_ERROR_MSG));
+                .itemClickHandlerProvider(
+                        this.handleOperation(description.getClickOperation(), ClickReferenceValueOperation::getBody,
+                                CLICKING_ERROR_MSG)) //
+                .itemRemoveHandlerProvider(
+                        this.handleOperation(description.getRemoveOperation(), MultiReferenceRemoveOperation::getBody,
+                                DELETION_ERROR_MSG));
         if (description.getReorderOperation() != null) {
-            builder.moveHandlerProvider(this.handleOperation(description.getReorderOperation(), MultiReferenceReorderOperation::getBody, "Something went wrong while handling items reordering."));
+            builder.moveHandlerProvider(
+                    this.handleOperation(description.getReorderOperation(), MultiReferenceReorderOperation::getBody,
+                            "Something went wrong while handling items reordering."));
         }
 
         if (description.getHelpExpression() != null && !description.getHelpExpression().isBlank()) {

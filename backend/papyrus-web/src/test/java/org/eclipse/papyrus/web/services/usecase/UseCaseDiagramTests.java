@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -183,7 +183,9 @@ public class UseCaseDiagramTests extends AbstractDiagramTest {
 
     @Override
     protected UseCaseDiagramService buildService() {
-        return new UseCaseDiagramService(this.getObjectService(), this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true, this.getViewDiagramDescriptionService(),
+        return new UseCaseDiagramService(this.getIdentityService(), getLabelService(), getObjectSearchService(),
+                this.getDiagramNavigationService(), this.getDiagramOperationsService(), e -> true,
+                this.getViewDiagramDescriptionService(),
                 new MockLogger());
     }
 

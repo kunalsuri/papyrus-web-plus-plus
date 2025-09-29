@@ -413,9 +413,9 @@ public class ADSemanticDropTest extends SemanticDropTest {
         EObject elementToDrop = this.createSemanticElement(parentElement, containmentReference, elementType, elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, ADMappingTypes.getMappingTypeAsSubNode(elementType), ROOT_ACTIVITY);
         if (elementType.isSuperTypeOf(UML.getActivityParameterNode())) {
-            this.semanticDropOnHolder(ROOT_ACTIVITY, this.getObjectService().getId(elementToDrop), graphicalChecker);
+            this.semanticDropOnHolder(ROOT_ACTIVITY, this.getIdentityService().getId(elementToDrop), graphicalChecker);
         } else {
-            this.semanticDropOnContent(ROOT_ACTIVITY, this.getObjectService().getId(elementToDrop), graphicalChecker);
+            this.semanticDropOnContent(ROOT_ACTIVITY, this.getIdentityService().getId(elementToDrop), graphicalChecker);
         }
     }
 
@@ -434,7 +434,8 @@ public class ADSemanticDropTest extends SemanticDropTest {
             elementToDrop = this.createSemanticElementInActivityGroup(activity, containmentReference, elementType, elementType.getName() + DROP_SUFFIX, activityPartition);
         }
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, ADMappingTypes.getMappingTypeAsSubNode(elementType), ACTIVITY_PARTITION_LABEL);
-        this.semanticDropOnContent(ACTIVITY_PARTITION_LABEL, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(ACTIVITY_PARTITION_LABEL, this.getIdentityService().getId(elementToDrop),
+                graphicalChecker);
     }
 
     /**
@@ -460,7 +461,8 @@ public class ADSemanticDropTest extends SemanticDropTest {
         EObject semanticContainerElement = this.findSemanticElementByName(CONDITIONAL_NODE_LABEL);
         EObject elementToDrop = this.createSemanticElement(semanticContainerElement, containmentReference, elementType, elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, ADMappingTypes.getMappingTypeAsSubNode(elementType), CONDITIONAL_NODE_LABEL);
-        this.semanticDropOnContent(CONDITIONAL_NODE_LABEL, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(CONDITIONAL_NODE_LABEL, this.getIdentityService().getId(elementToDrop),
+                graphicalChecker);
     }
 
     @ParameterizedTest(name = "[{index}] Drop Node {1} on ExpansionRegion")
@@ -477,9 +479,11 @@ public class ADSemanticDropTest extends SemanticDropTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, expectedMapping, EXPANSION_REGION_LABEL);
         if (elementType.isSuperTypeOf(UML.getExpansionNode())) {
-            this.semanticDropOnHolder(EXPANSION_REGION_LABEL, this.getObjectService().getId(elemenToDrop), graphicalChecker);
+            this.semanticDropOnHolder(EXPANSION_REGION_LABEL, this.getIdentityService().getId(elemenToDrop),
+                    graphicalChecker);
         } else {
-            this.semanticDropOnContent(EXPANSION_REGION_LABEL, this.getObjectService().getId(elemenToDrop), graphicalChecker);
+            this.semanticDropOnContent(EXPANSION_REGION_LABEL, this.getIdentityService().getId(elemenToDrop),
+                    graphicalChecker);
         }
     }
 
@@ -492,7 +496,8 @@ public class ADSemanticDropTest extends SemanticDropTest {
         // The semantic parent of an ActivityNode in a partition is the enclosing Activity
         EObject elementToDrop = this.createSemanticElementInActivityGroup(activity, containmentReference, elementType, elementType.getName() + DROP_SUFFIX, interruptibleActivityRegion);
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, ADMappingTypes.getMappingTypeAsSubNode(elementType), INTERRUPTIBLE_ACTIVITY_REGION_LABEL);
-        this.semanticDropOnContent(INTERRUPTIBLE_ACTIVITY_REGION_LABEL, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(INTERRUPTIBLE_ACTIVITY_REGION_LABEL, this.getIdentityService().getId(elementToDrop),
+                graphicalChecker);
     }
 
     @ParameterizedTest(name = "[{index}] Drop Node {1} on LoopNode")
@@ -502,7 +507,7 @@ public class ADSemanticDropTest extends SemanticDropTest {
         EObject semanticContainerElement = this.findSemanticElementByName(LOOP_NODE_LABEL);
         EObject elementToDrop = this.createSemanticElement(semanticContainerElement, containmentReference, elementType, elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, ADMappingTypes.getMappingTypeAsSubNode(elementType), LOOP_NODE_LABEL);
-        this.semanticDropOnContent(LOOP_NODE_LABEL, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(LOOP_NODE_LABEL, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest(name = "[{index}] Drop Node {1} on StructuredActivityNode")
@@ -512,7 +517,8 @@ public class ADSemanticDropTest extends SemanticDropTest {
         EObject semanticContainerElement = this.findSemanticElementByName(STRUCTURED_ACTIVITY_NODE_LABEL);
         EObject elementToDrop = this.createSemanticElement(semanticContainerElement, containmentReference, elementType, elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, ADMappingTypes.getMappingTypeAsSubNode(elementType), STRUCTURED_ACTIVITY_NODE_LABEL);
-        this.semanticDropOnContent(STRUCTURED_ACTIVITY_NODE_LABEL, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(STRUCTURED_ACTIVITY_NODE_LABEL, this.getIdentityService().getId(elementToDrop),
+                graphicalChecker);
     }
 
     @ParameterizedTest(name = "[{index}] Drop Node {1} on SequenceNode")
@@ -522,7 +528,8 @@ public class ADSemanticDropTest extends SemanticDropTest {
         EObject semanticContainerElement = this.findSemanticElementByName(SEQUENCE_NODE_LABEL);
         EObject elementToDrop = this.createSemanticElement(semanticContainerElement, containmentReference, elementType, elementType.getName() + DROP_SUFFIX);
         NodeCreationGraphicalChecker graphicalChecker = this.getCreationChecker(elementType, ADMappingTypes.getMappingTypeAsSubNode(elementType), SEQUENCE_NODE_LABEL);
-        this.semanticDropOnContent(SEQUENCE_NODE_LABEL, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(SEQUENCE_NODE_LABEL, this.getIdentityService().getId(elementToDrop),
+                graphicalChecker);
     }
 
     @ParameterizedTest
@@ -567,11 +574,12 @@ public class ADSemanticDropTest extends SemanticDropTest {
      * @return the created element
      */
     protected EObject createSemanticElementInActivityGroup(EObject parentElement, EReference containmentReference, EClass type, String name, ActivityGroup activityGroup) {
-        String parentElementId = this.getObjectService().getId(parentElement);
+        String parentElementId = this.getIdentityService().getId(parentElement);
         int numberOfChildren = ((List<?>) parentElement.eGet(containmentReference)).size();
         this.applyCreateChildTool(parentElementId, containmentReference, type);
         IEditingContext editingContext = this.getEditingContext();
-        EObject updatedParentElement = (EObject) this.getObjectService().getObject(editingContext, parentElementId).get();
+        EObject updatedParentElement = (EObject) this.getObjectSearchService()
+                .getObject(editingContext, parentElementId).get();
         EObject createdObject = (EObject) ((List<?>) updatedParentElement.eGet(containmentReference)).get(numberOfChildren);
         if (createdObject instanceof ActivityNode activityNode) {
             activityNode.setName(name);
@@ -600,11 +608,12 @@ public class ADSemanticDropTest extends SemanticDropTest {
      */
     @Override
     protected EObject createSemanticElement(EObject parentElement, EReference containmentReference, EClass type, String name) {
-        String parentElementId = this.getObjectService().getId(parentElement);
+        String parentElementId = this.getIdentityService().getId(parentElement);
         int numberOfChildren = ((List<?>) parentElement.eGet(containmentReference)).size();
         this.applyCreateChildTool(parentElementId, containmentReference, type);
         IEditingContext editingContext = this.getEditingContext();
-        EObject updatedParentElement = (EObject) this.getObjectService().getObject(editingContext, parentElementId).get();
+        EObject updatedParentElement = (EObject) this.getObjectSearchService()
+                .getObject(editingContext, parentElementId).get();
         EObject createdObject = (EObject) ((List<?>) updatedParentElement.eGet(containmentReference)).get(numberOfChildren);
         if (createdObject instanceof NamedElement namedElement) {
             namedElement.setName(name);

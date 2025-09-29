@@ -376,7 +376,8 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         this.createNodeWithLabel(this.rootActivityId, new ADCreationTool(ADToolSections.EXPANSION_REGION, UML.getExpansionRegion()), EXPANSION_REGION_LABEL);
         Node interruptibleActivityRegionNode = this.createNode(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getInterruptibleActivityRegion()));
         // InterruptibleActivityRegions don't have a label, so we need to rename their semantic object
-        Object interruptibleActivityRegionObject = this.getObjectService().getObject(this.getEditingContext(), interruptibleActivityRegionNode.getTargetObjectId()).orElse(null);
+        Object interruptibleActivityRegionObject = this.getObjectSearchService()
+                .getObject(this.getEditingContext(), interruptibleActivityRegionNode.getTargetObjectId()).orElse(null);
         if (interruptibleActivityRegionObject instanceof InterruptibleActivityRegion interruptibleActivityRegion) {
             interruptibleActivityRegion.setName(INTERRUPTIBLE_ACTIVITY_REGION_LABEL);
         }
@@ -402,9 +403,11 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         }
         HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ACTIVITY_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(ACTIVITY_LABEL), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(ROOT_ACTIVITY), containmentReference);
 
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
@@ -430,7 +433,8 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
             semanticOwnerLabel = ROOT_ACTIVITY;
         }
 
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(semanticOwnerLabel), containmentReference);
         // No semantic deletion check: the elements are still in the activity root.
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker);
@@ -448,9 +452,11 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
                 () -> this.findGraphicalElementContentByLabel(CONDITIONAL_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(CONDITIONAL_NODE_LABEL), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(CONDITIONAL_NODE_SOURCE_LABEL), containmentReference);
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
         this.graphicalDropOnContainer(nodeToDrop, CONDITIONAL_NODE_LABEL, checker);
@@ -467,9 +473,11 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
                 () -> this.findGraphicalElementContentByLabel(EXPANSION_REGION_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(EXPANSION_REGION_LABEL), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(EXPANSION_REGION_SOURCE_LABEL), containmentReference);
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
         this.graphicalDropOnContainer(nodeToDrop, EXPANSION_REGION_LABEL, checker);
@@ -481,7 +489,9 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         Node parentInterruptibleActivityRegionNodeHolder = this.createNode(this.rootActivityId, new ADCreationTool(ADToolSections.ACTIVITY_GROUP, UML.getInterruptibleActivityRegion()));
         Node parentInterruptibleActivityRegionNode = this.getSubNode(parentInterruptibleActivityRegionNodeHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getInterruptibleActivityRegion()));
 
-        Object parentObject = this.getObjectService().getObject(this.getEditingContext(), parentInterruptibleActivityRegionNode.getTargetObjectId()).orElse(null);
+        Object parentObject = this.getObjectSearchService()
+                .getObject(this.getEditingContext(), parentInterruptibleActivityRegionNode.getTargetObjectId())
+                .orElse(null);
         if (parentObject instanceof InterruptibleActivityRegion parentInterruptibleActivityRegion) {
             parentInterruptibleActivityRegion.setName(INTERRUPTIBLE_ACTIVITY_REGION_SOURCE_LABEL);
         }
@@ -497,7 +507,8 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
             semanticOwnerLabel = ROOT_ACTIVITY;
         }
 
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(semanticOwnerLabel), containmentReference);
         // No semantic deletion check: the elements are still in the activity root.
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker);
@@ -514,9 +525,11 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         Node nodeToDrop = this.createNodeWithLabel(parentLoopNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
         HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(LOOP_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(LOOP_NODE_LABEL), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(LOOP_NODE_SOURCE_LABEL), containmentReference);
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
         this.graphicalDropOnContainer(nodeToDrop, LOOP_NODE_LABEL, checker);
@@ -533,9 +546,11 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
                 () -> this.findGraphicalElementContentByLabel(SEQUENCE_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(SEQUENCE_NODE_LABEL), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(SEQUENCE_NODE_SOURCE_LABEL), containmentReference);
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
         this.graphicalDropOnContainer(nodeToDrop, SEQUENCE_NODE_LABEL, checker);
@@ -551,9 +566,11 @@ public class ADGraphicalDropTest extends GraphicalDropTest {
         HolderNodeGraphicalDnDGraphicalChecker graphicalChecker = new HolderNodeGraphicalDnDGraphicalChecker(this::getDiagram,
                 () -> this.findGraphicalElementContentByLabel(STRUCTURED_ACTIVITY_NODE_LABEL),
                 ADMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
-        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(this.getObjectService(), this::getEditingContext, expectedType,
+        NodeCreationSemanticChecker semanticCreationChecker = new NodeCreationSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext, expectedType,
                 () -> this.findSemanticElementByName(STRUCTURED_ACTIVITY_NODE_LABEL), containmentReference);
-        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeSemanticDeletionSemanticChecker semanticDeletionChecker = new NodeSemanticDeletionSemanticChecker(
+                this.getObjectSearchService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(STRUCTURED_ACTIVITY_NODE_SOURCE_LABEL), containmentReference);
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
         this.graphicalDropOnContainer(nodeToDrop, STRUCTURED_ACTIVITY_NODE_LABEL, checker);

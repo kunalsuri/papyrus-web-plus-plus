@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.IDiagramElement;
 import org.eclipse.sirius.components.diagrams.Node;
@@ -34,7 +34,7 @@ import org.eclipse.uml2.uml.NamedElement;
  */
 public class LabelSemanticChecker implements Checker {
 
-    private IObjectService objectService;
+    private final IObjectSearchService objectSearchService;
 
     private Supplier<IEditingContext> editingContextSupplier;
 
@@ -43,15 +43,16 @@ public class LabelSemanticChecker implements Checker {
     /**
      * Initializes the checker with the provided parameters.
      *
-     * @param objectService
+     * @param objectSearchService
      *            the object service used to retrieve and compute identifiers
      * @param editingContextSupplier
      *            a supplier to access and reload the editing context
      * @param expectedLabel
      *            the expected label to check
      */
-    public LabelSemanticChecker(IObjectService objectService, Supplier<IEditingContext> editingContextSupplier, String expectedLabel) {
-        this.objectService = objectService;
+    public LabelSemanticChecker(IObjectSearchService objectSearchService,
+            Supplier<IEditingContext> editingContextSupplier, String expectedLabel) {
+        this.objectSearchService = objectSearchService;
         this.editingContextSupplier = editingContextSupplier;
         this.expectedLabel = expectedLabel;
     }
@@ -66,7 +67,7 @@ public class LabelSemanticChecker implements Checker {
         } else {
             fail("Unknown IDiagramElement type " + element.getClass().getSimpleName());
         }
-        Optional<Object> optObject = this.objectService.getObject(this.editingContextSupplier.get(), semanticId);
+        Optional<Object> optObject = this.objectSearchService.getObject(this.editingContextSupplier.get(), semanticId);
         assertThat(optObject).as("Cannot find the semantic element with id " + semanticId).isPresent();
         assertThat(optObject.get()).as("The semantic object with id " + semanticId + " isn't a NamedElement").isInstanceOf(NamedElement.class);
         NamedElement namedElement = (NamedElement) optObject.get();

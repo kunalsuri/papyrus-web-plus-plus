@@ -147,13 +147,13 @@ public class CPDSemanticDropTest extends SemanticDropTest {
             graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER),
                     CPDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
-            this.semanticDropOnHolder(COMPONENT_CONTAINER, this.getObjectService().getId(elementToDrop),
+            this.semanticDropOnHolder(COMPONENT_CONTAINER, this.getIdentityService().getId(elementToDrop),
                     graphicalChecker);
         } else {
             graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(COMPONENT_CONTAINER),
                     CPDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
-            this.semanticDropOnContent(COMPONENT_CONTAINER, this.getObjectService().getId(elementToDrop),
+            this.semanticDropOnContent(COMPONENT_CONTAINER, this.getIdentityService().getId(elementToDrop),
                     graphicalChecker);
         }
     }
@@ -174,7 +174,7 @@ public class CPDSemanticDropTest extends SemanticDropTest {
             graphicalChecker = new HolderCreationGraphicalChecker(this::getDiagram, null,
                     CPDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
         }
-        this.semanticDropOnDiagram(this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnDiagram(this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -195,7 +195,8 @@ public class CPDSemanticDropTest extends SemanticDropTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.getSubNode(INTERFACE_CONTAINER, compartmentName),
                 CPDMappingTypes.getMappingType(elementType), this.getCapturedNodes());
-        this.semanticDropOnContentCompartment(INTERFACE_CONTAINER, compartmentName, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContentCompartment(INTERFACE_CONTAINER, compartmentName,
+                this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -219,7 +220,7 @@ public class CPDSemanticDropTest extends SemanticDropTest {
                     CPDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         }
-        this.semanticDropOnContent(MODEL_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(MODEL_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest
@@ -243,7 +244,7 @@ public class CPDSemanticDropTest extends SemanticDropTest {
                     CPDMappingTypes.getMappingTypeAsSubNode(elementType),
                     this.getCapturedNodes());
         }
-        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(PACKAGE_CONTAINER, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest

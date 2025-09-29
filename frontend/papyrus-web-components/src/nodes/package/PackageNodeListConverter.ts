@@ -121,6 +121,7 @@ const toListNode = (
     isDropNodeTarget: false,
     isDropNodeCandidate: false,
     isHovered: false,
+    connectionLinePositionOnNode: 'none',
     nodeAppearanceData: {
       gqlStyle: style,
       customizedStyleProperties: [],

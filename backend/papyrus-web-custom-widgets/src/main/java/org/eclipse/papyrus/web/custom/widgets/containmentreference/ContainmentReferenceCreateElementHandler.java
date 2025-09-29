@@ -35,7 +35,7 @@ import org.eclipse.sirius.components.core.URLParser;
 import org.eclipse.sirius.components.core.api.ChildCreationDescription;
 import org.eclipse.sirius.components.core.api.IEditService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.core.api.SemanticKindConstants;
 import org.eclipse.sirius.components.emf.services.api.IEMFEditingContext;
 import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
@@ -64,7 +64,7 @@ public class ContainmentReferenceCreateElementHandler implements IReferenceWidge
 
     private final IEditService editService;
 
-    private final IObjectService objectService;
+    private final ILabelService labelService;
 
     private final IViewFormDescriptionSearchService viewFormSearchService;
 
@@ -74,11 +74,11 @@ public class ContainmentReferenceCreateElementHandler implements IReferenceWidge
 
     private final IClearExecutor clearExecutor;
 
-    public ContainmentReferenceCreateElementHandler(IEMFKindService emfKindService, IEditService editService, IObjectService objectService, IViewFormDescriptionSearchService viewFormSearchService,
+    public ContainmentReferenceCreateElementHandler(IEMFKindService emfKindService, IEditService editService, ILabelService labelService, IViewFormDescriptionSearchService viewFormSearchService,
             IAQLInterpreterProvider interpreterProvider, IAddExecutor addExecutor, IClearExecutor clearExecutor) {
         this.emfKindService = Objects.requireNonNull(emfKindService);
         this.editService = Objects.requireNonNull(editService);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.labelService = Objects.requireNonNull(labelService);
         this.viewFormSearchService = Objects.requireNonNull(viewFormSearchService);
         this.interpreterProvider = Objects.requireNonNull(interpreterProvider);
         this.addExecutor = addExecutor;
@@ -108,13 +108,13 @@ public class ContainmentReferenceCreateElementHandler implements IReferenceWidge
         return this.getInstanciableTypesOf(editingContext, referenceKind) //
                 .stream() //
                 .map(this::createChildCreationDescription) //
-                .sorted(Comparator.comparing(ChildCreationDescription::getLabel)) //
+                .sorted(Comparator.comparing(ChildCreationDescription::label)) //
                 .toList();
     }
 
     private ChildCreationDescription createChildCreationDescription(EClass eClass) {
         String id = eClass.getEPackage().getName() + "::" + eClass.getName();
-        List<String> iconURL = this.objectService.getImagePath(eClass.getEPackage().getEFactoryInstance().create(eClass));
+        List<String> iconURL = this.labelService.getImagePaths(eClass.getEPackage().getEFactoryInstance().create(eClass));
         String label = eClass.getName();
         return new ChildCreationDescription(id, label, iconURL);
     }

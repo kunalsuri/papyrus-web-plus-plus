@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -68,9 +68,12 @@ public abstract class AbstractDiagramTest extends AbstractWebUMLTest {
     public void before() {
         super.before();
         this.diagramService = this.buildService();
-        this.viewTestHelper = new DiagramTestHelper(this.getEditingContext(), this.getObjectService(), this.viewRegistry, this.diagramBuilderService, this.diagramOpService, this.diagramNavService,
+        this.viewTestHelper = new DiagramTestHelper(this.getEditingContext(), this.getIdentityService(),
+                getLabelService(), getObjectSearchService(), this.viewRegistry, this.diagramBuilderService,
+                this.diagramOpService, this.diagramNavService,
                 this.viewDiagramDescriptionService, this.idProvider);
-        this.diagramServiceTestHelper = new DiagramServiceTestHelper(this.viewTestHelper, this.diagramService, this.getEditingContext(), this.getObjectService());
+        this.diagramServiceTestHelper = new DiagramServiceTestHelper(this.viewTestHelper, this.diagramService,
+                this.getEditingContext(), getIdentityService(), getObjectSearchService());
     }
 
     protected IViewDiagramDescriptionService getViewDiagramDescriptionService() {

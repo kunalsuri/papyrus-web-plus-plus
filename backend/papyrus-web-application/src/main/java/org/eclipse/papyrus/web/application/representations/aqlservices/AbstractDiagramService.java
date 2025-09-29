@@ -96,7 +96,9 @@ import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionServi
 import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.Node;
@@ -132,33 +134,50 @@ public abstract class AbstractDiagramService {
 
     private static final String ITEM_SEP = ",";
 
-    private final IObjectService objectService;
-
     private final IDiagramNavigationService diagramNavigationService;
 
     private final IDiagramOperationsService diagramOperationsService;
 
+    private final IIdentityService identityService;
+
+    private final ILabelService labelService;
+
+    private final IObjectSearchService objectSearchService;
+
     private final IEditableChecker editableChecker;
 
-    private IViewDiagramDescriptionService viewDiagramService;
+    private final IViewDiagramDescriptionService viewDiagramService;
 
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
 
-    public AbstractDiagramService(IObjectService objectService, IDiagramNavigationService diagramNavigationService, IDiagramOperationsService diagramOperationsService,
+    // CHECKSTYLE:OFF Injected parameters
+    public AbstractDiagramService(IIdentityService identityService, ILabelService labelService, IObjectSearchService objectSearchService, IDiagramNavigationService diagramNavigationService,
+            IDiagramOperationsService diagramOperationsService,
             IEditableChecker editableChecker, IViewDiagramDescriptionService viewDiagramService, ILogger logger) {
-        this.editableChecker = editableChecker;
+        // CHECKSTYLE:ON Injected parameters
+        this.identityService = Objects.requireNonNull(identityService);
+        this.labelService = Objects.requireNonNull(labelService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
+        this.editableChecker = Objects.requireNonNull(editableChecker);
         this.viewDiagramService = Objects.requireNonNull(viewDiagramService);
-        this.objectService = Objects.requireNonNull(objectService);
         this.diagramNavigationService = Objects.requireNonNull(diagramNavigationService);
         this.diagramOperationsService = Objects.requireNonNull(diagramOperationsService);
         this.logger = logger;
     }
 
-    protected IObjectService getObjectService() {
-        return this.objectService;
+    protected IIdentityService getIdentityService() {
+        return this.identityService;
+    }
+
+    protected ILabelService getLabelService() {
+        return this.labelService;
+    }
+
+    protected IObjectSearchService getObjectSearchService() {
+        return this.objectSearchService;
     }
 
     protected IDiagramNavigationService getDiagramNavigationService() {
@@ -177,10 +196,6 @@ public abstract class AbstractDiagramService {
      * Prevents displaying between element are displayed as children. The containment link should only be display in
      * case of sibling elements.
      *
-     * @param semanticSource
-     *            the semantic source of the edge
-     * @param semanticTarget
-     *            the semantic target of the edge
      * @param ancestorCandidate
      *            the visual source of the edge candidate
      * @param descendantCandidate
@@ -276,7 +291,6 @@ public abstract class AbstractDiagramService {
      *
      * @param semanticElement
      *            a semantic element
-     *
      * @return a useless EObject see https://github.com/eclipse-sirius/sirius-components/issues/1343
      */
     public EObject destroy(EObject semanticElement) {
@@ -312,7 +326,6 @@ public abstract class AbstractDiagramService {
      *            the representation of the semantic object to delete
      * @param deletionPolicy
      *            check if it is a visual or semantic deletion
-     *
      * @return a useless EObject see https://github.com/eclipse-sirius/sirius-components/issues/1343
      */
     public EObject destroy(EObject semanticElement, IDiagramContext diagramContext, Edge targetView, Object deletionPolicy) {
@@ -324,7 +337,7 @@ public abstract class AbstractDiagramService {
     /**
      * Drop an element.
      *
-     * @param semanticDroppedElement
+     * @param droppedElement
      *            the dropped element
      * @param targetView
      *            the view on which the element is dropped (<code>null</code> if dropped on the diagram)
@@ -334,7 +347,7 @@ public abstract class AbstractDiagramService {
      *            the {@link IDiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
-     *            {@link org.eclipse.sirius.components.view.NodeDescription} -> {@link NodeDescription})
+     *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return self (required for the service to create a view - convention on Sirius component)
      */
     public EObject semanticDrop(EObject droppedElement, Node targetView, IEditingContext editionContext, IDiagramContext diagramContext,
@@ -345,7 +358,8 @@ public abstract class AbstractDiagramService {
 
     protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject droppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.viewDiagramService, this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
+        IViewHelper createViewHelper = ViewHelper.create(this.identityService, this.labelService, this.viewDiagramService, this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
         return new GenericWebExternalDropBehaviorProvider(createViewHelper, new DiagramNavigator(this.diagramNavigationService, diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
     }
 
@@ -357,7 +371,8 @@ public abstract class AbstractDiagramService {
 
     protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> capturedNodeDescriptions) {
-        IViewHelper createViewHelper = ViewHelper.create(this.getObjectService(), this.viewDiagramService, this.getDiagramOperationsService(), diagramContext, capturedNodeDescriptions);
+        IViewHelper createViewHelper = ViewHelper.create(this.identityService, this.labelService, this.viewDiagramService, this.getDiagramOperationsService(), diagramContext,
+                capturedNodeDescriptions);
         return new GenericWebInternalDropBehaviorProvider(createViewHelper, new DiagramNavigator(this.diagramNavigationService, diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
     }
 
@@ -500,7 +515,7 @@ public abstract class AbstractDiagramService {
     // CHECKSTYLE:ON
 
     private WebRepresentationQuerier createRepresentationQuerier(IEditingContext editingContext, Diagram diagram) {
-        return new WebRepresentationQuerier(diagram, this.objectService, this.diagramNavigationService, editingContext);
+        return new WebRepresentationQuerier(diagram, this.objectSearchService, this.diagramNavigationService, editingContext);
     }
 
     protected IDomainBasedEdgeCreationChecker buildDomainBasedEdgeCreationChecker() {
@@ -546,7 +561,7 @@ public abstract class AbstractDiagramService {
      *            the {@link IDiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
-     *            {@link org.eclipse.sirius.components.view.NodeDescription} -> {@link NodeDescription})
+     *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return a new instance or <code>null</code> if the creation failed
      */
     public EObject create(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
@@ -566,7 +581,8 @@ public abstract class AbstractDiagramService {
                 result = null;
             } else {
 
-                WebDiagramElementCreator elementCreator = new WebDiagramElementCreator(this.buildElementCreator(parent), this.objectService, this.viewDiagramService, this.diagramOperationsService);
+                WebDiagramElementCreator elementCreator = new WebDiagramElementCreator(this.buildElementCreator(parent), this.identityService, this.labelService, this.viewDiagramService,
+                        this.diagramOperationsService);
                 CreationStatus status = elementCreator.handleCreation(parent, type, referenceName, targetView, diagramContext, capturedNodeDescriptions);
                 result = status.getElement();
 
@@ -599,7 +615,7 @@ public abstract class AbstractDiagramService {
      *            the {@link IDiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
-     *            {@link org.eclipse.sirius.components.view.NodeDescription} -> {@link NodeDescription})
+     *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return a new instance or <code>null</code> if the creation failed
      */
     public EObject createInHolder(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
@@ -624,7 +640,7 @@ public abstract class AbstractDiagramService {
      *            the {@link IDiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
-     *            {@link org.eclipse.sirius.components.view.NodeDescription} -> {@link NodeDescription})
+     *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return a new instance or <code>null</code> if the creation failed
      */
     public EObject createInCompartment(EObject parent, String type, String compartmentName, String referenceName, Node targetView, IDiagramContext diagramContext,
@@ -885,7 +901,7 @@ public abstract class AbstractDiagramService {
         return owner.eClass().getEAllContainments().stream()//
                 .filter(f -> f.getEType().isInstance(child))//
                 .filter(f -> EMFUtils.getAncestor(EPackage.class, f) == UMLPackage.eINSTANCE)// Only use UML feature
-                                                                                             // (not ecore)
+                // (not ecore)
                 .collect(toList());
     }
 
@@ -940,7 +956,6 @@ public abstract class AbstractDiagramService {
      *
      * @param context
      *            context used to create diagram on
-     *
      * @return {@code true} if the resource contains the ".profile.uml" extension, {@code false} otherwise
      */
 
@@ -960,7 +975,6 @@ public abstract class AbstractDiagramService {
      *
      * @param context
      *            context used to create diagram on
-     *
      * @return <code>true</code> if the resource is a profile model, <code>false</code> otherwise.
      */
     public boolean isNotProfileModel(EObject context) {
@@ -970,9 +984,8 @@ public abstract class AbstractDiagramService {
     /**
      * Check if the nodes is a Symbol or not.
      *
-     * @param context
+     * @param diagramContext
      *            context used to create diagram on
-     *
      * @return <code>true</code> if the resource is a profile model, <code>false</code> otherwise.
      */
     public List<Node> getAllSymbol(DiagramContext diagramContext) {

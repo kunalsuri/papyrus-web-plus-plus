@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,6 @@ import org.eclipse.sirius.components.collaborative.messages.ICollaborativeMessag
 import org.eclipse.sirius.components.core.api.ErrorPayload;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IInput;
-import org.eclipse.sirius.components.core.api.IObjectService;
 import org.eclipse.sirius.components.core.api.IPayload;
 import org.springframework.stereotype.Service;
 
@@ -44,16 +43,15 @@ public class IsProfileDiagramEventHandler implements IEditingContextEventHandler
 
     private final ProfileDiagramService profileDiagramService;
 
-    private final IObjectService objectService;
 
     private final ICollaborativeMessageService messageService;
 
     private final Counter counter;
 
-    public IsProfileDiagramEventHandler(ICollaborativeMessageService messageService, MeterRegistry meterRegistry, ProfileDiagramService profileDiagramService, IObjectService objectService) {
+    public IsProfileDiagramEventHandler(ICollaborativeMessageService messageService, MeterRegistry meterRegistry,
+            ProfileDiagramService profileDiagramService) {
         this.messageService = Objects.requireNonNull(messageService);
         this.profileDiagramService = profileDiagramService;
-        this.objectService = objectService;
 
         this.counter = Counter.builder(Monitoring.EVENT_HANDLER)
                 .tag(Monitoring.NAME, this.getClass().getSimpleName())

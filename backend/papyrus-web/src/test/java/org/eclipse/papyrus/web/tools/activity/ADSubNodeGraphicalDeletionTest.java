@@ -668,7 +668,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
 
         this.createActivitySubNodes(activityContainer, ACTIVITY_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, ACTIVITY_LABEL);
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(ACTIVITY_LABEL), containmentReference);
         final String elementName;
         if (UML.getInterruptibleActivityRegion().equals(elementType)) {
@@ -695,7 +696,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
         } else {
             expectedSemanticOwner = ROOT_ACTIVITY;
         }
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(expectedSemanticOwner), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + ACTIVITY_PARTITION_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -710,7 +712,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
 
         this.createConditionalNodeSubNodes(conditionalNodeContainer, CONDITIONAL_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, CONDITIONAL_NODE_LABEL);
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(CONDITIONAL_NODE_LABEL), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + CONDITIONAL_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -725,7 +728,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
 
         this.createExpansionRegionSubNodes(expansionRegionNodeContainer, EXPANSION_REGION_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, EXPANSION_REGION_LABEL);
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(EXPANSION_REGION_LABEL), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + EXPANSION_REGION_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -738,7 +742,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
         Node activityPartitionContainer = this.getSubNode(activityPartitionContainerHolder, ADMappingTypes.getMappingTypeContentAsSubNode(UML.getInterruptibleActivityRegion()));
         this.createInterruptibleActivityRegionSubNodes(activityPartitionContainer, INTERRUPTIBLE_ACTIVITY_REGION_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, INTERRUPTIBLE_ACTIVITY_REGION_LABEL);
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(ROOT_ACTIVITY), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + INTERRUPTIBLE_ACTIVITY_REGION_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -753,7 +758,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
 
         this.createLoopNodeAndStructuredActivityNodeSubNodes(loopNodeContainer, LOOP_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, LOOP_NODE_LABEL);
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(LOOP_NODE_LABEL), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + LOOP_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -768,7 +774,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
 
         this.createLoopNodeAndStructuredActivityNodeSubNodes(structuredActivityNodeContainer, STRUCTURED_ACTIVITY_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, STRUCTURED_ACTIVITY_NODE_LABEL);
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(STRUCTURED_ACTIVITY_NODE_LABEL), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + STRUCTURED_ACTIVITY_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }
@@ -783,7 +790,8 @@ public class ADSubNodeGraphicalDeletionTest extends NodeDeletionTest {
 
         this.createSequenceNodeSubNodes(sequenceNodeContainer, SEQUENCE_NODE_SUB_NODE_SUFFIX);
         DeletionGraphicalChecker graphicalChecker = this.getGraphicalCheckerFor(elementType, SEQUENCE_NODE_LABEL);
-        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(this.getObjectService(), this::getEditingContext,
+        NodeGraphicalDeletionSemanticChecker semanticChecker = new NodeGraphicalDeletionSemanticChecker(
+                this.getObjectSearchService(), this.getIdentityService(), this::getEditingContext,
                 () -> this.findSemanticElementByName(SEQUENCE_NODE_LABEL), containmentReference);
         this.deleteGraphicalNode(elementType.getName() + SEQUENCE_NODE_SUB_NODE_SUFFIX, new CombinedChecker(graphicalChecker, semanticChecker));
     }

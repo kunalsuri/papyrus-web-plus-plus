@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,10 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.sirius.components.collaborative.api.ChangeKind;
 import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
+import org.eclipse.sirius.components.core.api.labels.StyledString;
 import org.eclipse.sirius.components.emf.forms.EMFFormDescriptionProvider;
 import org.eclipse.sirius.components.emf.forms.EStructuralFeatureChoiceOfValueProvider;
 import org.eclipse.sirius.components.emf.forms.EStructuralFeatureLabelProvider;
@@ -49,9 +52,9 @@ import org.eclipse.sirius.components.widget.reference.ReferenceWidgetDescription
 /**
  * Copy for {@link NonContainmentReferenceIfDescriptionProvider} but filter derived features.
  *
+ * @author Arthur Daussy
  * @see https://github.com/PapyrusSirius/papyrus-web/issues/58 to have an explanation on why derived feature are
  *      excluded.
- * @author Arthur Daussy
  */
 public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
 
@@ -61,7 +64,7 @@ public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
 
     private final ComposedAdapterFactory composedAdapterFactory;
 
-    private final IObjectService objectService;
+    private final ILabelService labelService;
 
     private final IPropertiesValidationProvider propertiesValidationProvider;
 
@@ -71,15 +74,23 @@ public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
 
     private final IFeedbackMessageService feedbackMessageService;
 
-    public NonDerivedNonContainmentReferenceIfDescriptionProvider(ComposedAdapterFactory composedAdapterFactory, IObjectService objectService,
+    private final IObjectSearchService objectSearchService;
+
+    private final IIdentityService identityService;
+
+    // CHECKSTYLE:OFF Injected parameters
+    public NonDerivedNonContainmentReferenceIfDescriptionProvider(ComposedAdapterFactory composedAdapterFactory, ILabelService labelService,
             Function<VariableManager, String> semanticTargetIdProvider, IPropertiesValidationProvider propertiesValidationProvider, IFeedbackMessageService feedbackMessageService,
-            IEMFKindService emfKindService) {
+            IEMFKindService emfKindService, IObjectSearchService objectSearchService, IIdentityService identityService) {
+        // CHECKSTYLE:ON Injected parameters
         this.composedAdapterFactory = Objects.requireNonNull(composedAdapterFactory);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.labelService = Objects.requireNonNull(labelService);
         this.propertiesValidationProvider = Objects.requireNonNull(propertiesValidationProvider);
         this.semanticTargetIdProvider = Objects.requireNonNull(semanticTargetIdProvider);
         this.emfKindService = Objects.requireNonNull(emfKindService);
         this.feedbackMessageService = Objects.requireNonNull(feedbackMessageService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
+        this.identityService = Objects.requireNonNull(identityService);
     }
 
     public IfDescription getIfDescription() {
@@ -165,23 +176,27 @@ public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
     }
 
     private String getItemLabel(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getLabel).orElse("");
+        return this.getItem(variableManager)
+                .map(this.labelService::getStyledLabel)
+                .filter(Objects::nonNull)
+                .map(StyledString::toString)
+                .orElse("");
     }
 
     private List<String> getItemIconURL(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getImagePath).orElse(List.of());
+        return this.getItem(variableManager).map(this.labelService::getImagePaths).orElse(List.of());
     }
 
     private String getItemKind(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getKind).orElse("");
+        return this.getItem(variableManager).map(this.identityService::getKind).orElse("");
     }
 
     private String getItemId(VariableManager variableManager) {
-        return this.getItem(variableManager).map(this.objectService::getId).orElse("");
+        return this.getItem(variableManager).map(this.identityService::getId).orElse("");
     }
 
     private String getOwnerId(VariableManager variableManager) {
-        return variableManager.get(VariableManager.SELF, EObject.class).map(this.objectService::getId).orElse("");
+        return variableManager.get(VariableManager.SELF, EObject.class).map(this.identityService::getId).orElse("");
     }
 
     private Function<VariableManager, String> getLabelProvider() {

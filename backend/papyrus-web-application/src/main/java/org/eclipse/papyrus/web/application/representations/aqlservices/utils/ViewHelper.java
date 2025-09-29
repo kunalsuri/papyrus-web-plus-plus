@@ -40,7 +40,8 @@ import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.diagrams.CollapsingState;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.FreeFormLayoutStrategy;
@@ -71,8 +72,10 @@ public class ViewHelper implements IViewHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewHelper.class);
 
-    private final IObjectService objectService;
+    //private final IObjectService objectService;
 
+    private final IIdentityService identityService;
+    private final ILabelService labelService;
     private final IDiagramOperationsService diagramOperationsService;
 
     private final IDiagramContext diagramContext;
@@ -84,21 +87,24 @@ public class ViewHelper implements IViewHelper {
     /**
      * Instantiates a new view helper.
      *
-     * @param objectService
-     *            the object service
+     * @param identityService
+     *         the identity service
+     * @param labelService
+     *         the label service
      * @param diagramOperationsService
-     *            the diagram operations service
+     *         the diagram operations service
      * @param diagramContext
-     *            the diagram context
+     *         the diagram context
      * @param diagramDescription
-     *            the diagram description
+     *         the diagram description
      * @param capturedNodeDescriptions
-     *            the captured node descriptions
+     *         the captured node descriptions
      */
-    public ViewHelper(IObjectService objectService, IDiagramOperationsService diagramOperationsService, IDiagramContext diagramContext, DiagramDescription diagramDescription,
+    public ViewHelper(IIdentityService identityService, ILabelService labelService, IDiagramOperationsService diagramOperationsService, IDiagramContext diagramContext, DiagramDescription diagramDescription,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         super();
-        this.objectService = objectService;
+        this.identityService = identityService;
+        this.labelService = labelService;
         this.diagramOperationsService = Objects.requireNonNull(diagramOperationsService);
         this.diagramContext = diagramContext;
         this.diagramDescription = diagramDescription;
@@ -112,24 +118,26 @@ public class ViewHelper implements IViewHelper {
      * If the capturedNodeDescriptions is empty then return a NoOp implementation
      * </p>
      *
-     * @param objectService
-     *            the {@link IObjectService}
+     * @param identityService
+     *         the identity service
+     * @param labelService
+     *         the label service
      * @param viewDiagramService
-     *            the {@link IDiagramNavigationService}
+     *         the {@link IDiagramNavigationService}
      * @param diagramOperationsService
-     *            the {@link IDiagramOperationsService}
+     *         the {@link IDiagramOperationsService}
      * @param diagramContext
-     *            the {@link IDiagramContext}
+     *         the {@link IDiagramContext}
      * @param capturedNodeDescriptions
-     *            a map that contains all mapping between {@link org.eclipse.sirius.components.view.diagram.NodeDescription} and
-     *            {@link NodeDescription} for the current diagram
+     *         a map that contains all mapping between {@link org.eclipse.sirius.components.view.diagram.NodeDescription} and
+     *         {@link NodeDescription} for the current diagram
      * @return a new instance
      */
     @FactoryMethod
-    public static IViewHelper create(IObjectService objectService, IViewDiagramDescriptionService viewDiagramService, IDiagramOperationsService diagramOperationsService,
+    public static IViewHelper create(IIdentityService identityService, ILabelService labelService, IViewDiagramDescriptionService viewDiagramService, IDiagramOperationsService diagramOperationsService,
             IDiagramContext diagramContext, Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return viewDiagramService.getDiagramDescription(capturedNodeDescriptions)
-                .map(dd -> (IViewHelper) new ViewHelper(objectService, diagramOperationsService, diagramContext, dd, capturedNodeDescriptions))
+                .map(dd -> (IViewHelper) new ViewHelper(identityService, labelService, diagramOperationsService, diagramContext, dd, capturedNodeDescriptions))
                 .orElse(new IViewHelper.NoOp());
 
     }
@@ -138,9 +146,9 @@ public class ViewHelper implements IViewHelper {
      * Creates the child view.
      *
      * @param self
-     *            the self
+     *         the self
      * @param selectedNode
-     *            the selected node
+     *         the selected node
      * @return true, if successful
      */
     @Override
@@ -152,11 +160,11 @@ public class ViewHelper implements IViewHelper {
      * Creates the child view.
      *
      * @param self
-     *            the self
+     *         the self
      * @param selectedNode
-     *            the selected node
+     *         the selected node
      * @param mappingName
-     *            the mapping name
+     *         the mapping name
      * @return true, if successful
      */
     @Override
@@ -173,8 +181,8 @@ public class ViewHelper implements IViewHelper {
             if (childrenType != null) {
                 if (!IdBuilder.isFakeChildNode(
                         childrenType)) { /*
-                                          * Workaround for https://github.com/PapyrusSirius/papyrus-web/issues/164
-                                          */
+                 * Workaround for https://github.com/PapyrusSirius/papyrus-web/issues/164
+                 */
                     result = this.createView(self, selectedNode, childrenType);
                 }
             } else {
@@ -193,18 +201,19 @@ public class ViewHelper implements IViewHelper {
      * Creates the child view.
      *
      * @param self
-     *            the self
+     *         the self
      * @param possibleParent
-     *            the possible parent
+     *         the possible parent
      * @param mappingName
-     *            the mapping name
+     *         the mapping name
      * @return true, if successful
      */
     @Override
     public boolean createChildView(EObject self, List<Node> possibleParent, String mappingName) {
         boolean result = false;
         // First parent is not possible
-        PARENT: for (Node parent : possibleParent) {
+        PARENT:
+        for (Node parent : possibleParent) {
             org.eclipse.sirius.components.view.diagram.NodeDescription targetNodeDescription = this.getViewNodeDescription(parent.getDescriptionId()).orElse(null);
             if (targetNodeDescription != null) {
                 org.eclipse.sirius.components.view.diagram.NodeDescription childrenType = null;
@@ -232,19 +241,12 @@ public class ViewHelper implements IViewHelper {
 
     }
 
-    /**
-     * @param self
-     * @param result
-     * @param parent
-     * @param children
-     * @return
-     */
     private boolean tryCreatingView(EObject self, Node parent, org.eclipse.sirius.components.view.diagram.NodeDescription children) {
         if (children != null) {
             if (!IdBuilder.isFakeChildNode(
                     children)) { /*
-                                  * Workaround for https://github.com/PapyrusSirius/papyrus-web/issues/164
-                                  */
+             * Workaround for https://github.com/PapyrusSirius/papyrus-web/issues/164
+             */
                 return this.createView(self, parent, children);
             }
         }
@@ -255,7 +257,7 @@ public class ViewHelper implements IViewHelper {
      * Creates the root view.
      *
      * @param self
-     *            the self
+     *         the self
      * @return true, if successful
      */
     @Override
@@ -267,9 +269,9 @@ public class ViewHelper implements IViewHelper {
      * Creates the root view.
      *
      * @param self
-     *            the self
+     *         the self
      * @param mappingName
-     *            the mapping name
+     *         the mapping name
      * @return true, if successful
      */
     @Override
@@ -294,11 +296,11 @@ public class ViewHelper implements IViewHelper {
      * Creates the view.
      *
      * @param semanticElement
-     *            the semantic element
+     *         the semantic element
      * @param selectedNode
-     *            the selected node
+     *         the selected node
      * @param newViewDescription
-     *            the new view description
+     *         the new view description
      * @return true, if successful
      */
     @Override
@@ -316,7 +318,7 @@ public class ViewHelper implements IViewHelper {
             // Need to check that no other view on this element is already created
             NodeDescription nodeDescription = this.capturedNodeDescriptions.get(newViewDescription);
             String nodeDescriptionId = nodeDescription.getId();
-            String semanticId = this.objectService.getId(semanticElement);
+            String semanticId = this.identityService.getId(semanticElement);
 
             // Workaround to avoid java.lang.IllegalStateException: Duplicate key problem -
             // https://github.com/eclipse-sirius/sirius-components/issues/1317
@@ -338,7 +340,7 @@ public class ViewHelper implements IViewHelper {
      * Delete the view.
      *
      * @param droppedNode
-     *            the dropped node
+     *         the dropped node
      * @return true, if successful
      */
     @Override
@@ -351,15 +353,15 @@ public class ViewHelper implements IViewHelper {
      * Creates the fake nodes.
      *
      * @param semanticElement
-     *            the semantic element
+     *         the semantic element
      * @param selectedNode
-     *            the selected node
+     *         the selected node
      * @return the list
      */
     @Override
     public List<Node> createFakeNodes(EObject semanticElement, Node selectedNode) {
         List<Node> fakeNodes = new ArrayList<>();
-        String targetObjectId = this.objectService.getId(semanticElement);
+        String targetObjectId = this.identityService.getId(semanticElement);
         String parentElementId = null;
         List<org.eclipse.sirius.components.view.diagram.NodeDescription> childrenTypes = new ArrayList<>();
         if (selectedNode == null) {
@@ -383,8 +385,14 @@ public class ViewHelper implements IViewHelper {
 
                 org.eclipse.sirius.components.diagrams.description.NodeDescription nodeDescription = this.capturedNodeDescriptions.get(childrenType);
 
-                var targetObjectKind = this.objectService.getKind(semanticElement);
-                var targetObjectLabel = this.objectService.getLabel(semanticElement);
+                var targetObjectKind = this.identityService.getKind(semanticElement);
+                var targetObjectStyledLabel = this.labelService.getStyledLabel(semanticElement);
+                final String targetObjectLabel;
+                if (targetObjectStyledLabel != null) {
+                    targetObjectLabel = targetObjectStyledLabel.toString();
+                } else {
+                    targetObjectLabel = "";
+                }
                 String nodeId = new NodeIdProvider().getNodeId(parentElementId, nodeDescription.getId().toString(), containmentKind, targetObjectId);
 
                 var labelStyle = LabelStyle.newLabelStyle()
@@ -452,7 +460,7 @@ public class ViewHelper implements IViewHelper {
      * Gets all the nodes.
      *
      * @param diagram
-     *            the diagram
+     *         the diagram
      * @return the list of all nodes
      */
     public static List<Node> getAllNodes(Diagram diagram) {

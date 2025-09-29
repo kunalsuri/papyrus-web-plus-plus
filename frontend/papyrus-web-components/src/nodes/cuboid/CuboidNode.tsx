@@ -23,6 +23,7 @@ import {
   Label,
   useDrop,
   useDropNodeStyle,
+  useConnectionLineNodeStyle,
   useRefreshConnectionHandles,
   useConnectorNodeStyle,
 } from '@eclipse-sirius/sirius-components-diagrams';
@@ -90,6 +91,8 @@ export const CuboidNode = memo(({ data, id, selected, dragging }: NodeProps<Node
   const { onDrop, onDragOver } = useDrop();
   const { style: connectionFeedbackStyle } = useConnectorNodeStyle(id, data.nodeDescription.id);
   const { style: dropFeedbackStyle } = useDropNodeStyle(data.isDropNodeTarget, data.isDropNodeCandidate, dragging);
+  const { style: connectionLineActiveNodeStyle } = useConnectionLineNodeStyle(data.connectionLinePositionOnNode);
+
   const { getNodes } = useReactFlow<Node<CuboidNodeData>>();
   const node = getNodes().find((node) => node.id === id);
 
@@ -117,6 +120,7 @@ export const CuboidNode = memo(({ data, id, selected, dragging }: NodeProps<Node
           ...cuboidNodeStyle(theme, data.style, !!selected, data.isHovered, data.faded),
           ...connectionFeedbackStyle,
           ...dropFeedbackStyle,
+          ...connectionLineActiveNodeStyle,
         }}
         onDragOver={onDragOver}
         onDrop={handleOnDrop}

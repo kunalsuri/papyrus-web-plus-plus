@@ -29,7 +29,9 @@ import org.eclipse.papyrus.web.tests.utils.UMLTestHelper;
 import org.eclipse.papyrus.web.utils.mutations.PapyrusCreateProjectMutationRunner;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IEditingContextSearchService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.emf.services.JSONResourceFactory;
 import org.eclipse.sirius.components.emf.services.api.IEMFEditingContext;
 import org.eclipse.sirius.components.events.ICause;
@@ -56,10 +58,7 @@ public class AbstractWebUMLTest extends AbstractIntegrationTest {
 
     protected AdapterFactoryEditingDomain editingDomain;
 
-    private UMLTestHelper umlHelper = new UMLTestHelper();
-
-    @Autowired
-    private IObjectService objectService;
+    private final UMLTestHelper umlHelper = new UMLTestHelper();
 
     @Autowired
     private IEditingContextSearchService editingContextSearchService;
@@ -69,6 +68,15 @@ public class AbstractWebUMLTest extends AbstractIntegrationTest {
 
     @Autowired
     private IProjectSemanticDataSearchService projectSemanticDataSearchService;
+
+    @Autowired
+    private IIdentityService identityService;
+
+    @Autowired
+    private IObjectSearchService objectSearchService;
+
+    @Autowired
+    private ILabelService labelService;
 
     private IEditingContext editingContext;
 
@@ -86,8 +94,16 @@ public class AbstractWebUMLTest extends AbstractIntegrationTest {
         }
     }
 
-    protected IObjectService getObjectService() {
-        return this.objectService;
+    public ILabelService getLabelService() {
+        return labelService;
+    }
+
+    public IIdentityService getIdentityService() {
+        return identityService;
+    }
+
+    public IObjectSearchService getObjectSearchService() {
+        return objectSearchService;
     }
 
     public IEditingContext getEditingContext() {

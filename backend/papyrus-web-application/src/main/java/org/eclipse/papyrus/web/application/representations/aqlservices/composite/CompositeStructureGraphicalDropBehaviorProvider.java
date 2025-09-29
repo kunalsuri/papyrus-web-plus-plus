@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,7 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.utils.Gra
 import org.eclipse.papyrus.web.application.representations.aqlservices.utils.IViewHelper;
 import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Node;
 
 /**
@@ -45,8 +45,6 @@ public class CompositeStructureGraphicalDropBehaviorProvider implements IWebInte
 
     private final IViewHelper viewHelper;
 
-    private final IObjectService objectService;
-
     private final ECrossReferenceAdapter crossRef;
 
     private final IEditableChecker editableChecker;
@@ -56,7 +54,9 @@ public class CompositeStructureGraphicalDropBehaviorProvider implements IWebInte
     /**
      * Logger used to report errors and warnings to the user.
      */
-    private ILogger logger;
+    private final ILogger logger;
+
+    private final IObjectSearchService objectSearchService;
 
     /**
      * Constructor.
@@ -65,7 +65,7 @@ public class CompositeStructureGraphicalDropBehaviorProvider implements IWebInte
      *            editing context used to retrieve semantic target
      * @param viewHelper
      *            the helper used to create element on a diagram
-     * @param objectService
+     * @param objectSearchService
      *            service used to retrieve semantic target according to node id
      * @param crossRef
      *            An adapter used to get inverse references
@@ -76,14 +76,15 @@ public class CompositeStructureGraphicalDropBehaviorProvider implements IWebInte
      * @param logger
      *            Logger used to report errors and warnings to the user
      */
-    public CompositeStructureGraphicalDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper, IObjectService objectService, ECrossReferenceAdapter crossRef,
+    public CompositeStructureGraphicalDropBehaviorProvider(IEditingContext editionContext, IViewHelper viewHelper,
+            IObjectSearchService objectSearchService, ECrossReferenceAdapter crossRef,
             IEditableChecker editableChecker, DiagramNavigator diagramNavigator, ILogger logger) {
         this.diagramNavigator = Objects.requireNonNull(diagramNavigator);
         this.crossRef = Objects.requireNonNull(crossRef);
         this.editableChecker = Objects.requireNonNull(editableChecker);
         this.editionContext = Objects.requireNonNull(editionContext);
         this.viewHelper = Objects.requireNonNull(viewHelper);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.logger = logger;
     }
 
@@ -96,7 +97,7 @@ public class CompositeStructureGraphicalDropBehaviorProvider implements IWebInte
      *            the semantic target of the dropped element
      * @param droppedNode
      *            the node to drop
-     * @param targetNodeIm
+     * @param targetNode
      *            the target node or <code>null</code> if the drop occurred on the diagram
      */
     @Override
@@ -114,7 +115,7 @@ public class CompositeStructureGraphicalDropBehaviorProvider implements IWebInte
     }
 
     private Object getSemanticObject(String id) {
-        return this.objectService.getObject(this.editionContext, id).orElse(null);
+        return this.objectSearchService.getObject(this.editionContext, id).orElse(null);
     }
 
 }

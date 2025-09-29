@@ -104,6 +104,7 @@ const toCustomImageNode = (
     isDropNodeCandidate: false,
     isHovered: false,
     shape: style.shape,
+    connectionLinePositionOnNode: 'none',
     nodeAppearanceData: {
       gqlStyle: style,
       customizedStyleProperties: [],

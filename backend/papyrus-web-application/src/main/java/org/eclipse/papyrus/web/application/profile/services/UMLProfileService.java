@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,7 +29,6 @@ import java.util.stream.StreamSupport;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EAnnotation;
-import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -57,7 +56,8 @@ import org.eclipse.papyrus.web.domain.boundedcontext.profile.service.api.IProfil
 import org.eclipse.papyrus.web.domain.boundedcontext.profile.service.api.IProfileSearchService;
 import org.eclipse.sirius.components.core.api.ErrorPayload;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.core.api.IPayload;
 import org.eclipse.sirius.components.emf.services.api.IEMFEditingContext;
 import org.eclipse.sirius.components.events.ICause;
@@ -86,24 +86,27 @@ public class UMLProfileService implements IUMLProfileService {
 
     private final UMLProfileMetadataRegistry umlRegistry;
 
-    private final IObjectService objectService;
-
     private final IProfileSearchService profileSearchService;
 
     private final IProfileDeletionService profileDeletionService;
 
     private final IProfileCreationService profileCreationService;
 
+    private final IIdentityService identityService;
+
     private Registry factoryRegistry;
 
-    public UMLProfileService(UMLProfileMetadataRegistry registry, IObjectService objectService, IProfileSearchService profileSearchService, IProfileDeletionService profileDeletionService,
-            IProfileCreationService profileCreationService, Registry factoryRegistry) {
+    private final IObjectSearchService objectSearchService;
+
+    public UMLProfileService(UMLProfileMetadataRegistry registry, IIdentityService identityService, IProfileSearchService profileSearchService, IProfileDeletionService profileDeletionService,
+            IProfileCreationService profileCreationService, Registry factoryRegistry, IObjectSearchService objectSearchService) {
         this.profileDeletionService = Objects.requireNonNull(profileDeletionService);
         this.profileCreationService = Objects.requireNonNull(profileCreationService);
         this.umlRegistry = Objects.requireNonNull(registry);
-        this.objectService = Objects.requireNonNull(objectService);
+        this.identityService = Objects.requireNonNull(identityService);
         this.profileSearchService = Objects.requireNonNull(profileSearchService);
         this.factoryRegistry = factoryRegistry;
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
     }
 
     @Override
@@ -149,7 +152,7 @@ public class UMLProfileService implements IUMLProfileService {
 
             resource.getContents().addAll(copiedObjects);
             for (EObject sourceObject : copier.keySet()) {
-                String id = this.objectService.getId(sourceObject);
+                String id = this.identityService.getId(sourceObject);
                 xmlResource.setID(copier.get(sourceObject), id);
             }
         }
@@ -166,7 +169,7 @@ public class UMLProfileService implements IUMLProfileService {
         String packageUMLId = input.modelId();
         String profileURI = input.profileUriPath();
         IPayload payload = null;
-        Optional<Package> umlPackageOptional = this.objectService.getObject(editingContext, packageUMLId)//
+        Optional<Package> umlPackageOptional = this.objectSearchService.getObject(editingContext, packageUMLId)//
                 .filter(Package.class::isInstance)//
                 .map(Package.class::cast);
 
@@ -219,7 +222,7 @@ public class UMLProfileService implements IUMLProfileService {
     public Optional<UMLProfileVersion> getProfileLastVersion(IEditingContext editingContext, String profileId) {
         Optional<UMLProfileVersion> versionOpt = Optional.empty();
 
-        Optional<Profile> profileOpt = this.objectService.getObject(editingContext, profileId)//
+        Optional<Profile> profileOpt = this.objectSearchService.getObject(editingContext, profileId)//
                 .filter(Profile.class::isInstance)//
                 .map(Profile.class::cast);
         //
@@ -268,7 +271,7 @@ public class UMLProfileService implements IUMLProfileService {
                 .map(EPackage.class::cast)//
                 .findFirst();
         if (ePackageOpt.isPresent()) {
-            versionOpt = ePackageOpt.map(ePackage -> ((EModelElement) ePackage).getEAnnotation("PapyrusVersion"))//
+            versionOpt = ePackageOpt.map(ePackage -> ePackage.getEAnnotation("PapyrusVersion"))//
                     .map(eAnnotation -> eAnnotation.getDetails().get("Version")) //
                     .map(strVersion -> {
                         UMLProfileVersion profileLastVersion = null;
@@ -292,7 +295,7 @@ public class UMLProfileService implements IUMLProfileService {
 
     @Override
     public IPayload publishProfile(IEditingContext editingContext, PublishProfileInput publishProfileInput) {
-        Optional<Profile> profileOpt = this.objectService.getObject(editingContext, publishProfileInput.objectId())//
+        Optional<Profile> profileOpt = this.objectSearchService.getObject(editingContext, publishProfileInput.objectId())//
                 .filter(Profile.class::isInstance)//
                 .map(Profile.class::cast);
 

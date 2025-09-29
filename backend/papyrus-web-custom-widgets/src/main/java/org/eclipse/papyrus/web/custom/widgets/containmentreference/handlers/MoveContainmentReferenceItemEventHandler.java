@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,7 @@ import org.eclipse.sirius.components.collaborative.forms.api.IFormQueryService;
 import org.eclipse.sirius.components.collaborative.forms.messages.ICollaborativeFormMessageService;
 import org.eclipse.sirius.components.core.api.ErrorPayload;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.core.api.IPayload;
 import org.eclipse.sirius.components.core.api.SuccessPayload;
 import org.eclipse.sirius.components.forms.Form;
@@ -53,19 +53,20 @@ public class MoveContainmentReferenceItemEventHandler implements IFormEventHandl
     private final ICollaborativeFormMessageService messageService;
 
     private final Counter counter;
+    private final IObjectSearchService objectSearchService;
 
     private final IFormQueryService formQueryService;
 
-    private final IObjectService objectService;
-
-    public MoveContainmentReferenceItemEventHandler(IFormQueryService formQueryService, ICollaborativeFormMessageService messageService, MeterRegistry meterRegistry, IObjectService objectService) {
+    public MoveContainmentReferenceItemEventHandler(IFormQueryService formQueryService,
+            ICollaborativeFormMessageService messageService, MeterRegistry meterRegistry,
+            IObjectSearchService objectSearchService) {
         this.formQueryService = Objects.requireNonNull(formQueryService);
         this.messageService = Objects.requireNonNull(messageService);
-        this.objectService = Objects.requireNonNull(objectService);
 
         this.counter = Counter.builder(Monitoring.EVENT_HANDLER)
                 .tag(Monitoring.NAME, this.getClass().getSimpleName())
                 .register(meterRegistry);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class MoveContainmentReferenceItemEventHandler implements IFormEventHandl
     }
 
     private Optional<MoveContainmentReferenceItemHandlerParamaters> getHandlerInput(IEditingContext editingContext, MoveContainmentReferenceItemInput input) {
-        return this.objectService.getObject(editingContext, input.referenceItemId()).flatMap(value -> {
+        return this.objectSearchService.getObject(editingContext, input.referenceItemId()).flatMap(value -> {
             return Optional.of(new MoveContainmentReferenceItemHandlerParamaters(value, input.fromIndex(), input.toIndex()));
         });
     }

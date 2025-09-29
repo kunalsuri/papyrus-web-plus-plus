@@ -41,16 +41,18 @@ public class UMLExplorerItemContextMenuEntryProvider implements ITreeItemContext
     }
 
     @Override
-    public boolean canHandle(IEditingContext editingContext, TreeDescription treeDescription, Tree tree, TreeItem treeItem) {
-        return tree.getId().startsWith(ExplorerDescriptionProvider.PREFIX)
-                && Objects.equals(tree.getDescriptionId(), umlDefaultTreeInstaller.getDescriptionId());
+    public boolean canHandle(IEditingContext editingContext, TreeDescription treeDescription, Tree tree,
+            TreeItem treeItem) {
+        return tree.getId().startsWith(ExplorerDescriptionProvider.PREFIX) && Objects.equals(tree.getDescriptionId(),
+                umlDefaultTreeInstaller.getDescriptionId());
     }
 
     @Override
-    public List<ITreeItemContextMenuEntry> getTreeItemContextMenuEntries(IEditingContext editingContext, TreeDescription treeDescription, Tree tree, TreeItem treeItem) {
+    public List<ITreeItemContextMenuEntry> getTreeItemContextMenuEntries(IEditingContext editingContext,
+            TreeDescription treeDescription, Tree tree, TreeItem treeItem) {
         List<ITreeItemContextMenuEntry> result = new ArrayList<>();
         if (treeItem.isHasChildren()) {
-            result.add(new SingleClickTreeItemContextMenuEntry("expandAll", "", List.of()));
+            result.add(new SingleClickTreeItemContextMenuEntry("expandAll", "", List.of(), false));
         }
         return result;
     }

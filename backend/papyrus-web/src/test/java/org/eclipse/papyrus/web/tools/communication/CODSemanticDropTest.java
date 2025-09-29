@@ -81,7 +81,7 @@ public class CODSemanticDropTest extends SemanticDropTest {
         }
         NodeCreationGraphicalChecker graphicalChecker = new NodeCreationGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ROOT_INTERACTION),
                 CODMappingTypes.getMappingType(elementType), this.getCapturedNodes());
-        this.semanticDropOnContent(ROOT_INTERACTION, this.getObjectService().getId(elementToDrop), graphicalChecker);
+        this.semanticDropOnContent(ROOT_INTERACTION, this.getIdentityService().getId(elementToDrop), graphicalChecker);
     }
 
     @ParameterizedTest

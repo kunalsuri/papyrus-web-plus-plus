@@ -21,7 +21,13 @@ import Typography from '@mui/material/Typography';
 import { Edge, Node, NodeProps, useStoreApi, NodeResizeControl } from '@xyflow/react';
 import { memo, useContext, useEffect, useState } from 'react';
 import { CustomImageNodeData, NodeComponentsMap } from './CustomImageNode.types';
-import { EdgeData, NodeData } from '@eclipse-sirius/sirius-components-diagrams';
+import {
+  EdgeData,
+  NodeData,
+  useConnectorNodeStyle,
+  useDropNodeStyle,
+  useConnectionLineNodeStyle,
+} from '@eclipse-sirius/sirius-components-diagrams';
 
 const resizeControlLineStyle = (theme: Theme): React.CSSProperties => {
   return { borderColor: 'transparent', borderWidth: theme.spacing(0.25) };
@@ -61,7 +67,7 @@ const customImageNodeStyle = (
 };
 
 export const CustomImageNode: NodeComponentsMap['customImageNode'] = memo(
-  ({ data, id, selected }: NodeProps<Node<CustomImageNodeData>>) => {
+  ({ data, id, selected, dragging }: NodeProps<Node<CustomImageNodeData>>) => {
     const { readOnly } = useContext<DiagramContextValue>(DiagramContext);
     const theme = useTheme();
     const { addErrorMessage } = useMultiToast();
@@ -70,6 +76,9 @@ export const CustomImageNode: NodeComponentsMap['customImageNode'] = memo(
       url: data.shape && data.shape !== '' ? httpOrigin + data.shape : '',
       validImage: data.shape !== undefined && data.shape !== '',
     });
+    const { style: connectionFeedbackStyle } = useConnectorNodeStyle(id, data.nodeDescription.id);
+    const { style: dropFeedbackStyle } = useDropNodeStyle(data.isDropNodeTarget, data.isDropNodeCandidate, dragging);
+    const { style: connectionLineActiveNodeStyle } = useConnectionLineNodeStyle(data.connectionLinePositionOnNode);
 
     const onErrorLoadingImage = () => {
       setState((prevState) => ({ ...prevState, validImage: false }));
@@ -107,6 +116,9 @@ export const CustomImageNode: NodeComponentsMap['customImageNode'] = memo(
         <div
           style={{
             ...customImageNodeStyle(theme, data.style, selected, data.isHovered, data.faded),
+            ...connectionFeedbackStyle,
+            ...dropFeedbackStyle,
+            ...connectionLineActiveNodeStyle,
           }}>
           {state.validImage ? (
             <img

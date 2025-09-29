@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -30,7 +30,7 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.AbstractD
 import org.eclipse.papyrus.web.application.representations.view.IdBuilder;
 import org.eclipse.papyrus.web.sirius.contributions.ViewDiagramDescriptionService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
@@ -42,42 +42,42 @@ import org.eclipse.sirius.components.diagrams.description.NodeDescription;
  */
 public final class SynchronizedDomainBasedEdgeCreationTestHelper {
 
-    private IdBuilder idBuilder;
+    private final IdBuilder idBuilder;
 
-    private DiagramTestHelper representationHelper;
+    private final DiagramTestHelper representationHelper;
 
-    private IObjectService objectService;
+    private final EObject source;
 
-    private EObject source;
+    private final EObject target;
 
-    private EObject target;
+    private final String sourceNodeDescriptionName;
 
-    private String sourceNodeDescriptionName;
+    private final String targetNodeDescriptionName;
 
-    private String targetNodeDescriptionName;
+    private final String expectedDomainBasedEdgeDescriptionName;
 
-    private String expectedDomainBasedEdgeDescriptionName;
+    private final IObjectSearchService objectSearchService;
 
     private String sourceNodeId;
 
     private String targetNodeId;
 
-    private IEditingContext editingContext;
+    private final IEditingContext editingContext;
 
-    private EClass type;
+    private final EClass type;
 
-    private EReference expectedContainementRef;
+    private final EReference expectedContainementRef;
 
-    private EObject expectedOwner;
+    private final EObject expectedOwner;
 
-    private AbstractDiagramService diagramService;
+    private final AbstractDiagramService diagramService;
 
     private EObject newElement;
 
     private SynchronizedDomainBasedEdgeCreationTestHelper(Builder builder) {
         this.idBuilder = builder.idBuilder;
         this.representationHelper = builder.representationHelper;
-        this.objectService = builder.objectService;
+        this.objectSearchService = builder.objectSearchService;
         this.source = builder.source;
         this.target = builder.target;
         this.sourceNodeDescriptionName = builder.sourceNodeDescriptionName;
@@ -120,14 +120,16 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
         Node sourceNode = this.getSourceNode();
         Node targetNode = this.getTargetNode();
 
-        Optional<Object> optSemanticSource = this.objectService.getObject(this.editingContext, sourceNode.getTargetObjectId());
+        Optional<Object> optSemanticSource = this.objectSearchService.getObject(this.editingContext,
+                sourceNode.getTargetObjectId());
         if (optSemanticSource.isEmpty()) {
             fail("Unable to find semantic target element of " + sourceNode);
         }
 
         EObject semanticSource = (EObject) optSemanticSource.get();
 
-        Optional<Object> optSemanticTarget = this.objectService.getObject(this.editingContext, targetNode.getTargetObjectId());
+        Optional<Object> optSemanticTarget = this.objectSearchService.getObject(this.editingContext,
+                targetNode.getTargetObjectId());
         if (optSemanticTarget.isEmpty()) {
             fail("Unable to find semantic target element of " + targetNode);
         }
@@ -217,8 +219,6 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
 
         private DiagramTestHelper representationHelper;
 
-        private IObjectService objectService;
-
         private EObject source;
 
         private EObject target;
@@ -243,6 +243,8 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
 
         private AbstractDiagramService diagramService;
 
+        private IObjectSearchService objectSearchService;
+
         private Builder() {
         }
 
@@ -256,8 +258,8 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
             return this;
         }
 
-        public Builder withObjectService(IObjectService objectService) {
-            this.objectService = objectService;
+        public Builder withObjectSearchService(IObjectSearchService objectSearchService) {
+            this.objectSearchService = objectSearchService;
             return this;
         }
 
@@ -325,7 +327,7 @@ public final class SynchronizedDomainBasedEdgeCreationTestHelper {
             Objects.requireNonNull(this.source);
             Objects.requireNonNull(this.target);
             Objects.requireNonNull(this.representationHelper);
-            Objects.requireNonNull(this.objectService);
+            Objects.requireNonNull(this.objectSearchService);
             Objects.requireNonNull(this.editingContext);
             Objects.requireNonNull(this.expectedContainementRef);
             Objects.requireNonNull(this.expectedOwner);

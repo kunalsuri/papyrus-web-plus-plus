@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2024 Obeo.
+ * Copyright (c) 2019, 2025 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -28,11 +28,14 @@ import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IIdentityService;
+import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.emf.forms.EEnumIfDescriptionProvider;
 import org.eclipse.sirius.components.emf.forms.EStringIfDescriptionProvider;
 import org.eclipse.sirius.components.emf.forms.NumberIfDescriptionProvider;
 import org.eclipse.sirius.components.emf.forms.api.IPropertiesValidationProvider;
+import org.eclipse.sirius.components.emf.forms.api.IWidgetReadOnlyProvider;
 import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
 import org.eclipse.sirius.components.emf.services.messages.IEMFMessageService;
 import org.eclipse.sirius.components.forms.description.AbstractControlDescription;
@@ -46,19 +49,18 @@ import org.eclipse.uml2.uml.Element;
 import org.springframework.stereotype.Service;
 
 /**
- * Custom implemenation of {@link PropertiesDefaultDescriptionProvider} to display an advanced view for UML properties.
- *
- * @see https://github.com/PapyrusSirius/papyrus-web/issues/58
+ * Custom implementation of the default property view to display an advanced view for UML properties, it disable live
+ * validation and extends the default data type handled with the standard UML Type such as
+ * TypesPackage.eINSTANCE.getBoolean().
  *
  * @author Arthur Daussy
+ * @see EBooleanIfDescriptionProvider
  */
 
 @Service
 public class AdvancedPropertiesDescriptionProvider {
 
     public static final String ESTRUCTURAL_FEATURE = "eStructuralFeature";
-
-    private final IObjectService objectService;
 
     private final ComposedAdapterFactory composedAdapterFactory;
 
@@ -72,17 +74,30 @@ public class AdvancedPropertiesDescriptionProvider {
 
     private final IFeedbackMessageService feedbackMessageService;
 
-    public AdvancedPropertiesDescriptionProvider(IObjectService objectService, ComposedAdapterFactory composedAdapterFactory, IEMFMessageService emfMessageService,
-            IFeedbackMessageService feedbackMessageService, IEMFKindService emfKindService) {
-        this.objectService = Objects.requireNonNull(objectService);
+    private final IIdentityService identityService;
+
+    private final IWidgetReadOnlyProvider widgetReadOnlyProvider;
+
+    private final ILabelService labelService;
+
+    private final IObjectSearchService objectSearchService;
+
+    // CHECKSTYLE:OFF Injected parameters
+    public AdvancedPropertiesDescriptionProvider(IIdentityService identityService, ComposedAdapterFactory composedAdapterFactory, IEMFMessageService emfMessageService,
+            IFeedbackMessageService feedbackMessageService, IEMFKindService emfKindService, IWidgetReadOnlyProvider widgetReadOnlyProvider, ILabelService labelService,
+            IObjectSearchService objectSearchService) {
+        this.identityService = Objects.requireNonNull(identityService);
+        // CHECKSTYLE:ON Injected parameters
         this.composedAdapterFactory = Objects.requireNonNull(composedAdapterFactory);
+        this.widgetReadOnlyProvider = Objects.requireNonNull(widgetReadOnlyProvider);
+        this.labelService = Objects.requireNonNull(labelService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.propertiesValidationProvider = new IPropertiesValidationProvider.NoOp(); // Unplug live validation
-                                                                                      // validation
+        // validation
         this.emfMessageService = Objects.requireNonNull(emfMessageService);
-        this.semanticTargetIdProvider = variableManager -> variableManager.get(VariableManager.SELF, Object.class).map(objectService::getId).orElse(null);
+        this.semanticTargetIdProvider = variableManager -> variableManager.get(VariableManager.SELF, Object.class).map(identityService::getId).orElse(null);
         this.emfKindService = Objects.requireNonNull(emfKindService);
         this.feedbackMessageService = Objects.requireNonNull(feedbackMessageService);
-
     }
 
     public FormDescription getFormDescription() {
@@ -98,7 +113,7 @@ public class AdvancedPropertiesDescriptionProvider {
         Function<VariableManager, String> labelProvider = variableManager -> "Properties";
 
         Function<VariableManager, String> targetObjectIdProvider = variableManager -> variableManager.get(VariableManager.SELF, Object.class)
-                .map(this.objectService::getId)
+                .map(this.identityService::getId)
                 .orElse(null);
 
         return FormDescription.newFormDescription(UUID.nameUUIDFromBytes("UMLAdvancedPropertyViewForm".getBytes()).toString())
@@ -125,7 +140,7 @@ public class AdvancedPropertiesDescriptionProvider {
             var optionalSelf = variableManager.get(VariableManager.SELF, Object.class);
             if (optionalSelf.isPresent()) {
                 Object self = optionalSelf.get();
-                return this.objectService.getId(self);
+                return this.identityService.getId(self);
             }
             return UUID.randomUUID().toString();
         };
@@ -174,12 +189,12 @@ public class AdvancedPropertiesDescriptionProvider {
         };
 
         List<AbstractControlDescription> ifDescriptions = new ArrayList<>();
-        ifDescriptions.add(new EStringIfDescriptionProvider(this.composedAdapterFactory, this.propertiesValidationProvider, this.semanticTargetIdProvider).getIfDescription());
-        ifDescriptions.add(new EBooleanIfDescriptionProvider(this.composedAdapterFactory, this.propertiesValidationProvider, this.semanticTargetIdProvider).getIfDescription());
-        ifDescriptions.add(new EEnumIfDescriptionProvider(this.composedAdapterFactory, this.propertiesValidationProvider, this.semanticTargetIdProvider).getIfDescription());
+        ifDescriptions.addAll(new EStringIfDescriptionProvider(this.identityService, this.composedAdapterFactory, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
+        ifDescriptions.addAll(new EBooleanIfDescriptionProvider(this.identityService, this.composedAdapterFactory, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
+        ifDescriptions.addAll(new EEnumIfDescriptionProvider(this.identityService, this.composedAdapterFactory, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
 
-        ifDescriptions.add(new NonDerivedNonContainmentReferenceIfDescriptionProvider(this.composedAdapterFactory, this.objectService, this.semanticTargetIdProvider, this.propertiesValidationProvider,
-                this.feedbackMessageService, this.emfKindService).getIfDescription());
+        ifDescriptions.add(new NonDerivedNonContainmentReferenceIfDescriptionProvider(this.composedAdapterFactory, this.labelService, this.semanticTargetIdProvider, this.propertiesValidationProvider,
+                this.feedbackMessageService, this.emfKindService, this.objectSearchService, this.identityService).getIfDescription());
 
         var numericDataTypes = List.of(
                 EcorePackage.Literals.EINT,
@@ -193,8 +208,9 @@ public class AdvancedPropertiesDescriptionProvider {
                 EcorePackage.Literals.ESHORT,
                 EcorePackage.Literals.ESHORT_OBJECT);
         for (var dataType : numericDataTypes) {
-            ifDescriptions.add(new NumberIfDescriptionProvider(dataType, this.composedAdapterFactory, this.propertiesValidationProvider, this.emfMessageService, this.semanticTargetIdProvider)
-                    .getIfDescription());
+            ifDescriptions.add(new NumberIfDescriptionProvider(dataType, this.composedAdapterFactory, this.propertiesValidationProvider, this.emfMessageService, this.semanticTargetIdProvider,
+                    this.widgetReadOnlyProvider)
+                            .getIfDescription());
         }
 
         ForDescription forDescription = ForDescription.newForDescription("forId")

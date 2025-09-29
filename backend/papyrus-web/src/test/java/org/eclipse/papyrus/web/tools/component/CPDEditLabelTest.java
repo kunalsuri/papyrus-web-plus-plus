@@ -132,7 +132,8 @@ public class CPDEditLabelTest extends EditLabelTest {
             default -> NEW_LABEL;
         };
         LabelGraphicalChecker graphicalChecker = new LabelGraphicalChecker(expectedGraphicalLabel);
-        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectService(), this::getEditingContext, NEW_LABEL);
+        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectSearchService(),
+                this::getEditingContext, NEW_LABEL);
         this.editLabel(elementName, NEW_LABEL, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 
@@ -140,7 +141,8 @@ public class CPDEditLabelTest extends EditLabelTest {
     public void testEditLabelPropertyInComponent() {
         this.applyNodeCreationTool(this.componentNodeId, new CreationTool(ToolSections.NODES, UML.getProperty()));
         LabelGraphicalChecker graphicalChecker = new LabelGraphicalChecker(PROPERTY_LABEL_PREFIX + NEW_LABEL + PROPERTY_LABEL_SUFFIX);
-        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectService(), this::getEditingContext, NEW_LABEL);
+        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectSearchService(),
+                this::getEditingContext, NEW_LABEL);
         this.editLabel(PROPERTY, NEW_LABEL, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 
@@ -148,7 +150,8 @@ public class CPDEditLabelTest extends EditLabelTest {
     public void testEditLabelPropertyInInterface() {
         this.applyNodeCreationTool(this.interfaceNodeId, new CreationTool(ToolSections.NODES, UML.getProperty()));
         LabelGraphicalChecker graphicalChecker = new LabelGraphicalChecker(PROPERTY_LABEL_PREFIX + NEW_LABEL + PROPERTY_LABEL_SUFFIX);
-        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectService(), this::getEditingContext, NEW_LABEL);
+        LabelSemanticChecker semanticChecker = new LabelSemanticChecker(this.getObjectSearchService(),
+                this::getEditingContext, NEW_LABEL);
         this.editLabel(PROPERTY, NEW_LABEL, new CombinedChecker(graphicalChecker, semanticChecker));
     }
 

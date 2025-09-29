@@ -133,15 +133,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.sirius</groupId>
-            <artifactId>sirius-components-graphiql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.sirius</groupId>
-            <artifactId>sirius-components-graphql-voyager</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.eclipse.sirius</groupId>
             <artifactId>sirius-components-domain-edit</artifactId>

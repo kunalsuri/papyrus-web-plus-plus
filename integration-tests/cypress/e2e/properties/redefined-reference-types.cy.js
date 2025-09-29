@@ -41,7 +41,7 @@ describe('Redefined reference types test', () => {
   };
 
   it('check ConnectableElementTemplateParameter.parameteredElement: ConnectableElement instead of ParameterableElement', () => {
-    cy.getByTestId('<Connectable Element Template Parameter>').scrollIntoView().should('be.visible').click();
+    cy.getByTestId('ConnectableElementTemplateParameter').scrollIntoView().should('be.visible').click();
     cy.activateDetailsTabAndWaitForElement('UML', 'Parametered element');
     cy.openReferenceChildCreationDialog('Parametered element', 'Activity');
     checkChildDescriptionContent([

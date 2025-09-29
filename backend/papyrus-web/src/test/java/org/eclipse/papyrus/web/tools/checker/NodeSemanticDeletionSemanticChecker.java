@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.sirius.components.core.api.IEditingContext;
-import org.eclipse.sirius.components.core.api.IObjectService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.IDiagramElement;
 
 /**
@@ -37,7 +37,7 @@ public class NodeSemanticDeletionSemanticChecker extends DeletionSemanticChecker
     /**
      * Initializes the checker with the provided parameters.
      *
-     * @param objectService
+     * @param objectSearchService
      *            the object service used to retrieve and compute identifiers
      * @param editingContextSupplier
      *            a supplier to access and reload the editing context
@@ -46,8 +46,10 @@ public class NodeSemanticDeletionSemanticChecker extends DeletionSemanticChecker
      * @param containmentFeature
      *            the expected containment feature of the checked element
      */
-    public NodeSemanticDeletionSemanticChecker(IObjectService objectService, Supplier<IEditingContext> editingContextSupplier, Supplier<EObject> oldOwnerSupplier, EReference containmentFeature) {
-        super(objectService, editingContextSupplier, oldOwnerSupplier, containmentFeature);
+    public NodeSemanticDeletionSemanticChecker(IObjectSearchService objectSearchService,
+            Supplier<IEditingContext> editingContextSupplier, Supplier<EObject> oldOwnerSupplier,
+            EReference containmentFeature) {
+        super(objectSearchService, editingContextSupplier, oldOwnerSupplier, containmentFeature);
     }
 
     @Override
