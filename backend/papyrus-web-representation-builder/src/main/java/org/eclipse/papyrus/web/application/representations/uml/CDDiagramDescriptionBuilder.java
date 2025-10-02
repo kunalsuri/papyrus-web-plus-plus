@@ -12,6 +12,7 @@
  *  Obeo - Initial API and implementation
  *  Titouan BOUETE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issues 200, 203, 219, 227
  *  Aurelien Didier (Artal Technologies) - Issue 199, 190, 229
+ *  Pauline DEVILLE (CEA LIST) - Issue 279
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -40,7 +41,6 @@ import org.eclipse.papyrus.web.application.representations.view.aql.Services;
 import org.eclipse.papyrus.web.application.representations.view.builders.CallbackAdapter;
 import org.eclipse.papyrus.web.application.representations.view.builders.ViewBuilder;
 import org.eclipse.sirius.components.view.ChangeContext;
-import org.eclipse.sirius.components.view.ViewFactory;
 import org.eclipse.sirius.components.view.diagram.ArrowStyle;
 import org.eclipse.sirius.components.view.diagram.DiagramDescription;
 import org.eclipse.sirius.components.view.diagram.DiagramElementDescription;
@@ -1031,8 +1031,6 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
     }
 
     private EdgeTool createSpecializedAssociationDomainBasedEdgeTool(String specializationName, String iconName, String serviceName, EdgeDescription cdAssociation) {
-        ChangeContext changeContext = ViewFactory.eINSTANCE.createChangeContext();
-
         String query = new CallQuery(SEMANTIC_EDGE_SOURCE)//
                 .callService(serviceName, //
                         SEMANTIC_EDGE_TARGET, //
@@ -1046,7 +1044,6 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
             List<DiagramElementDescription> targetNodeDescriptions = cdAssociation.getTargetDescriptions();
             tool.getTargetElementDescriptions().addAll(targetNodeDescriptions);
         }));
-        tool.getBody().add(changeContext);
         return tool;
     }
 
