@@ -134,7 +134,7 @@ To build the application yourself you will need the following tools:
 ** https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/[Apache Maven 3.6.3]
 ** https://www.docker.com/[Docker] must be installed and running for some of the backend components tests to run.
 * To build the frontend components:
-** LTS versions of https://nodejs.org/[Node and NPM]: in particular, Node >= 18.7.0 is required along with npm >= 8.15.0.
+** LTS versions of https://nodejs.org/[Node and NPM]: in particular, Node >= 22.16.0 is required along with npm >= 10.9.2.
 
 
 WARNING: Note that there are issues with npm under Windows Subsystem for Linux (WSL). If you use WSL and encounter error messages like _"Maximum call stack size exceeded"_ when running NPM, switch to plain Windows where this should work.

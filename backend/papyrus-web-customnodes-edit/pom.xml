@@ -19,7 +19,7 @@ Copyright (c) 2023, 2024 CEA LIST, Obeo
 	<parent>
 		<groupId>org.eclipse.papyrus.papyrus-web</groupId>
 		<artifactId>papyrus-web-parent</artifactId>
-		<version>2025.4.0</version>
+		<version>2025.9.0</version>
 		<relativePath>../papyrus-web-parent</relativePath>
 	</parent>
 	<artifactId>papyrus-web-customnodes-edit</artifactId>

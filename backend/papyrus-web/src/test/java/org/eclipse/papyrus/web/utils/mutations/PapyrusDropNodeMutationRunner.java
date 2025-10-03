@@ -13,8 +13,6 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.utils.mutations;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,7 +29,8 @@ import graphql.GraphQL;
 /**
  * Service used to drop a graphical element on the diagram or on graphical containers.
  * <p>
- * This class instantiates and runs the {@code dropNode} mutation. Note that this mutation can drop elements on the diagram itself, or on containers already displayed on the diagram.
+ * This class instantiates and runs the {@code dropNode} mutation. Note that this mutation can drop elements on the
+ * diagram itself, or on containers already displayed on the diagram.
  * </p>
  *
  * @author <a href="mailto:gwendal.daniel@obeosoft.com">Gwendal Daniel</a>
@@ -71,9 +70,9 @@ public class PapyrusDropNodeMutationRunner {
      * Initializes the runner with the provided {@code graphQL} and {@code objectMapper}.
      *
      * @param graphQL
-     *         the GraphQL execution engine
+     *            the GraphQL execution engine
      * @param objectMapper
-     *         the object mapper
+     *            the object mapper
      */
     public PapyrusDropNodeMutationRunner(GraphQL graphQL, ObjectMapper objectMapper) {
         this.graphQL = graphQL;
@@ -87,13 +86,13 @@ public class PapyrusDropNodeMutationRunner {
      * </p>
      *
      * @param editingContextId
-     *         the project containing the element to drop
+     *            the project containing the element to drop
      * @param representationId
-     *         the representation where the element is dropped
+     *            the representation where the element is dropped
      * @param droppedElementId
-     *         the graphical identifier of the element to drop
+     *            the graphical identifier of the element to drop
      * @param targetElementId
-     *         the graphical identifier of the target container element
+     *            the graphical identifier of the target container element
      */
     public void dropNode(String editingContextId, String representationId, String droppedElementId, String targetElementId) {
         DropNodeInput dropNodeInput = new DropNodeInput(UUID.randomUUID(), editingContextId, representationId, droppedElementId, targetElementId, 0, 0);

@@ -13,8 +13,6 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.utils.mutations;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,7 +30,8 @@ import graphql.GraphQL;
 /**
  * Service used to drop a semantic element on the diagram.
  * <p>
- * This class instantiates and runs the {@code dropOnDiagram} mutation. Note that this mutation can drop elements on the diagram itself, or on containers already displayed on the diagram.
+ * This class instantiates and runs the {@code dropOnDiagram} mutation. Note that this mutation can drop elements on the
+ * diagram itself, or on containers already displayed on the diagram.
  * </p>
  *
  * @author <a href="mailto:gwendal.daniel@obeosoft.com">Gwendal Daniel</a>
@@ -67,9 +66,9 @@ public class PapyrusDropOnDiagramMutationRunner {
      * Initializes the runner with the provided {@code graphQL} and {@code objectMapper}.
      *
      * @param graphQL
-     *         the GraphQL execution engine
+     *            the GraphQL execution engine
      * @param objectMapper
-     *         the object mapper
+     *            the object mapper
      */
     public PapyrusDropOnDiagramMutationRunner(GraphQL graphQL, ObjectMapper objectMapper) {
         this.graphQL = graphQL;
@@ -83,13 +82,13 @@ public class PapyrusDropOnDiagramMutationRunner {
      * </p>
      *
      * @param editingContextId
-     *         the project containing the elements to drop
+     *            the project containing the elements to drop
      * @param representationId
-     *         the representation where the elements are dropped
+     *            the representation where the elements are dropped
      * @param targetElementId
-     *         the graphical identifier of the target container element
+     *            the graphical identifier of the target container element
      * @param droppedObjectIds
-     *         the semantic identifiers of the elements to drop
+     *            the semantic identifiers of the elements to drop
      */
     public void dropOnDiagram(String editingContextId, String representationId, String targetElementId, List<String> droppedObjectIds) {
         // Starting position isn't relevant when invoking the tool manually, so we set it to 0

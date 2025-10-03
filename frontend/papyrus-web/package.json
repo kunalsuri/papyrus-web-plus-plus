@@ -1,7 +1,7 @@
 {
   "name": "@eclipse-papyrus/papyrus-web",
   "author": "Eclipse Sirius",
-  "version": "2025.4.0",
+  "version": "2025.9.0",
   "license": "EPL-2.0",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "@eclipse-sirius/sirius-components-widget-table": "2025.8.0",
     "@eclipse-sirius/sirius-web-application": "2025.8.0",
     "@eclipse-sirius/sirius-web-view-fork": "2025.8.0",
-    "@eclipse-papyrus/papyrus-web-components": "2025.4.0",
+    "@eclipse-papyrus/papyrus-web-components": "2025.9.0",
     "@lexical/react": "0.8.1",
     "@mui/icons-material": "7.0.2",
     "@mui/material": "7.0.2",
