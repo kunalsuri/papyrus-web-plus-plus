@@ -9,45 +9,76 @@ This repository, `papyrus-web` is a mono repo containing both frontend and backe
 
 To test _Papyrus Web_ you have two possible options:
 
-. If you just want to run an already built version of the example application, follow link:#quick-start[the Quick Start].
+. If you just want to run an already built version of Papyrus Web, follow link:#quick-start[the Quick Start].
 . If you want to _build_ the application yourself, follow link:#build[the complete Build instructions].
 
 [#quick-start]
 == Quick Start
 
+
 [#docker-compose]
-=== Building and running with docker compose
+=== Running released application with docker compose
 
-To build and run the application using docker compose, do the following actions:
+To run the application using docker compose, it is necessary to have https://docs.docker.com/compose/install/[Docker Compose] installed. Then, run:
 
-* Create a Github User and Access Token at https://github.com/settings/tokens. Use the scope `read:package` when asked. Finally, create two environment variables with the user name and generated token:
-
-[source,sh]
-----
-export GITHUB_USERNAME=<replace by your user name>
-export GITHUB_AUTH_TOKEN=<replace by your access token>
-----
-
-* Create a .env environment file from the env.template. This file contains the enviroment variables for configuring the services. The default values may be changed. 
+*On Linux terminal*
 
 [source,sh]
 ----
-cp env.template .env
+echo '
+services:
+  database:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: test_username
+      POSTGRES_PASSWORD: test_password
+  papyrus-web:
+    image: eclipsepapyrus/papyrus-web:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database/postgres
+      SPRING_DATASOURCE_USERNAME: test_username
+      SPRING_DATASOURCE_PASSWORD: test_password
+      SIRIUS_COMPONENTS_CORS_ALLOWEDORIGINPATTERNS: "*"  
+    depends_on:
+      - database
+' | docker compose -f - up
 ----
 
-* Build the image and run all the services. This command builds the PapyrusWeb image, pulls the database image and instantiates both services. The first execution takes several minutes, since it compiles the application. The remaining executions use the locally compiled image.
+*On Windows with PowerShell*
 
 [source,sh]
 ----
-docker compose up
+@'
+services:
+  database:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: test_username
+      POSTGRES_PASSWORD: test_password
+  papyrus-web:
+    image: eclipsepapyrus/papyrus-web:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database/postgres
+      SPRING_DATASOURCE_USERNAME: test_username
+      SPRING_DATASOURCE_PASSWORD: test_password
+      SIRIUS_COMPONENTS_CORS_ALLOWEDORIGINPATTERNS: "*"
+    depends_on:
+      - database
+'@ | docker compose -p papyrusweb -f - up
 ----
 
 The application is available at http://localhost:8080
 
+*NOTE*: The repository provides a docker-compose.yml and a env.template environment file, if the user wants to run it after cloning the repository. It may be changed to use different ports or even a different image.
 
 [#application-jar]
-=== Running the compiled application 
-
+=== Running the compiled application jar 
 If you want a quick overview of how Papyrus Web looks and feels like without building the sample application yourself, you will simply need:
 
 * Java 17
@@ -97,7 +128,7 @@ Note that this will remove all the data you have created while testing the appli
 
 To build the application yourself you will need the following tools:
 
-* Git, and a GitHub account
+* Git and a GitHub account
 * To build the backend components:
 ** https://adoptium.net/temurin/releases/[Java 17]
 ** https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/[Apache Maven 3.6.3]
@@ -195,20 +226,25 @@ cp -R frontend/papyrus-web/dist/* backend/papyrus-web-frontend/src/main/resource
 ----
 
 . Build the backend ([.small]#from the `backend` subfolder of Papyrus web main location#):
-+
+
+
 [source,sh]
 ----
 mvn clean verify
 ----
 or to ignore the basic tests: 
+
+[source,sh]
 ----
 mvn clean verify -DskipTests
 ----
+
 or to launch all tests (take around 7 hours):
+[source,sh]
 ----
 mvn clean verify -DallTests
 ----
-+
+
 
 The result is a ready-to-run, Spring Boot "fat JAR" in backend/papyrus-web/target/papyrus-web-<VERSION>.jar. Refer to the instructions in the "Quick Start" section above to launch it.
 
@@ -364,6 +400,37 @@ https://download.eclipse.org/cbi/updates/tpd/nightly/latest/
 . Run database docker image (see <<docker-db>>)
 . Launch backend from STS (see <<backend-launch-config>>)
 . Launch frontend `npm start`
+
+
+[#docker-compose-build]
+== Building and running with docker compose
+
+To build and run the application using docker compose, do the following actions:
+
+* Create a Github User and Access Token at https://github.com/settings/tokens. Use the scope `read:package` when asked. Finally, create two environment variables with the user name and generated token:
+
+[source,sh]
+----
+export GITHUB_USERNAME=<replace by your user name>
+export GITHUB_AUTH_TOKEN=<replace by your access token>
+----
+
+* Create a .env environment file from the env.template. This file contains the enviroment variables for configuring the services. The default values may be changed. 
+
+[source,sh]
+----
+cp env.template .env
+----
+
+* Build the image and run all the services. This command builds the PapyrusWeb image, pulls the database image and instantiates both services. The first execution takes several minutes, since it compiles the application. The remaining executions use the locally compiled image.
+
+[source,sh]
+----
+docker compose up
+----
+
+The application is available at http://localhost:8080
+
 
 == License
 
