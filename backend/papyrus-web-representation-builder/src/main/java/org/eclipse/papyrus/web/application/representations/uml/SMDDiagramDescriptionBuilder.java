@@ -12,7 +12,7 @@
  *  Obeo - Initial API and implementation
  *  Aurelien Didier (Artal Technologies) - Issue 199, 229, 232
  *  Titouan BOUETE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issues 219, 227
- *  Vincent LORENZO (CEA LIST) - vincent.lorenzo@cea.fr - Issue 294, 296
+ *  Vincent LORENZO (CEA LIST) - vincent.lorenzo@cea.fr - Issue 294, 296, 189
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
 
@@ -153,7 +153,7 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
         RectangularNodeStyleDescription rectangularNodeStyle = this.getViewBuilder().createRectangularNodeStyle();
         rectangularNodeStyle.setBorderRadius(STATEMACHINE_NODE_BORDER_RADIUS);
         ListLayoutStrategyDescription listLayoutStrategyDescription = this.createListLayoutStrategy();
-        InsideLabelStyle createDefaultInsideLabelStyle = this.getViewBuilder().createDefaultInsideLabelStyle(false, true);
+        InsideLabelStyle createDefaultInsideLabelStyle = this.getViewBuilder().createDefaultInsideLabelStyle(true, true);
         createDefaultInsideLabelStyle.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
         NodeDescription smdStateMachineNodeDesc = this.newNodeBuilder(this.umlPackage.getStateMachine(), rectangularNodeStyle)//
                 .layoutStrategyDescription(listLayoutStrategyDescription)//
@@ -188,7 +188,7 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
         RectangularNodeStyleDescription rectangularNodeStyle = this.getViewBuilder().createRectangularNodeStyle();
         rectangularNodeStyle.setBorderRadius(STATEMACHINE_NODE_BORDER_RADIUS);
         ListLayoutStrategyDescription listLayoutStrategyDescription = this.createListLayoutStrategy();
-        InsideLabelStyle createDefaultInsideLabelStyle = this.getViewBuilder().createDefaultInsideLabelStyle(false, true);
+        InsideLabelStyle createDefaultInsideLabelStyle = this.getViewBuilder().createDefaultInsideLabelStyle(true, true);
         createDefaultInsideLabelStyle.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
         NodeDescription smdStateNodeDesc = this.newNodeBuilder(this.umlPackage.getState(), rectangularNodeStyle)//
                 .layoutStrategyDescription(listLayoutStrategyDescription)//
@@ -255,7 +255,7 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
     private NodeDescription createStateSharedNodeDescription(DiagramDescription diagramDescription) {
         RectangularNodeStyleDescription rectangularNodeStyle = this.getViewBuilder().createRectangularNodeStyle();
         rectangularNodeStyle.setBorderRadius(STATEMACHINE_NODE_BORDER_RADIUS);
-        InsideLabelDescription labelDescription = this.getViewBuilder().createDefaultInsideLabelDescription(false, true);
+        InsideLabelDescription labelDescription = this.getViewBuilder().createDefaultInsideLabelDescription(true, true);
 
         NodeDescription stateNodeDesc = this.newNodeBuilder(this.umlPackage.getState(), rectangularNodeStyle)//
                 .layoutStrategyDescription(this.createListLayoutStrategy())//
