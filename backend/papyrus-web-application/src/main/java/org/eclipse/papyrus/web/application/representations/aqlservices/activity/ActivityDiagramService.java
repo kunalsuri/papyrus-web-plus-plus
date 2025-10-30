@@ -45,7 +45,6 @@ import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionServi
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
 import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -136,24 +135,24 @@ public class ActivityDiagramService extends AbstractDiagramService {
     }
 
     @Override
-    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
                 capturedNodeDescriptions);
         IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ActivitySemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
     @Override
-    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
                 capturedNodeDescriptions);
         IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ActivityGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
@@ -312,7 +311,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      * @param capturedNodeDescriptions
      *            the {@link NodeDescription}s
      */
-    public EObject createActivityNodeAD(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
+    public EObject createActivityNodeAD(EObject parent, String type, String referenceName, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         // Copied from Papyrus Desktop, see
         // org.eclipse.papyrus.sirius.uml.diagram.activity.services.ActivityDiagramServices
@@ -346,7 +345,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      * @param isInput
      *            {@code true} if the created {@link ExpansionNode} should be added as input, {@code false} as output
      */
-    public EObject createExpansionNodeAD(EObject parentExpansionRegion, Node targetView, IDiagramContext diagramContext,
+    public EObject createExpansionNodeAD(EObject parentExpansionRegion, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions, boolean isInput) {
         // Copied from Papyrus Desktop, see
         // org.eclipse.papyrus.sirius.uml.diagram.activity.services.ActivityDiagramServices
@@ -369,7 +368,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
         return createdElement;
     }
 
-    private EObject createActivityNodeInActivityGroup(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
+    private EObject createActivityNodeInActivityGroup(EObject parent, String type, String referenceName, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         // Copied from Papyrus Desktop, see
         // org.eclipse.papyrus.sirius.uml.diagram.activity.services.ActivityDiagramServices
@@ -429,7 +428,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the new created {@link ActionInputPin}
      */
-    public EObject createActionInputPinAD(Element parent, Node targetView, IDiagramContext diagramContext,
+    public EObject createActionInputPinAD(Element parent, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return this.createPin(parent, UMLPackage.eINSTANCE.getActionInputPin().getName(), targetView, diagramContext, capturedNodeDescriptions);
     }
@@ -447,7 +446,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the new created {@link InputPin}
      */
-    public EObject createInputPinAD(Element parent, Node targetView, IDiagramContext diagramContext,
+    public EObject createInputPinAD(Element parent, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return this.createPin(parent, UMLPackage.eINSTANCE.getInputPin().getName(), targetView, diagramContext, capturedNodeDescriptions);
     }
@@ -465,7 +464,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the new created {@link OutputPin}
      */
-    public EObject createOutputPinAD(Element parent, Node targetView, IDiagramContext diagramContext,
+    public EObject createOutputPinAD(Element parent, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return this.createPin(parent, UMLPackage.eINSTANCE.getOutputPin().getName(), targetView, diagramContext, capturedNodeDescriptions);
     }
@@ -483,7 +482,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the new created {@link ValuePin}
      */
-    public EObject createValuePinAD(Element parent, Node targetView, IDiagramContext diagramContext,
+    public EObject createValuePinAD(Element parent, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return this.createPin(parent, UMLPackage.eINSTANCE.getValuePin().getName(), targetView, diagramContext, capturedNodeDescriptions);
     }
@@ -503,7 +502,7 @@ public class ActivityDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the new created {@link Pin}
      */
-    private EObject createPin(Element parent, String typeToCreate, Node targetView, IDiagramContext diagramContext,
+    private EObject createPin(Element parent, String typeToCreate, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         EObject createdObject = null;
         EStructuralFeature feature = new ActivityFeatureProvider().getActivityFeature(parent, typeToCreate);
@@ -633,10 +632,10 @@ public class ActivityDiagramService extends AbstractDiagramService {
         boolean isDeletingDecisionNode = false;
         boolean isCreatingDecisionNode = false;
         if (!previousDecisionNode.isEmpty()) {
-            isDeletingDecisionNode = diagramContext.getViewDeletionRequests().stream() //
+            isDeletingDecisionNode = diagramContext.viewDeletionRequests().stream() //
                     .anyMatch(viewDeletionRequest -> Objects.equals(viewDeletionRequest.getElementId(), previousDecisionNode.get(0).getId()));
         }
-        isCreatingDecisionNode = diagramContext.getViewCreationRequests().stream() //
+        isCreatingDecisionNode = diagramContext.viewCreationRequests().stream() //
                 .anyMatch(viewCreationRequest -> Objects.equals(viewCreationRequest.getTargetObjectId(), this.getIdentityService().getId(decisionNode)));
         boolean showDecisionNodeNote = false;
         if (!previousDecisionNode.isEmpty() && !isDeletingDecisionNode) {

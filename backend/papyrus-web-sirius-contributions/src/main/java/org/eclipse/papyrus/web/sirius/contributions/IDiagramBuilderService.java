@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.description.DiagramDescription;
@@ -59,7 +59,8 @@ public interface IDiagramBuilderService {
      *            the optional updater of the diagram
      * @return the new state of the diagram if the update terminated successfully, {@link Optional#empty()} otherwise
      */
-    Optional<Diagram> updateDiagram(Diagram initialDiagramState, IEditingContext editingContext, Consumer<IDiagramContext> updater);
+    Optional<Diagram> updateDiagram(Diagram initialDiagramState, IEditingContext editingContext,
+            Consumer<DiagramContext> updater);
 
     /**
      * Update the give diagram using a updater and return a value provided by a function. <b> /!\ Be aware that the
@@ -73,7 +74,8 @@ public interface IDiagramBuilderService {
      *            the optional updater of the diagram that returs a value
      * @return the new state of the diagram if the update terminated successfully, {@link Optional#empty()} otherwise
      */
-    <T> Optional<Pair<Diagram, T>> updateDiagramAndGet(Diagram initialDiagramState, IEditingContext editingContext, Function<IDiagramContext, T> updater);
+    <T> Optional<Pair<Diagram, T>> updateDiagramAndGet(Diagram initialDiagramState, IEditingContext editingContext,
+            Function<DiagramContext, T> updater);
 
     /**
      * Refresh the given diagram. <b> /!\ Be aware that the given diagram is not modified, the returned value contained

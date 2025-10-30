@@ -1,4 +1,4 @@
-= Profile tests
+= Profile Tests
 :toc:
 
 [WARN]
@@ -12,7 +12,7 @@ Do all those tests sequentially
 Check that the profiles can be imported published and downloaded
 
 .Recipe
-. create a _profiles_ project 
+. create a _profiles_ project
 . Upload the provided link:resources/profile.uml[profile model] to the web
 . download this model twice
 ** [ ] Both files are identical
@@ -34,13 +34,13 @@ Check that the profiles can be imported published and downloaded
 Check that the UML model can use a dynamic profile
 
 .Recipe
-. create an _UML_ project using the template
+. create a _UML_ project using the template
 . contextual menu on Package1/Apply profile
 . select the published profile
 ** [ ] the profile application is visible in the tree
 . contextual menu on Package1/Apply profile
 . select the same published profile
-** [ ] no error is diplayed
+** [ ] no error is displayed
 . contextual menu on Class1/Apply stereotype
 . select the available Stereotype
 ** [ ] the stereotype application is visible in the tree
@@ -54,7 +54,7 @@ Check that the dynamic profile can be updated, that is published in a new versio
 .Recipe
 . change the Stereotype name
 . open the publish profile dialog again
-** [ ] the current version is `1.2.3` 
+** [ ] the current version is `1.2.3`
 . publish and download the profile
 ** [ ] the difference with previous download is a new `EPackage` with the following content
 <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3AlglM9BEe6clZMqIDuyGw" key="Version" value="1.2.3"/>
@@ -68,8 +68,6 @@ Check that the UML model using a profile keeps the reference to this profile whe
 . Go to the main web page and wait 7s to be sure that data are released on the server
 . Open the project containing _UML sample self contained.uml_
 . Select the profile application object in the explorer tree
-** [ ] the referenced profile is present in the properties view 
+** [ ] the referenced profile is present in the properties view
 . Select the stereotype application object in the explorer tree
-** [ ] the referenced stereotype is present in the properties view 
-
-
+** [ ] the referenced stereotype is present in the properties view

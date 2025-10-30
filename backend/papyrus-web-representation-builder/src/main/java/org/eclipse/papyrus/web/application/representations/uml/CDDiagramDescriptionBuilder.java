@@ -26,9 +26,8 @@ import static org.eclipse.papyrus.web.application.representations.view.aql.Varia
 import static org.eclipse.papyrus.web.application.representations.view.aql.Variables.SEMANTIC_EDGE_SOURCE;
 import static org.eclipse.papyrus.web.application.representations.view.aql.Variables.SEMANTIC_EDGE_TARGET;
 
-import com.google.common.base.Predicate;
-
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.eclipse.emf.ecore.EClass;

@@ -35,7 +35,7 @@ import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -102,7 +102,7 @@ public class DeploymentDiagramService extends AbstractDiagramService {
     }
 
     @Override
-    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
                 this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
@@ -110,12 +110,12 @@ public class DeploymentDiagramService extends AbstractDiagramService {
         IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new DeploymentSemanticDropBehaviorProvider(
                 editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
     @Override
-    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
                 this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
@@ -123,7 +123,7 @@ public class DeploymentDiagramService extends AbstractDiagramService {
         IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new DeploymentGraphicalDropBehaviorProvider(
                 editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
@@ -142,7 +142,7 @@ public class DeploymentDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the created {@link Artifact}.
      */
-    public EObject createArtifactDD(EObject container, String type, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+    public EObject createArtifactDD(EObject container, String type, org.eclipse.sirius.components.diagrams.Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         EObject newArtifact = null;
         Optional<EReference> optionalContainmentFeature = this.getArtifactContainmentFeature((Element) container);
@@ -166,11 +166,11 @@ public class DeploymentDiagramService extends AbstractDiagramService {
      * @param editingContext
      *            the current {@link IEditingContext}
      * @param diagramContext
-     *            the current {@link IDiagramContext}
+     *            the current {@link DiagramContext}
      * @return a new {@link Manifestation}
      */
     public EObject createManifestationDD(EObject source, EObject target, org.eclipse.sirius.components.diagrams.Node sourceNode, org.eclipse.sirius.components.diagrams.Node targetNode,
-            IEditingContext editingContext, IDiagramContext diagramContext) {
+            IEditingContext editingContext, DiagramContext diagramContext) {
         EObject newEdge = null;
         if (source instanceof Artifact) {
             newEdge = this.createDomainBasedEdge(source, target, UMLPackage.eINSTANCE.getManifestation().getName(), UMLPackage.eINSTANCE.getArtifact_Manifestation().getName(), sourceNode, targetNode,
@@ -197,7 +197,7 @@ public class DeploymentDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the created {@link Node}.
      */
-    public EObject createNodeDD(Element container, String type, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+    public EObject createNodeDD(Element container, String type, org.eclipse.sirius.components.diagrams.Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         EObject newNode = null;
         Optional<EReference> optionalContainmentFeature = this.getNodeContainmentFeature(container);

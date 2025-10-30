@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -39,7 +39,7 @@ import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationMetadataPersistenceService;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationPersistenceService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.RepresentationMetadata;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IRepresentationDescriptionSearchService;
@@ -287,7 +287,7 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
                 });
     }
 
-    private void fillStateMachineDiagram(StateMachine stateMachine, IEditingContext editingContext, Diagram diagram, IDiagramContext diagramContext) {
+    private void fillStateMachineDiagram(StateMachine stateMachine, IEditingContext editingContext, Diagram diagram, DiagramContext diagramContext) {
         Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes = this.papyrusRepresentationRegistry
                 .getConvertedNode(SMDDiagramDescriptionBuilder.SMD_REP_NAME);
         // Display all state in each region

@@ -103,7 +103,7 @@ Cypress.Commands.add('createTestProject', (context, projectName, elementToSelect
           { force: true }
         )
         .then(() => {
-          cy.getByTestId('upload-document-submit').should('be.visible').should('not.be.disabled').click();
+          cy.getByTestId('upload-document-split-button').should('be.visible').should('not.be.disabled').click();
           cy.getByTestId('upload-document-close').should('be.visible').should('not.be.disabled').click();
           cy.expandAll('model4test.uml');
 
@@ -143,7 +143,7 @@ Cypress.Commands.add('createTestProfileProject', (context, projectName, profileN
           { force: true }
         )
         .then(() => {
-          cy.getByTestId('upload-document-submit').should('be.visible').should('not.be.disabled').click();
+          cy.getByTestId('upload-document-split-button').should('be.visible').should('not.be.disabled').click();
           cy.getByTestId('upload-document-close').should('be.visible').should('not.be.disabled').click();
 
           cy.getByTestId('DynamicProfileTypeTests.profile.uml-more').should('exist').click();

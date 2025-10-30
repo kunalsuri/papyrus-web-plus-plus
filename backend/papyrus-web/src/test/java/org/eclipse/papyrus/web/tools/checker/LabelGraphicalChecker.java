@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -56,8 +56,8 @@ public class LabelGraphicalChecker implements Checker {
                 fail("No label found in element " + element.getId());
             }
         } else if (element instanceof Edge edge) {
-            String labelError = MessageFormat.format(LABEL_ERROR_TEMPLATE, edge.getCenterLabel().getText(), edge.getId(), this.expectedLabel);
-            assertThat(edge.getCenterLabel().getText()).as(labelError).isEqualTo(this.expectedLabel);
+            String labelError = MessageFormat.format(LABEL_ERROR_TEMPLATE, edge.getCenterLabel().text(), edge.getId(), this.expectedLabel);
+            assertThat(edge.getCenterLabel().text()).as(labelError).isEqualTo(this.expectedLabel);
         } else {
             fail("Unknown IDiagramElement type " + element.getClass().getSimpleName());
         }

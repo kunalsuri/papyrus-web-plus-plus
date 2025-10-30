@@ -1,4 +1,4 @@
-= Composite Structure Diagram tests
+= Composite Structure Diagram Tests
 :toc:
 
 [WARN]
@@ -57,7 +57,7 @@ Check all edge creations in the diagram.
 . Create a _new Connector_ between _Property 1::Port 1_ to _Property 2::Port 1_
 ** [ ] An edge should appear in both Ports_
 ** [ ] A connector should be created in _Class 1_
-** [ ] The feature _role_ and _partWithRole_ on the _ConnectorEnd_ of the _Connector_ should be set correctly (first role=Port 1 partWithport=Property1 second role=Port1 partWithport=Porperty 2)
+** [ ] The feature _role_ and _partWithRole_ on the _ConnectorEnd_ of the _Connector_ should be set correctly (first role=Port 1 partWithport=Property1 second role=Port1 partWithport=Property 2)
 . Use auto layout
 . Creates a _new Generalization_ between _Class 1_ and _Class 4_
 ** [ ] An edge should appear between the elements
@@ -68,7 +68,7 @@ Check all edge creations in the diagram.
 . Create a _new Connector_ between _Property 1_ to _Property 2_
 ** [ ] An edge should appear between both Properties_
 ** [ ] A connector should be created in _Class 1_
-** [ ] The feature _role_ only (not _partWithRole_) on the _ConnectorEnd_ of the _Connector_ should be set correctly (first role=Property 1 second role=Property2)
+** [ ] The feature _role_ only (_partWithRole_ is not set) on the _ConnectorEnd_ of the _Connector_ should be set correctly (first role=Property 1 second role=Property2)
 . Use auto layout
 
 image::imgs/CSD10-Final-step.png[]
@@ -80,11 +80,11 @@ image::imgs/CSD10-Final-step.png[]
 Check all the drag and drop in the _Composite Structure Diagram_.
 
 .Recipe
-Create a new Class Class_DND and a Property inside it Prop_DND. Set Prop_DND type to _Class 1_.
+Create a new Class _Class_DND_ and a Property inside it _Prop_DND_. Set _Prop_DND_ type to _Class 1_.
 
-Drag and Drop _Property 1_ inside the Class_DND before putting it back in the original Class.
-Drag and Drop _Class 1_ inside the Class_DND before putting it back in the original Class.
-Drag and Drop _Property 1_ inside the new Prop_DND before putting it back in the original Class.
+Drag and Drop _Property 1_ inside _Class_DND_ before putting it back in its original Class.
+Drag and Drop _Class 1_ inside the _Class_DND_ before putting it back in the diagram.
+Drag and Drop _Property 1_ inside the new _Prop_DND_ before putting it back in its original Class.
 
 Remove Class_DND and Prop_DND from model.
 
@@ -97,7 +97,7 @@ Remove Class_DND and Prop_DND from model.
 Check that a diagram can be created only using Drag and Drop tools
 
 .Recipe
-. Create a new _Composite Structure Diagram_ name _CSD20_
+. Create a new _Composite Structure Diagram_ name _CSD30_
 . DnD _Class 1_ on the diagram
 ** [ ] A node _Class 1_ should appear
 . DnD _Class 1::Property 1_ on _Class 1_
@@ -111,8 +111,8 @@ Check that a diagram can be created only using Drag and Drop tools
 ** [ ] A bordered node should appear on _Property 2_
 ** [ ] An edge between the ports should be displayed (_Connector 1_ )
 . Dnd _Class 4::Property 4.1_ on _Class 1_ (inherited member)
-** [ ] A new node _Property 4.1_ should DnD from _Class 4_
-. Type  Property 4.1 with  _Class 4_ 
+** [ ] A new node _Property 4.1_ should appear _Class 1_
+. Type  Property 4.1 with  _Class 4_
 ** [ ] The label of _Property 4.1_ should be _+ Property 4.1 : Class 4 [1]_
 . Create a _new Port_ on _Property 4.1_ and connect it with a _Connector_ to _Class 1::Property 1::Port 1_
 . DnD _Class 2_ on _Property 4.1_
@@ -120,7 +120,7 @@ Check that a diagram can be created only using Drag and Drop tools
 ** [ ] _Connector 3_ should be deleted (semantically)
 ** [ ] The bordered node and the edge from _Property 4.1_ should be deleted
 . DnD _Class 4_ on the diagram
-** [ ] The node _Class 4_ should be dsiplayed
+** [ ] The node _Class 4_ should be displayed
 ** [ ] The _Generalization_ link between _Class 1_ and _Class 4_ should be displayed
 . DnD _Class 2::Property 2.1_ in the node _Class 1::Property 1_ (bug https://github.com/PapyrusSirius/papyrus-web/issues/49)
 ** [ ] A new child node _Property 2.1_ should be added to _Class 1::Property 1_
@@ -156,5 +156,3 @@ Check that the deletion tools work properly
 ** [ ] _Class 1::Property 2_ still exists in the model
 . *Semantically* delete _Class 1_
 ** [ ] Only _Class 3_ and _Class 4_ remain in the diagram and in the semantic model
-
-

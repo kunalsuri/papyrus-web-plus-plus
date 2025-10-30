@@ -113,7 +113,7 @@ public class UseCaseDiagramTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link UseCaseDiagramService#createUseCaseUCD(org.eclipse.uml2.uml.Element, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link UseCaseDiagramService#createUseCaseUCD(org.eclipse.uml2.uml.Element, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Package}. The containment feature used is UMLPackage.eINSTANCE.getPackage_PackagedElement().
      */
     @Test
@@ -141,7 +141,7 @@ public class UseCaseDiagramTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link UseCaseDiagramService#createUseCaseUCD(org.eclipse.uml2.uml.Element, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link UseCaseDiagramService#createUseCaseUCD(org.eclipse.uml2.uml.Element, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside an {@link Interaction}. The containment feature used is UMLPackage.eINSTANCE.getClassifier_OwnedUseCase().
      */
     @Test

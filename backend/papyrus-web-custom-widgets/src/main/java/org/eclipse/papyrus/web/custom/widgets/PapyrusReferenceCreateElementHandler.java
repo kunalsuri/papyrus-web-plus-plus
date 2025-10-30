@@ -36,6 +36,7 @@ import org.eclipse.sirius.components.core.api.ChildCreationDescription;
 import org.eclipse.sirius.components.core.api.IEditService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.ILabelService;
+import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.core.api.SemanticKindConstants;
 import org.eclipse.sirius.components.emf.services.api.IEMFEditingContext;
 import org.eclipse.sirius.components.emf.services.api.IEMFKindService;
@@ -68,9 +69,11 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
 
     private final IEMFKindService emfKindService;
 
-    private final IEditService editService;
-    private final ILabelService labelService;
+    private final IObjectSearchService objectSearchService;
 
+    private final IEditService editService;
+
+    private final ILabelService labelService;
 
     private final IViewFormDescriptionSearchService viewFormSearchService;
 
@@ -80,9 +83,13 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
 
     private final IClearExecutor clearExecutor;
 
-    public PapyrusReferenceCreateElementHandler(IEMFKindService emfKindService, IEditService editService, ILabelService labelService, IViewFormDescriptionSearchService viewFormSearchService,
+    //CHECKSTYLE:OFF Injected parameters
+    public PapyrusReferenceCreateElementHandler(IEMFKindService emfKindService, IObjectSearchService objectSearchService, IEditService editService, ILabelService labelService,
+            IViewFormDescriptionSearchService viewFormSearchService,
             IAQLInterpreterProvider interpreterProvider, IAddExecutor addExecutor, IClearExecutor clearExecutor) {
+        //CHECKSTYLE:OFF Injected parameters
         this.emfKindService = Objects.requireNonNull(emfKindService);
+        this.objectSearchService = Objects.requireNonNull(objectSearchService);
         this.editService = Objects.requireNonNull(editService);
         this.labelService = Objects.requireNonNull(labelService);
         this.viewFormSearchService = Objects.requireNonNull(viewFormSearchService);
@@ -109,9 +116,9 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
     }
 
     @Override
-    public List<ChildCreationDescription> getChildCreationDescriptions(IEditingContext editingContext, String kind, String referenceKind, String descriptionId) {
+    public List<ChildCreationDescription> getChildCreationDescriptions(IEditingContext editingContext, String ownerId, String referenceKind, String descriptionId) {
         List<EClass> childrenTypes = this.getInstanciableTypesOf(editingContext, referenceKind);
-        return this.toEClass(editingContext, kind)//
+        return this.toEClassByOwnerId(editingContext, ownerId)//
                 .map(eClass -> this.createChildCreationDescription(eClass, childrenTypes))//
                 .orElse(List.of());
 
@@ -136,12 +143,20 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
         return children;
     }
 
-    private Optional<EClass> toEClass(IEditingContext editingContext, String kind) {
+    private Optional<EClass> toEClassByOwnerId(IEditingContext editingContext, String ownerId) {
+        return objectSearchService.getObject(editingContext, ownerId)
+                .filter(EObject.class::isInstance)
+                .map(EObject.class::cast)
+                .map(EObject::eClass);
+
+    }
+
+    private Optional<EClass> toEClassByReferenceKind(IEditingContext editingContext, String refKind) {
         Optional<Registry> optionalRegistry = this.getPackageRegistry(editingContext);
-        if (optionalRegistry.isPresent() && !kind.isBlank() && kind.startsWith(SemanticKindConstants.PREFIX)) {
+        if (optionalRegistry.isPresent() && !refKind.isBlank() && refKind.startsWith(SemanticKindConstants.PREFIX)) {
             var ePackageRegistry = optionalRegistry.get();
-            String ePackageName = this.emfKindService.getEPackageName(kind);
-            String eClassName = this.emfKindService.getEClassName(kind);
+            String ePackageName = this.emfKindService.getEPackageName(refKind);
+            String eClassName = this.emfKindService.getEClassName(refKind);
             Optional<EPackage> optionalPackage = this.emfKindService.findEPackage(ePackageRegistry, ePackageName);
 
             if (optionalPackage.isPresent()) {
@@ -156,7 +171,7 @@ public class PapyrusReferenceCreateElementHandler implements IReferenceWidgetCre
     }
 
     private List<EClass> getInstanciableTypesOf(IEditingContext editingContext, String referenceKind) {
-        return this.toEClass(editingContext, referenceKind).map(this::getInstanciableTypesOf).orElse(List.of());
+        return this.toEClassByReferenceKind(editingContext, referenceKind).map(this::getInstanciableTypesOf).orElse(List.of());
     }
 
     private List<EClass> getInstanciableTypesOf(EClass type) {

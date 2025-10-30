@@ -25,7 +25,7 @@ export interface GQLCustomImageNodeStyle extends GQLNodeStyle {
   background: string;
   borderColor: string;
   borderStyle: string;
-  borderSize: string;
+  borderSize: number;
 }
 
 export interface NodeDataMap {

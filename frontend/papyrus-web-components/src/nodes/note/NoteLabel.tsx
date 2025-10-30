@@ -23,6 +23,9 @@ import { DiagramContextValue } from '@eclipse-sirius/sirius-components-diagrams'
 import { Label, NoteLabelProps } from './NoteNode.types';
 import { useDiagramDirectEdit } from '@eclipse-sirius/sirius-components-diagrams';
 import { DiagramDirectEditInput } from '@eclipse-sirius/sirius-components-diagrams';
+import { useViewport } from '@xyflow/react';
+import { useRef } from 'react';
+
 const isDisplayTopHeaderSeparator = (label: Label): boolean => {
   if ('displayHeaderSeparator' in label) {
     return label.displayHeaderSeparator && label.headerPosition === 'BOTTOM';
@@ -81,10 +84,22 @@ const labelOverflowStyle = (): React.CSSProperties => {
   return style;
 };
 
+const minWidth = 130;
+
+const directEditInputWidth = (element: HTMLDivElement | null, zoom: number): number => {
+  let result = minWidth;
+  if (element) {
+    result = element.getBoundingClientRect().width / zoom;
+  }
+  return Math.max(minWidth, result);
+};
+
 export const NoteLabel = memo(({ diagramElementId, label, faded }: NoteLabelProps) => {
   const theme: Theme = useTheme();
   const { currentlyEditedLabelId, editingKey, resetDirectEdit } = useDiagramDirectEdit();
   const { readOnly } = useContext<DiagramContextValue>(DiagramContext);
+  const labelElementRef = useRef<HTMLDivElement>(null);
+  const { zoom } = useViewport();
 
   const handleClose = () => {
     resetDirectEdit();
@@ -96,7 +111,12 @@ export const NoteLabel = memo(({ diagramElementId, label, faded }: NoteLabelProp
 
   const content: JSX.Element =
     label.id === currentlyEditedLabelId && !readOnly ? (
-      <DiagramDirectEditInput editingKey={editingKey} onClose={handleClose} labelId={label.id} />
+      <DiagramDirectEditInput
+        editingKey={editingKey}
+        onClose={handleClose}
+        labelId={label.id}
+        width={Math.max(minWidth, directEditInputWidth(labelElementRef.current, zoom))}
+      />
     ) : (
       <div
         data-id={`${label.id}-content`}

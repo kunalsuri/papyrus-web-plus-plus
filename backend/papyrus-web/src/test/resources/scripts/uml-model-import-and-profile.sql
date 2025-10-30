@@ -28,7 +28,7 @@ INSERT INTO semantic_data_domain (semantic_data_id,uri) VALUES
 	 ('cbf34577-d7fb-4d12-a096-27d0d1f9164e','http://www.eclipse.org/uml2/5.0.0/UML');
 
 
-INSERT INTO document (id,semantic_data_id,name,"content",created_on,last_modified_on) VALUES
+INSERT INTO document (id,semantic_data_id,name,"content",is_read_only,created_on,last_modified_on) VALUES
 	 ('b6270893-90c6-4184-9d2c-235c0d5b53b4','cbf34577-d7fb-4d12-a096-27d0d1f9164e','Model.uml','{
   "json": { "version": "1.0", "encoding": "utf-8" },
   "ns": {
@@ -93,7 +93,7 @@ INSERT INTO document (id,semantic_data_id,name,"content",created_on,last_modifie
     }
   ]
 }
-','2024-10-03 15:50:47.926621+02','2024-10-03 15:50:47.926621+02');
+', false, '2024-10-03 15:50:47.926621+02','2024-10-03 15:50:47.926621+02');
 
 
 INSERT INTO representation_metadata (

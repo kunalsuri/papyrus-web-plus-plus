@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 Obeo.
+ * Copyright (c) 2022, 2025 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ package org.eclipse.papyrus.web.sirius.contributions;
 import java.util.Optional;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.components.NodeContainmentKind;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
@@ -31,9 +31,10 @@ import org.eclipse.sirius.components.view.emf.IJavaServiceProvider;
  */
 public interface IDiagramOperationsService {
 
-    void createView(IDiagramContext diagramContext, EObject semanticElement, Optional<Node> optionalParentNode, NodeDescription nodeDescription, NodeContainmentKind containmentKind);
+    void createView(DiagramContext diagramContext, EObject semanticElement, Optional<Node> optionalParentNode,
+            NodeDescription nodeDescription, NodeContainmentKind containmentKind);
 
-    void deleteView(IDiagramContext diagramContext, Node node);
+    void deleteView(DiagramContext diagramContext, Node node);
 
     /**
      * Empty implementation that can be used or extended for testing.
@@ -43,12 +44,14 @@ public interface IDiagramOperationsService {
     class NoOp implements IDiagramOperationsService {
 
         @Override
-        public void createView(IDiagramContext diagramContext, EObject semanticElement, Optional<Node> optionalParentNode, NodeDescription nodeDescription, NodeContainmentKind containmentKind) {
+        public void createView(DiagramContext diagramContext, EObject semanticElement,
+                Optional<Node> optionalParentNode, NodeDescription nodeDescription,
+                NodeContainmentKind containmentKind) {
             // Do nothing
         }
 
         @Override
-        public void deleteView(IDiagramContext diagramContext, Node node) {
+        public void deleteView(DiagramContext diagramContext, Node node) {
             // Do nothing
         }
 

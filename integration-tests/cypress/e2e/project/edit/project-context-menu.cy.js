@@ -28,14 +28,14 @@ describe('/projects/:projectId/edit - Project Context Menu', () => {
   });
 
   it('shows the project context menu and hides it by clicking outside', () => {
-    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    let projectNavBar  = new Project().getProjectNavigationBar();
     projectNavBar.getRenameButton().should('be.visible');
     cy.get('body').click();
     projectNavBar.getRenameButton().should('not.exist');
   });
 
   it('shows the project context menu and hides it by typing esc', () => {
-    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    let projectNavBar  = new Project().getProjectNavigationBar();
     projectNavBar.getRenameButton().should('be.visible');
     cy.get('body').type('{esc}');
     projectNavBar.getRenameButton().should('not.exist');
@@ -47,14 +47,14 @@ describe('/projects/:projectId/edit - Project Context Menu', () => {
   });
 
   it('can open the delete project modal', () => {
-    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    let projectNavBar  = new Project().getProjectNavigationBar();
     projectNavBar.getDeleteButton().click();
 
     cy.get('.MuiDialog-container').should('be.visible');
   });
 
   it('can delete a project', () => {
-    let projectNavBar  = new Project().getProjectNavigationBar(projectName);
+    let projectNavBar  = new Project().getProjectNavigationBar();
     projectNavBar.getDeleteButton().click();
 
     cy.url().should('match', new RegExp(Cypress.config().baseUrl + '/projects'));

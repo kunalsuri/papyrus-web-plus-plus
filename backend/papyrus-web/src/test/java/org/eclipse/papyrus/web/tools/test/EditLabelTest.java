@@ -74,7 +74,7 @@ public class EditLabelTest extends AbstractPapyrusWebTest {
                 labelId = label.getId();
             }
         } else if (element instanceof Edge edge) {
-            labelId = edge.getCenterLabel().getId();
+            labelId = edge.getCenterLabel().id();
         } else {
             fail();
         }

@@ -44,7 +44,7 @@ export interface GQLContainmentReferenceItem {
 
 export interface GQLGetChildCreationDescriptionsQueryVariables {
   editingContextId: string;
-  kind: string;
+  containerId: string;
   referenceKind?: string;
   descriptionId: string;
 }

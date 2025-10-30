@@ -74,9 +74,9 @@ public class UMLEditServiceDelegate implements IEditServiceDelegate {
     }
 
     @Override
-    public List<ChildCreationDescription> getChildCreationDescriptions(IEditingContext editingContext, String kind,
+    public List<ChildCreationDescription> getChildCreationDescriptions(IEditingContext editingContext, String containerId,
             String referenceKind) {
-        return defaultEditService.getChildCreationDescriptions(editingContext, kind, referenceKind);
+        return defaultEditService.getChildCreationDescriptions(editingContext, containerId, referenceKind);
     }
 
     @Override

@@ -30,7 +30,7 @@ import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -97,7 +97,7 @@ public class CommunicationDiagramService extends AbstractDiagramService {
     }
 
     @Override
-    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
                 this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
@@ -105,7 +105,7 @@ public class CommunicationDiagramService extends AbstractDiagramService {
         IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new CommunicationSemanticDropBehaviorProvider(
                 editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
@@ -216,10 +216,10 @@ public class CommunicationDiagramService extends AbstractDiagramService {
      * @param editingContext
      *            the current {@link IEditingContext}
      * @param diagramContext
-     *            the current {@link IDiagramContext}
+     *            the current {@link DiagramContext}
      * @return a new Message
      */
-    public EObject createMessageCOD(EObject source, EObject target, Node sourceNode, Node targetNode, IEditingContext editingContext, IDiagramContext diagramContext) {
+    public EObject createMessageCOD(EObject source, EObject target, Node sourceNode, Node targetNode, IEditingContext editingContext, DiagramContext diagramContext) {
         EObject newEdge = this.createDomainBasedEdge(source, target, "uml::Message", UMLPackage.eINSTANCE.getInteraction_Message().getName(), sourceNode, targetNode, editingContext, diagramContext);
         if (newEdge instanceof Message) {
             this.initializeMessage((Message) newEdge, source, target);

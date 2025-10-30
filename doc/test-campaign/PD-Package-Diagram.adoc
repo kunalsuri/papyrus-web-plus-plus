@@ -1,4 +1,4 @@
-= Package Diagram tests
+= Package Diagram Tests
 
 [WARN]
 ====
@@ -75,7 +75,7 @@ Create a new Package Pack_1 and a sub Model Model_01.
 Drag and Drop all the existing element (Package, Model, Constraint and Comment) inside Pack_1 or Model_01 alternatively.
 
 === From Diagram to Package and back
-Take all the dropped element in the previous step and put them back in the the diagram (outside Pack_1 and Pack_01).
+Take all the dropped element in the previous step and put them back in the diagram (outside Pack_1 and Pack_01).
 Delete Pack_1 (and Model_01) from Model.
 
 == PD40 - Global Deletion
@@ -86,7 +86,7 @@ Check elements global deletion in the _Package Diagram_.
 
 .Recipe
 . Select each child element of the root _Model_ and use the palette to delete them one by one.
-. Delete as well the root _Model_ which is now empty.
+. Delete the root _Model_ as well, which is now empty.
 . Select the _Comment_ element contained inside the root _Package_ element, use the _Delete_ action from the contextual menu to remove this _Comment_ element
 ** [ ] Check that removed elements are no longer present in both diagram and _Explorer_ views
 
@@ -102,7 +102,7 @@ Check link reconnection in the _Package Diagram_.
 ** [ ] Check that inner _Package_ is now connected to the second _Model_ element
 
 . Select the _import_ link, grab the handle from the _Package_ and reconnect it to the first _Model_ element
-** [ ] Check that _Model_ elements are now connected with the merge link
+** [ ] Check that _Model_ elements are now connected with the _import_ link
 
 == PD60 - Direct edit
 
@@ -115,6 +115,6 @@ Check direct edit in the _Package Diagram_.
 . Rename once again the name of the root _Package_ using the property view (_Details_ view)
 . From the tree of the _Explorer_ view, use the _edit_ action of the contextual menu to change the name of an element
 ** [ ] For each rename action made above, check that the name is properly changed in all following places:
-*** Tree of the _Explorer_ view
+*** Model _Explorer_ view
 *** Diagram element
 *** _Details view_

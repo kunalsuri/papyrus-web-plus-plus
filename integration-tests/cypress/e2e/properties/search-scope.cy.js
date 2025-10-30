@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -35,7 +35,7 @@ describe('Containment reference widget tests', () => {
             { force: true }
           )
           .then(() => {
-            cy.getByTestId('upload-document-submit').click();
+            cy.getByTestId('upload-document-split-button').click();
             cy.getByTestId('upload-document-close').click();
             cy.expandAll('search-scope.uml');
           });

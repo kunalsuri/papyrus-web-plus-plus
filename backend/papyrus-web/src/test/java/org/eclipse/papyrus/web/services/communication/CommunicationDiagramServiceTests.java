@@ -233,7 +233,7 @@ public class CommunicationDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link CommunicationDiagramService#createMessageCOD(EObject, EObject, Node, Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext)}
+     * {@link CommunicationDiagramService#createMessageCOD(EObject, EObject, Node, Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext)}
      * between two {@link Lifeline}. Check initialization of the resulting Message and creation of its edge on the
      * diagram.
      */

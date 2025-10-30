@@ -1,4 +1,4 @@
-= Class Diagram tests
+= Class Diagram Tests
 :toc:
 
 [WARN]
@@ -27,7 +27,7 @@ Check all node creations in the _Class Diagram_
 ** _Primitive Type_
 ** _Package_
 ** _Model_
-** _Comment_ 
+** _Comment_
 *** [ ] The diagram should look like this
 +
 image::imgs/CD01-roots.png[]
@@ -36,7 +36,7 @@ image::imgs/CD01-roots.png[]
 +
 [INFO]
 ====
-In the _Nested Classifier Compartment_ of the _Class_ use both the _normal_ tools (available from the background of the compartement) and the _sibling_ tools (available when another _nested classifier_ is selected).
+In the _Nested Classifier Compartment_ of the _Class_ use both the _normal_ tools (available from the background of the compartment) and the _sibling_ tools (available when another _nested classifier_ is selected).
 ====
 +
 image::imgs/CD01-withListChildren.png[]
@@ -55,30 +55,25 @@ image::imgs/CD01-package-reused.png[]
 
 == CD10 - Edge Creations
 
-.Requiments
+.Requirements
 . Start from the state of _CD01_
 
 .Purpose
 Check all edges creation in the _Class Diagram_
-
-[WARNING]
-====
-In the current version _2023.3.0_, the layout of the edge is broken due to https://github.com/eclipse-sirius/sirius-components/issues/1683[1683]. After each eadge creation use the _auto _layout feature_
-====
 
 .Recipe
 . Create a _Package Merge_ between *Package1* and *Model1*
 ** [ ] A link between those nodes appears with label «merge»
 . Create a _Package Import_ between *Package1::Package1* and *Model1::Model1*
 ** [ ] A link between those nodes appears with label import
-. Using the _Connector_ tool ceate an _Abstraction_ between *PrimitiveType1* and *Enumeration1*
+. Using the _Connector_ tool create an _Abstraction_ between *PrimitiveType1* and *Enumeration1*
 ** [ ] A link with «abstraction» should be displayed between those nodes.
 . Create a _Dependency_ between *Package1::DataType1* and *Package1::PrimitiveType1*
 ** [ ] A link without label should be displayed between those nodes.
 . Create a _InterfaceRealization_ between *Model1::Class1* and *Model1::Interface1*
 ** [ ] A link without label should be displayed between those nodes.
 . Link the comment *Model1::Comment* to *Model1::Package1*
-** [ ] A link without a label should be displayed between those those
+** [ ] A link without a label should be displayed between those nodes.
 ** [ ] *Package1* should now belong to the _annotatedElement_ feature of the _Comment_ (Look into the _Property View__).
 . Creates an association between *Interface1* and *Package1::Class1*
 ** [ ] A link with no centered label is displayed
@@ -105,14 +100,14 @@ image::imgs/CD10-all-edges.png[]
 
 == CD20 - Direct edit
 
-.Requiments
+.Requirements
 . Start from the state of _CD10_
 
 .Purpose
 Check all the _Direct Edit Tools_
 
 .Recipe
-. For all nodes (except from _Comments_), use the _Direct Edit Tool_ (eiher by using the palette entry, the key shortcut _F2_ or a _double click_) to add an extra *0* at the end of the name.
+. For all nodes (except from _Comments_), use the _Direct Edit Tool_ (either by using the palette entry, the key shortcut _F2_ or a _double click_) to add an extra *0* at the end of the name.
 ** [ ] The label and the _name_ of the element should be changed
 +
 image::imgs/CD20-nodes.png[]
@@ -122,7 +117,7 @@ A body +
 with +
 multiple lines.
 ** [ ] The text should be displayed inside the comment
-. Using the _direct edit tool_ changed the name of the _Association_ to : *Association1*
+. Using the _direct edit tool_ change the name of the _Association_ to : *Association1*
 
 == CD30 - Drag and Drop (inside Diagram)
 
@@ -134,7 +129,7 @@ Create a new Package Pack_1 and a sub model Model_01.
 Drag and Drop all the element of the diagram inside Pack_1 or Model_01 alternatively.
 
 === From Diagram to Package
-Take all the dropped element in the previous step and put them back in the the diagram (outside Pack_1 and Model_01).
+Take all the dropped element in the previous step and put them back in the diagram (outside Pack_1 and Model_01).
 Delete Pack_1 (and Model_01) from Model.
 
 === Inside Nodes
@@ -164,14 +159,16 @@ image::imgs/CD30-containmentLink.png[]
 +
 . _Drag and Drop_ *Model10::Interface10* in *Model10*
 ** [ ] The interface should be displayed
+
 . _Drag and Drop_ *Package10::Interface10* in *Package10*
 ** [ ] The new node should be created
+
 . _Drag and Drop_ all sub elements in the correct compartment (on the background of the compartment or on a sibling both should work)) of *Model10::Interface10*
 ** [ ] All sub elements should be displayed
 
-== CD50 - Deletetion
+== CD50 - Deletion
 
-.Requiments
+.Requirements
 . Start from the state of _CD300_
 
 .Purpose
@@ -179,13 +176,10 @@ Check semantic deletion of nodes and edges
 
 .Recipe
 . Using the _Delete Tool_ from the palette, delete the _annotatedElement_ edge from *Model10::Comment* to *Model10::Package10*
-** [ ] The edge should disapear
+** [ ] The edge should disappear
 ** [ ] *Model10::Package10* should no longer belong to the _annotatedElement_ feature of *Model10::Comment*
 . Delete semantically all other edges (except the _ContainmentLink_ edge)
 ** [ ] For each deletion, the edge should be deleted from the diagram and the semantic element deleted from the diagram
 . Delete *Model10*
 ** [ ] The node should be removed (and all its content)
 ** [ ] The semantic element and all its content should be deleted
-
-
-

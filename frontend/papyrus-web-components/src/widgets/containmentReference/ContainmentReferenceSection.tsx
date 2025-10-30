@@ -139,14 +139,14 @@ export const moveContainmentReferenceItemMutation = gql`
 const getChildCreationDescriptionsQuery = gql`
   query getChildCreationDescriptions(
     $editingContextId: ID!
-    $kind: ID!
+    $containerId: ID!
     $referenceKind: String
     $descriptionId: String!
   ) {
     viewer {
       editingContext(editingContextId: $editingContextId) {
         referenceWidgetChildCreationDescriptions(
-          kind: $kind
+          containerId: $containerId
           referenceKind: $referenceKind
           descriptionId: $descriptionId
         ) {
@@ -413,7 +413,7 @@ const ContainmentReferenceSection = ({
     getChildCreationDescription({
       variables: {
         editingContextId,
-        kind: widget.containmentReference.ownerKind,
+        containerId: widget.ownerId,
         referenceKind: widget.containmentReference.referenceKind,
         descriptionId: widget.descriptionId,
       },

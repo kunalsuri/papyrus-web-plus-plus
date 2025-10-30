@@ -28,7 +28,7 @@ import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -87,7 +87,7 @@ public class UseCaseDiagramService extends AbstractDiagramService {
     }
 
     @Override
-    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
                 this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
@@ -95,12 +95,12 @@ public class UseCaseDiagramService extends AbstractDiagramService {
         IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new UseCaseSemanticDropBehaviorProvider(
                 editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
     @Override
-    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
                 this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
@@ -108,7 +108,7 @@ public class UseCaseDiagramService extends AbstractDiagramService {
         IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new UseCaseGraphicalDropBehaviorProvider(
                 editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
@@ -125,7 +125,7 @@ public class UseCaseDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the created {@link UseCase}.
      */
-    public EObject createUseCaseUCD(Element container, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+    public EObject createUseCaseUCD(Element container, org.eclipse.sirius.components.diagrams.Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         EObject newUseCase = null;
         String useCaseType = UMLPackage.eINSTANCE.getUseCase().getName();

@@ -299,7 +299,7 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
 
         final OutsideLabelDescription labelStyle = this.getViewBuilder().createDefaultOutsideLabelDescription(true);
 
-        NodeDescription pseudostateNodeDesc = this.newNodeBuilder(this.umlPackage.getPseudostate(), null)//
+        NodeDescription pseudostateNodeDesc = this.newNodeBuilder(this.umlPackage.getPseudostate(), this.getViewBuilder().createRectangularNodeStyle())//
                 .name(name)//
                 .semanticCandidateExpression(CallQuery.queryAttributeOnSelf(containmentFeature))//
                 .synchronizationPolicy(SynchronizationPolicy.UNSYNCHRONIZED)//

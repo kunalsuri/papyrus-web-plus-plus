@@ -38,7 +38,7 @@ import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionServi
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationSearchService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -121,7 +121,7 @@ public class ProfileDiagramService extends AbstractDiagramService {
     }
 
     @Override
-    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
                 this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
@@ -129,12 +129,12 @@ public class ProfileDiagramService extends AbstractDiagramService {
         IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ProfileSemanticDropBehaviorProvider(
                 editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
     @Override
-    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), getLabelService(),
                 this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
@@ -142,7 +142,7 @@ public class ProfileDiagramService extends AbstractDiagramService {
         IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ProfileGraphicalDropBehaviorProvider(
                 editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
@@ -243,7 +243,7 @@ public class ProfileDiagramService extends AbstractDiagramService {
      *            the graphical context
      * @return {@code true} if the {@link ElementImport} and its view are successfully created, {@code false} otherwise
      */
-    public boolean createMetaclassImport(IEditingContext editingContext, String representationId, String diagramElementId, String metaclassId, IDiagramContext diagramContext) {
+    public boolean createMetaclassImport(IEditingContext editingContext, String representationId, String diagramElementId, String metaclassId, DiagramContext diagramContext) {
         boolean result = false;
         Optional<Diagram> optDiagram = this.representationSearchService.findById(editingContext, representationId, Diagram.class);
         if (optDiagram.isPresent()) {
@@ -279,7 +279,7 @@ public class ProfileDiagramService extends AbstractDiagramService {
                                 .anyMatch(p -> optMetaclass.get().getName().equals(p.getTargetObjectLabel()));
                     } else {
                         // The node is created on the diagram
-                        isNodePresentInParent = diagramContext.getDiagram().getNodes().stream() //
+                        isNodePresentInParent = diagramContext.diagram().getNodes().stream() //
                                 .anyMatch(p -> optMetaclass.get().getName().equals(p.getTargetObjectLabel()));
                     }
                     if (!isNodePresentInParent) {
@@ -303,7 +303,7 @@ public class ProfileDiagramService extends AbstractDiagramService {
      *            the semantic {@link ElementImport} with imported element represented by the Metaclass node
      * @return {@code true} if a creation request has been made, {@code false} otherwise
      */
-    private boolean createMetaclassNode(IDiagramContext diagramContext, Node parentNode, ElementImport elementImport) {
+    private boolean createMetaclassNode(DiagramContext diagramContext, Node parentNode, ElementImport elementImport) {
         boolean result;
         Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> convertedNodes = this.papyrusRepresentationRegistry
                 .getConvertedNode(PRDDiagramDescriptionBuilder.PRD_REP_NAME);

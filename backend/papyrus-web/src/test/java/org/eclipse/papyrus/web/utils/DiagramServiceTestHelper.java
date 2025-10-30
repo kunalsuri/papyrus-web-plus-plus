@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.papyrus.web.application.representations.aqlservices.AbstractDiagramService;
 import org.eclipse.papyrus.web.application.representations.view.IdBuilder;
 import org.eclipse.papyrus.web.tests.utils.UMLTestHelper;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.IObjectSearchService;
@@ -93,7 +93,7 @@ public class DiagramServiceTestHelper {
      *
      * <p>
      * This code use the
-     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * service to create a new element on a Node. Then check the semantic creation occurred and a new node has
      * been added inside the parent node with given EReference.
      * </p>
@@ -119,7 +119,7 @@ public class DiagramServiceTestHelper {
      *
      * <p>
      * This code use the
-     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * service to create a new element on a Node. Then check the semantic creation occurred and a new node has
      * been added inside the parent node with given EReference.
      * </p>
@@ -149,7 +149,7 @@ public class DiagramServiceTestHelper {
      *
      * <p>
      * This code use the
-     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * service to create a new element on a Node. Then check the semantic creation occurred and a new node has
      * been added inside the parent node with given EReference.
      * </p>
@@ -209,7 +209,7 @@ public class DiagramServiceTestHelper {
      *
      * <p>
      * This code use the
-     * {@link AbstractDiagramService#createSibling(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link AbstractDiagramService#createSibling(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * service to create a new element as a sibling of on a Node. Then check the the semantic creation occurred and the
      * a new node has been added aside the sibling node with given EReference.
      * </p>
@@ -253,7 +253,7 @@ public class DiagramServiceTestHelper {
      *
      * <p>
      * This code use the
-     * {@link AbstractDiagramService#createSibling(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link AbstractDiagramService#createSibling(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * service to create a new element as a sibling of on a Node. Then check the semantic creation occurred and the
      * a new node has been added aside the sibling node with given EReference. The expected semantic owner is expected
      * to be the semantic element of the visual parent
@@ -275,7 +275,7 @@ public class DiagramServiceTestHelper {
 
     /**
      * Uses the
-     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link AbstractDiagramService#create(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * and then checks that the creation was properly handled.
      *
      * @param type
@@ -307,7 +307,7 @@ public class DiagramServiceTestHelper {
     }
 
     /**
-     * Uses the {@link AbstractDiagramService#semanticDrop(EObject, Node, IEditingContext, IDiagramContext, Map)} and then checks that the drop was properly handled.
+     * Uses the {@link AbstractDiagramService#semanticDrop(EObject, Node, IEditingContext, DiagramContext, Map)} and then checks that the drop was properly handled.
      *
      * @param expectedNodeDescriptionName
      *            the expected NodeDescription of the dropped element
@@ -383,7 +383,7 @@ public class DiagramServiceTestHelper {
         Node newTargetView = this.diagramHelper.assertGetUniqueMatchingNode(newTargetNode.getDescriptionId(), newTargetNode.getSemanticElement());
         this.diagramHelper.modify(diagramContext -> {
             this.diagramService.reconnectTargetOnDomainBasedEdge(edgeMatchet.getSemanticElement(), oldTargetNode.getSemanticElement(), newTargetNode.getSemanticElement(), newTargetView, oldTargetView,
-                    this.editingContext, diagramContext.getDiagram());
+                    this.editingContext, diagramContext.diagram());
         });
 
         Node sourceNode = this.diagramHelper.assertGetUniqueMatchingNode(source.getDescriptionId(), source.getSemanticElement());
@@ -421,7 +421,7 @@ public class DiagramServiceTestHelper {
         Node newSourceView = this.diagramHelper.assertGetUniqueMatchingNode(newSourceNode.getDescriptionId(), newSourceNode.getSemanticElement());
         this.diagramHelper.modify(diagramContext -> {
             this.diagramService.reconnectSourceOnDomainBasedEdge(semanticEdge.getSemanticElement(), oldSourceNode.getSemanticElement(), newSourceNode.getSemanticElement(), newSourceView,
-                    oldSourceView, this.editingContext, diagramContext.getDiagram());
+                    oldSourceView, this.editingContext, diagramContext.diagram());
         });
 
         Node sourceNode = this.diagramHelper.assertGetUniqueMatchingNode(oldSourceNode.getDescriptionId(), oldSourceNode.getSemanticElement());

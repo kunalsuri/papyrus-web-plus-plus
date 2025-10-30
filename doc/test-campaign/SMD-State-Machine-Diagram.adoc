@@ -1,4 +1,4 @@
-= State Machine Diagram tests
+= State Machine Diagram Tests
 :toc:
 
 [WARN]
@@ -21,19 +21,19 @@ Check all creation in the _State Machine Diagram_.
 . Select the stateMachine node and create a _Region_ with the palette
 ** [ ] A new Region is  a displayed in the stateMachine node
 . Select the region and create all kind of elements with the palette
-** [ ] Each elements is displayed in the region
+** [ ] Each element is displayed in the region
 +
 image::imgs/SMD01-creation-nodes.png[]
 +
-. Select the _state1_ node and create two times a Region with the palette
+. Select the _State 1_ node and create two _Region_ nodes with the palette
 . Select the second region node and create any object with the palette
 ** [ ] the regions in the state are displayed vertically
 +
 image::imgs/SMD01-creation-regions.png[]
 +
-. Select the _stateMachine_ node and create EntryPoint and ExitPointwith the palette
-. Select the _state1_ node and create EntryPoint and ExitPoint with the palette
-** [ ] EntryPoint and ExitPoint are displayed as border nodes on _state1_ and _stateMachine_ (note that EntryPoint and ExitPoint override themselves but it is not a bug)
+. Select the _stateMachine_ node and create EntryPoint and ExitPoint with the palette
+. Select the _State 1_ node and create EntryPoint and ExitPoint with the palette
+** [ ] EntryPoint and ExitPoint are displayed as border nodes on _State 1_ and _stateMachine_ (note that EntryPoint and ExitPoint override themselves, but it is not a bug)
 
 image::imgs/SMD01-creation-bordernodes.png[]
 
@@ -46,10 +46,11 @@ image::imgs/SMD01-creation-bordernodes.png[]
 Checks all edge creations in the diagram.
 
 .Recipe
-. Select _Initial1_ and select _New Transition_ in the palette and the select _State1_  
-** [ ] And edge is displayed oriented from _Initial1_ to _State1_
-. Idem : create a Transition between _State1_ and _FinalState1_.
-** [ ] And edge is displayed oriented from _State1_ to _FinalState1_
+. Create an edge between _Initial 1_ and _State 1_
+** [ ] An edge is displayed oriented from _Initial1_ to _State 1_
+** [ ] Check a _Transition_ element is present at the root of _StateMachine_ in the *Model Explorer*
+. Idem : create a Transition between _State 1_ and _FinalState 1_.
+** [ ] An edge is displayed oriented from _State 1_ to _FinalState 1_
 . Reconnect source of a transition to _Join1_
 ** [ ] Reconnection succeeds and edge display is updated
 . Reconnect target of a transition to _Fork1_
@@ -62,7 +63,7 @@ Check all the drag and drop in the _State Machine Diagram_.
 
 .Recipe
 Create a new State State_DND in the first region and create a Region in this State.
-Drag and Drop all the element of the State Machine into the State_DND (into its region). 
+Drag and Drop all the element of the State Machine into the State_DND (into its region).
 Drag and Drop all the element from State_DND back into the StateMachine.
 Delete State_DND from the model.
 
@@ -72,13 +73,13 @@ Delete State_DND from the model.
 . Start from SMD30 (same state as SMD20) (or its semantic model)
 
 .Purpose
-Check that a elements can be created on the diagram only using Drag and Drop tools
+Check that the elements can be created on the diagram only using Drag and Drop tools
 
 .Recipe
 . Create a new _State Machine Diagram_
 . DnD _EntryPoint1_ of the StateMachine on the _StateMachine_ node
 ** [ ] The border node  is displayed
-. DnD all elements contained in _StateMachine_ region into the _StateMachine_ region node
+. DnD all elements contained in StateMachine region in the Model Explorer into the _StateMachine_ region node
 ** [ ] All nodes are displayed
 ** [ ] Both edges are displayed
 
@@ -87,7 +88,7 @@ Check that a elements can be created on the diagram only using Drag and Drop too
 
 [NOTE]
 ====
-All deletions are done using the tool "Delete from model" from the contextual palette. Never deletes using the _Explorer_ view.
+All deletions are done using the tool "Delete from model" from the contextual palette. Never delete using the _Explorer_ view.
 ====
 
 .Requirements
@@ -98,8 +99,13 @@ Check that the deletion tools work properly
 
 .Recipe
 . Select _Transition_ edges and delete it
-** [ ] The Transitions are not displayed in the Explorer tree and not in the diagram
+** [ ] The Transitions are not displayed in the Model Explorer and not in the diagram
 . Idem selecting all nodes
-** [ ] The corresponding elements neither displayed in the Explorer tree nor in the diagram
-** Select the StateMachine region and delete it from Explorer tree.
-** [ ] The Region is neither displayed in the Explorer tree nor in the diagram
+** [ ] The corresponding elements neither displayed in the Model Explorer nor in the diagram
+
+. Select the _StateMachine_ node and create a second _Region_ using the palette
+** [ ] A new Region is displayed in the _StateMachine_ node
+. Select the newly created _Region_ in the _StateMachine_ node and delete it
+** [ ] The _Region_ is neither displayed in the Model Explorer, nor in the diagram, and the _StateMachine_ node contains only one _Region_
+. Try to delete the last _Region_ in the _StateMachine_ node in the diagram and in the Model Explorer
+** [ ] You should not be able to delete the last _Region_ in a State Machine

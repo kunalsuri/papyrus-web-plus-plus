@@ -23,7 +23,7 @@ Check that the documentation for the diagram is available.
 * [ ] Open the documentation and check that the Component Diagram section is present
 
 == CPD03 Conditional Styles
-.Purpose 
+.Purpose
 Check that the conditional styles are applied when they should.
 
 .Recipe
@@ -152,7 +152,7 @@ Check that a property can be graphically drag and dropped in components and type
 * Graphically drag "P1" in "P2"
 ** [ ] The _Property_ node "P1" is moved inside the node "P2". The semantic _Property_ "P1" is added in "C3" in the Model Explorer
 * Graphically drag "P1" in "C1"
-** [ ] The _Property_ node "P1" is moved inside the node "C1". The semantic _Property_ "P1" is added in "C1" in the Model Explorer, and its not in "C3" anymore
+** [ ] The _Property_ node "P1" is moved inside the node "C1". The semantic _Property_ "P1" is added in "C1" in the Model Explorer, and it's not in "C3" anymore
 
 == CPD12 Semantic DnD to type a Property
 .Purpose

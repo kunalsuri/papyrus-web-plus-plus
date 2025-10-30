@@ -83,7 +83,7 @@ const toCuboidListNode = (
       borderStyle: convertLineStyle(style.borderStyle),
     },
     insideLabel: null,
-    outsideLabels: convertOutsideLabels(outsideLabels),
+    outsideLabels: convertOutsideLabels(outsideLabels, gqlDiagram.layoutData.labelLayoutData),
     isBorderNode: isBorderNode,
     borderNodePosition: isBorderNode ? BorderNodePosition.EAST : null,
     faded: state === GQLViewModifier.Faded,
@@ -104,6 +104,7 @@ const toCuboidListNode = (
       ? gqlNode.style.childrenLayoutStrategy.bottomGap
       : 0,
     isListChild: isListLayoutStrategy(gqlParentNode?.style.childrenLayoutStrategy),
+    isDraggedNode: false,
     resizedByUser,
     growableNodeIds: isListLayoutStrategy(gqlNode.style.childrenLayoutStrategy)
       ? gqlNode.style.childrenLayoutStrategy.growableNodeIds

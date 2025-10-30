@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -48,7 +48,7 @@ public class LabelStyleCheck {
     public static LabelStyleCheck buildCenteredLabel(Edge e) {
         Label label = e.getCenterLabel();
         assertNotNull(label);
-        LabelStyle style = label.getStyle();
+        LabelStyle style = label.style();
         assertNotNull(style);
         return new LabelStyleCheck(style);
     }

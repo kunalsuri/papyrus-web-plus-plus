@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.ViewCreationRequest;
@@ -40,22 +40,23 @@ public class DiagramOperationsService implements IDiagramOperationsService {
     }
 
     @Override
-    public void createView(IDiagramContext diagramContext, EObject semanticElement, Optional<Node> optionalParentNode, NodeDescription nodeDescription, NodeContainmentKind containmentKind) {
+    public void createView(DiagramContext diagramContext, EObject semanticElement, Optional<Node> optionalParentNode,
+            NodeDescription nodeDescription, NodeContainmentKind containmentKind) {
         String targetObjectId = this.identityService.getId(semanticElement);
-        String parentElementId = optionalParentNode.map(Node::getId).orElseGet(() -> diagramContext.getDiagram().getId());
+        String parentElementId = optionalParentNode.map(Node::getId).orElseGet(() -> diagramContext.diagram().getId());
         ViewCreationRequest viewCreationRequest = ViewCreationRequest.newViewCreationRequest()
                 .parentElementId(parentElementId)
                 .targetObjectId(targetObjectId)
                 .descriptionId(nodeDescription.getId())
                 .containmentKind(containmentKind)
                 .build();
-        diagramContext.getViewCreationRequests().add(viewCreationRequest);
+        diagramContext.viewCreationRequests().add(viewCreationRequest);
     }
 
     @Override
-    public void deleteView(IDiagramContext diagramContext, Node node) {
+    public void deleteView(DiagramContext diagramContext, Node node) {
         ViewDeletionRequest viewDeletionRequest = ViewDeletionRequest.newViewDeletionRequest().elementId(node.getId()).build();
-        diagramContext.getViewDeletionRequests().add(viewDeletionRequest);
+        diagramContext.viewDeletionRequests().add(viewDeletionRequest);
     }
 
 }

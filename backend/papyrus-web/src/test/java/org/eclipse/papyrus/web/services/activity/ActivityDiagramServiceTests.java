@@ -352,7 +352,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)
+     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)
      * for an {@link ActivityNode} in an {@link Activity}.
      */
     @Test
@@ -378,7 +378,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)
+     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)
      * for an {@link ActivityNode} in an {@link ActivityPartition}.
      */
     @Test
@@ -413,7 +413,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)
+     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)
      * for an {@link ActivityNode} in an {@link InterruptibleActivityRegion}.
      */
     @Test
@@ -450,7 +450,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)
+     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)
      * for an {@link ActivityNode} in a {@link StructuredActivityNode}.
      */
     @Test
@@ -483,7 +483,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)
+     * {@link ActivityDiagramService#createActivityNodeAD(EObject, String, String, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)
      * for an {@link ActivityNode} in a non-{@link Activity}, non-{@link ActivityGroup},
      * non-{@link StructuredActivityNode}.
      */
@@ -508,7 +508,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createExpansionNodeAD(EObject, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map, boolean)}
+     * {@link ActivityDiagramService#createExpansionNodeAD(EObject, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map, boolean)}
      * for an input {@link ExpansionNode} in an {@link ExpansionRegion}.
      */
     @Test
@@ -539,7 +539,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createExpansionNodeAD(EObject, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map, boolean)}
+     * {@link ActivityDiagramService#createExpansionNodeAD(EObject, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map, boolean)}
      * for an output {@link ExpansionNode} in an {@link ExpansionRegion}.
      */
     @Test
@@ -569,7 +569,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createActionInputPinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ActivityDiagramService#createActionInputPinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * for an {@link ActionInputPin} in an {@link OpaqueAction}.
      */
     @Test
@@ -598,7 +598,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createInputPinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ActivityDiagramService#createInputPinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * for an {@link InputPin} in an {@link OpaqueAction}.
      */
     @Test
@@ -627,7 +627,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createOutputPinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ActivityDiagramService#createOutputPinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * for an {@link OutputPin} in an {@link OpaqueAction}.
      */
     @Test
@@ -656,7 +656,7 @@ public class ActivityDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Tests
-     * {@link ActivityDiagramService#createValuePinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ActivityDiagramService#createValuePinAD(org.eclipse.uml2.uml.Element, Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * for a {@link ValuePin} in an {@link OpaqueAction}.
      */
     @Test

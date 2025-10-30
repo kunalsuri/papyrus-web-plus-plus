@@ -25,7 +25,7 @@ import org.eclipse.papyrus.web.application.representations.aqlservices.utils.IVi
 import org.eclipse.papyrus.web.application.representations.aqlservices.utils.ViewHelper;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.diagrams.Node;
@@ -60,7 +60,7 @@ public class WebDiagramElementCreator {
     }
 
     public CreationStatus handleCreation(EObject parent, String type, String referenceName, Node targetView,
-            IDiagramContext diagramContext,
+            DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
 
         if (parent == null || type == null || referenceName == null) {

@@ -23,7 +23,7 @@ Check that the documentation for the diagram is available.
 * [ ] Open the documentation and check that the Deployment Diagram section is present
 
 == DD03 Conditional Styles
-.Purpose 
+.Purpose
 Check that the conditional styles are applied when they should.
 
 .Recipe
@@ -74,7 +74,7 @@ Check that the deletion of a comment deletes both the comment node and the link 
 .Recipe
 * Create/open a DD diagram
 * Create a _Comment_ using the tool in the palette
-* Create a _Artifact_ using the tool in the palette
+* Create an _Artifact_ using the tool in the palette
 * Create a link between the _Comment_ and the _Artifact_
 * Delete the _Comment_
 ** [ ] The _Comment_ and the link are deleted
@@ -91,4 +91,3 @@ Check that the deletion of comment/constraint links works as expected and doesn'
 * Create a link between the _Comment_ and both _Artifact_ (2 links) and between the _Constraint_ and both _Artifact_ (2 links)
 * Delete the links one by one
 ** [ ] Only the graphical links are deleted, no semantic element is deleted when a link is deleted
-

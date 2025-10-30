@@ -90,7 +90,7 @@ const toListNode = (
       borderStyle: convertLineStyle(style.borderStyle),
     },
     insideLabel: null,
-    outsideLabels: convertOutsideLabels(outsideLabels),
+    outsideLabels: convertOutsideLabels(outsideLabels, gqlDiagram.layoutData.labelLayoutData),
     isBorderNode: isBorderNode,
     borderNodePosition: isBorderNode ? BorderNodePosition.WEST : null,
     faded: state === GQLViewModifier.Faded,
@@ -114,6 +114,7 @@ const toListNode = (
       ? gqlNode.style.childrenLayoutStrategy.bottomGap
       : 1,
     isListChild: isListLayoutStrategy(gqlParentNode?.style.childrenLayoutStrategy),
+    isDraggedNode: false,
     resizedByUser,
     growableNodeIds: isListLayoutStrategy(gqlNode.style.childrenLayoutStrategy)
       ? gqlNode.style.childrenLayoutStrategy.growableNodeIds

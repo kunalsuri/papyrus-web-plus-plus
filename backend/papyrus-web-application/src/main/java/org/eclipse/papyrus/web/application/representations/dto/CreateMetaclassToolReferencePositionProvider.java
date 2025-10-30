@@ -13,7 +13,7 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.dto;
 
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramInputReferencePositionProvider;
 import org.eclipse.sirius.components.collaborative.diagrams.dto.ReferencePosition;
 import org.eclipse.sirius.components.core.api.IInput;
@@ -34,10 +34,10 @@ public class CreateMetaclassToolReferencePositionProvider implements IDiagramInp
     }
 
     @Override
-    public ReferencePosition getReferencePosition(IInput diagramInput, IDiagramContext diagramContext) {
+    public ReferencePosition getReferencePosition(IInput diagramInput, DiagramContext diagramContext) {
         if (diagramInput instanceof CreateMetaclassImportInput createMetaclassImportInput) {
             String parentId = null;
-            if (!diagramContext.getDiagram().getId().equals(createMetaclassImportInput.diagramElementId())) {
+            if (!diagramContext.diagram().getId().equals(createMetaclassImportInput.diagramElementId())) {
                 // null parentId means that the parent is the diagram
                 parentId = createMetaclassImportInput.diagramElementId();
             }

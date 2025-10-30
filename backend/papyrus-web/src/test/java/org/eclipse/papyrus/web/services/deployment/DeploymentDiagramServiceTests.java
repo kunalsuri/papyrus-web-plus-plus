@@ -403,7 +403,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link DeploymentDiagramService#createManifestationDD(EObject, EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext)}
+     * {@link DeploymentDiagramService#createManifestationDD(EObject, EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext)}
      * between two {@link Device}.The new {@link Manifestation} is contained by the closest {@link Package} parent.
      */
     @Test
@@ -436,7 +436,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link DeploymentDiagramService#createManifestationDD(EObject, EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext)}
+     * {@link DeploymentDiagramService#createManifestationDD(EObject, EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext)}
      * between two {@link Artifact}. The new {@link Manifestation} is contained by the source {@link Artifact}.
      */
     @Test
@@ -470,7 +470,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link DeploymentDiagramService#createArtifactDD(EObject, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link DeploymentDiagramService#createArtifactDD(EObject, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Package}. The containment feature used is UMLPackage.eINSTANCE.getPackage_PackagedElement().
      */
     @Test
@@ -499,7 +499,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link DeploymentDiagramService#createArtifactDD(EObject, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link DeploymentDiagramService#createArtifactDD(EObject, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Artifact}. The containment feature used is UMLPackage.eINSTANCE.getArtifact_NestedArtifact().
      */
     @Test
@@ -528,7 +528,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link DeploymentDiagramService#createArtifactDD(EObject, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link DeploymentDiagramService#createArtifactDD(EObject, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Node}. The containment feature used is UMLPackage.eINSTANCE.getClass_NestedClassifier().
      */
     @Test
@@ -557,7 +557,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link DeploymentDiagramService#createNodeDD(org.eclipse.uml2.uml.Element, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link DeploymentDiagramService#createNodeDD(org.eclipse.uml2.uml.Element, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Node}. The containment feature used is UMLPackage.eINSTANCE.getPackage_PackagedElement().
      */
     @Test
@@ -586,7 +586,7 @@ public class DeploymentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link DeploymentDiagramService#createNodeDD(org.eclipse.uml2.uml.Element, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link DeploymentDiagramService#createNodeDD(org.eclipse.uml2.uml.Element, String, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Device}. The containment feature used is UMLPackage.eINSTANCE.getNode_NestedNode().
      */
     @Test

@@ -39,7 +39,7 @@ describe('Comment table tests', () => {
             { force: true }
           )
           .then(() => {
-            cy.getByTestId('upload-document-submit').should('be.visible').should('not.be.disabled').click();
+            cy.getByTestId('upload-document-split-button').should('be.visible').should('not.be.disabled').click();
             cy.getByTestId('upload-document-close').should('be.visible').should('not.be.disabled').click();
             cy.expandAll('CommentTableTestModel.uml');
           });

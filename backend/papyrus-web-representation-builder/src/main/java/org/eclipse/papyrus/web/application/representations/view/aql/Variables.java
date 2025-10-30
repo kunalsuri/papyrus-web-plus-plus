@@ -13,7 +13,7 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.view.aql;
 
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.diagrams.Edge;
 import org.eclipse.sirius.components.diagrams.Node;
@@ -35,7 +35,7 @@ public class Variables {
 
     public static final String SEMANTIC_EDGE_TARGET = org.eclipse.sirius.components.diagrams.description.EdgeDescription.SEMANTIC_EDGE_TARGET;
 
-    public static final String DIAGRAM_CONTEXT = IDiagramContext.DIAGRAM_CONTEXT;
+    public static final String DIAGRAM_CONTEXT = DiagramContext.DIAGRAM_CONTEXT;
 
     public static final String DIAGRAM = "diagram";
 

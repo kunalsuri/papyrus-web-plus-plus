@@ -39,7 +39,7 @@ import org.eclipse.papyrus.web.sirius.contributions.FactoryMethod;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.diagrams.CollapsingState;
@@ -50,10 +50,12 @@ import org.eclipse.sirius.components.diagrams.InsideLabelLocation;
 import org.eclipse.sirius.components.diagrams.LabelOverflowStrategy;
 import org.eclipse.sirius.components.diagrams.LabelStyle;
 import org.eclipse.sirius.components.diagrams.LabelTextAlign;
+import org.eclipse.sirius.components.diagrams.LabelVisibility;
 import org.eclipse.sirius.components.diagrams.LineStyle;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.RectangularNodeStyle;
 import org.eclipse.sirius.components.diagrams.ViewModifier;
+import org.eclipse.sirius.components.diagrams.components.BorderNodePosition;
 import org.eclipse.sirius.components.diagrams.components.NodeContainmentKind;
 import org.eclipse.sirius.components.diagrams.components.NodeIdProvider;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
@@ -78,7 +80,7 @@ public class ViewHelper implements IViewHelper {
     private final ILabelService labelService;
     private final IDiagramOperationsService diagramOperationsService;
 
-    private final IDiagramContext diagramContext;
+    private final DiagramContext diagramContext;
 
     private final DiagramDescription diagramDescription;
 
@@ -100,7 +102,7 @@ public class ViewHelper implements IViewHelper {
      * @param capturedNodeDescriptions
      *         the captured node descriptions
      */
-    public ViewHelper(IIdentityService identityService, ILabelService labelService, IDiagramOperationsService diagramOperationsService, IDiagramContext diagramContext, DiagramDescription diagramDescription,
+    public ViewHelper(IIdentityService identityService, ILabelService labelService, IDiagramOperationsService diagramOperationsService, DiagramContext diagramContext, DiagramDescription diagramDescription,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         super();
         this.identityService = identityService;
@@ -127,7 +129,7 @@ public class ViewHelper implements IViewHelper {
      * @param diagramOperationsService
      *         the {@link IDiagramOperationsService}
      * @param diagramContext
-     *         the {@link IDiagramContext}
+     *         the {@link DiagramContext}
      * @param capturedNodeDescriptions
      *         a map that contains all mapping between {@link org.eclipse.sirius.components.view.diagram.NodeDescription} and
      *         {@link NodeDescription} for the current diagram
@@ -135,7 +137,7 @@ public class ViewHelper implements IViewHelper {
      */
     @FactoryMethod
     public static IViewHelper create(IIdentityService identityService, ILabelService labelService, IViewDiagramDescriptionService viewDiagramService, IDiagramOperationsService diagramOperationsService,
-            IDiagramContext diagramContext, Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
+            DiagramContext diagramContext, Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return viewDiagramService.getDiagramDescription(capturedNodeDescriptions)
                 .map(dd -> (IViewHelper) new ViewHelper(identityService, labelService, diagramOperationsService, diagramContext, dd, capturedNodeDescriptions))
                 .orElse(new IViewHelper.NoOp());
@@ -322,7 +324,7 @@ public class ViewHelper implements IViewHelper {
 
             // Workaround to avoid java.lang.IllegalStateException: Duplicate key problem -
             // https://github.com/eclipse-sirius/sirius-components/issues/1317
-            List<Node> matchingNodes = this.getAllNode(this.diagramContext.getDiagram(), (parent, node) -> this.matchExistingNode(parent, node, semanticId, nodeDescriptionId, selectedNode));
+            List<Node> matchingNodes = this.getAllNode(this.diagramContext.diagram(), (parent, node) -> this.matchExistingNode(parent, node, semanticId, nodeDescriptionId, selectedNode));
 
             if (semanticId == null || matchingNodes.isEmpty()) {
 
@@ -366,7 +368,7 @@ public class ViewHelper implements IViewHelper {
         List<org.eclipse.sirius.components.view.diagram.NodeDescription> childrenTypes = new ArrayList<>();
         if (selectedNode == null) {
             // case diagram
-            parentElementId = this.diagramContext.getDiagram().getId();
+            parentElementId = this.diagramContext.diagram().getId();
             childrenTypes = this.getAllChildrenNodeDescriptionsOfType(null, semanticElement.eClass());
         } else {
             parentElementId = selectedNode.getId();
@@ -402,6 +404,7 @@ public class ViewHelper implements IViewHelper {
                         .borderStyle(LineStyle.Solid)
                         .fontSize(14)
                         .iconURL(List.of())
+                        .visibility(LabelVisibility.visible)
                         .build();
 
                 var insideLabel = InsideLabel.newLabel("")
@@ -436,6 +439,7 @@ public class ViewHelper implements IViewHelper {
                         .borderNodes(List.of())//
                         .childNodes(List.of())//
                         .customizedStyleProperties(Set.of())
+                        .initialBorderNodePosition(BorderNodePosition.NONE)
                         .build();
 
                 fakeNodes.add(node);

@@ -40,7 +40,7 @@ import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -158,7 +158,7 @@ public class DiagramTestHelper {
      *            an diagram updater. It will be given the diagram context
      * @return a value return by the updater
      */
-    public <T> T modify(Function<IDiagramContext, T> updater) {
+    public <T> T modify(Function<DiagramContext, T> updater) {
         Optional<Pair<Diagram, T>> result = this.diagramBuilderService.updateDiagramAndGet(this.diagram, this.editingContext, updater);
         result.ifPresent(p -> {
             this.diagram = p.getFirst();
@@ -179,7 +179,7 @@ public class DiagramTestHelper {
      * @param updater
      *            an diagram updater. It will be given the diagram context
      */
-    public void modify(Consumer<IDiagramContext> updater) {
+    public void modify(Consumer<DiagramContext> updater) {
         this.diagram = this.diagramBuilderService.updateDiagram(this.diagram, this.editingContext, updater).get();
     }
 

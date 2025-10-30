@@ -22,7 +22,7 @@ export interface GQLNoteNodeStyle extends GQLNodeStyle {
   background: string;
   borderColor: string;
   borderStyle: string;
-  borderSize: string;
+  borderSize: number;
 }
 
 export interface Label {

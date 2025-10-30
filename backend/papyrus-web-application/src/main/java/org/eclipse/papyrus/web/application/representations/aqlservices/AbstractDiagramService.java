@@ -94,7 +94,6 @@ import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
 import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -321,14 +320,14 @@ public abstract class AbstractDiagramService {
      * @param semanticElement
      *            a semantic element
      * @param diagramContext
-     *            the {@link IDiagramContext}
+     *            the {@link DiagramContext}
      * @param targetView
      *            the representation of the semantic object to delete
      * @param deletionPolicy
      *            check if it is a visual or semantic deletion
      * @return a useless EObject see https://github.com/eclipse-sirius/sirius-components/issues/1343
      */
-    public EObject destroy(EObject semanticElement, IDiagramContext diagramContext, Edge targetView, Object deletionPolicy) {
+    public EObject destroy(EObject semanticElement, DiagramContext diagramContext, Edge targetView, Object deletionPolicy) {
         // Workaround for https://github.com/eclipse-sirius/sirius-components/issues/1343
         EObject result = FAILURE_OBJECT;
         return result;
@@ -344,36 +343,36 @@ public abstract class AbstractDiagramService {
      * @param editionContext
      *            the {@link IEditingContext}
      * @param diagramContext
-     *            the {@link IDiagramContext}
+     *            the {@link DiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
      *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return self (required for the service to create a view - convention on Sirius component)
      */
-    public EObject semanticDrop(EObject droppedElement, Node targetView, IEditingContext editionContext, IDiagramContext diagramContext,
+    public EObject semanticDrop(EObject droppedElement, Node targetView, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         this.buildSemanticDropBehaviorProvider(droppedElement, editionContext, diagramContext, capturedNodeDescriptions).handleSemanticDrop(droppedElement, targetView);
         return droppedElement;
     }
 
-    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject droppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject droppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.identityService, this.labelService, this.viewDiagramService, this.getDiagramOperationsService(), diagramContext,
                 capturedNodeDescriptions);
-        return new GenericWebExternalDropBehaviorProvider(createViewHelper, new DiagramNavigator(this.diagramNavigationService, diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+        return new GenericWebExternalDropBehaviorProvider(createViewHelper, new DiagramNavigator(this.diagramNavigationService, diagramContext.diagram(), capturedNodeDescriptions), this.logger);
     }
 
-    public EObject graphicalDrop(EObject droppedElement, EObject targetElement, Node droppedView, Node targetView, IEditingContext editionContext, IDiagramContext diagramContext,
+    public EObject graphicalDrop(EObject droppedElement, EObject targetElement, Node droppedView, Node targetView, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         this.buildGraphicalDropBehaviorProvider(droppedElement, editionContext, diagramContext, capturedNodeDescriptions).handleGraphicalDrop(droppedElement, targetElement, droppedView, targetView);
         return droppedElement;
     }
 
-    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.identityService, this.labelService, this.viewDiagramService, this.getDiagramOperationsService(), diagramContext,
                 capturedNodeDescriptions);
-        return new GenericWebInternalDropBehaviorProvider(createViewHelper, new DiagramNavigator(this.diagramNavigationService, diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+        return new GenericWebInternalDropBehaviorProvider(createViewHelper, new DiagramNavigator(this.diagramNavigationService, diagramContext.diagram(), capturedNodeDescriptions), this.logger);
     }
 
     /**
@@ -468,7 +467,7 @@ public abstract class AbstractDiagramService {
      *            the semantic target
      * @param type
      *            the new element type
-     * @param containementReferenceName
+     * @param containmentReferenceName
      *            the containment reference name
      * @param sourceNode
      *            the source {@link Node} of the new edge
@@ -477,26 +476,26 @@ public abstract class AbstractDiagramService {
      * @param editingContext
      *            the current {@link IEditingContext}
      * @param diagramContext
-     *            the current {@link IDiagramContext}
+     *            the current {@link DiagramContext}
      * @return a new element or <code>null</code>
      */
     // CHECKSTYLE:OFF All the parameters are required. We could remove source and target and recompute them using the
     // IObjectService. But since it is done in Sirius component it would be a shame
-    public EObject createDomainBasedEdge(EObject source, EObject target, String type, String containementReferenceName, Node sourceNode, Node targetNode, IEditingContext editingContext,
-            IDiagramContext diagramContext) {
+    public EObject createDomainBasedEdge(EObject source, EObject target, String type, String containmentReferenceName, Node sourceNode, Node targetNode, IEditingContext editingContext,
+            DiagramContext diagramContext) {
 
         String errorMessage = null;
-        IViewQuerier represenationQuery = this.createRepresentationQuerier(editingContext, diagramContext.getDiagram());
+        IViewQuerier representationQuery = this.createRepresentationQuerier(editingContext, diagramContext.diagram());
 
         // Workaround for missing precondition on edges
-        CheckStatus canCreateStatus = this.buildDomainBasedEdgeCreationChecker().canCreate(source, target, type, containementReferenceName, represenationQuery, sourceNode, targetNode);
+        CheckStatus canCreateStatus = this.buildDomainBasedEdgeCreationChecker().canCreate(source, target, type, containmentReferenceName, representationQuery, sourceNode, targetNode);
         final EObject result;
         if (!canCreateStatus.isValid()) {
             errorMessage = "Creation failed : " + canCreateStatus.getMessage();
             this.logWarnMessage(errorMessage);
             result = null;
         } else {
-            CreationStatus status = this.buildDomainBasedEdgeCreator(source).createDomainBasedEdge(source, target, type, containementReferenceName, represenationQuery, sourceNode, targetNode);
+            CreationStatus status = this.buildDomainBasedEdgeCreator(source).createDomainBasedEdge(source, target, type, containmentReferenceName, representationQuery, sourceNode, targetNode);
 
             result = status.getElement();
 
@@ -558,13 +557,13 @@ public abstract class AbstractDiagramService {
      * @param targetView
      *            the view on which the creation has been requested (<code>null</code> if request on the diagram root)
      * @param diagramContext
-     *            the {@link IDiagramContext}
+     *            the {@link DiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
      *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return a new instance or <code>null</code> if the creation failed
      */
-    public EObject create(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
+    public EObject create(EObject parent, String type, String referenceName, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         final EObject result;
         String errorMessage = null;
@@ -612,15 +611,15 @@ public abstract class AbstractDiagramService {
      * @param targetView
      *            the view on which the creation has been requested (<code>null</code> if request on the diagram root)
      * @param diagramContext
-     *            the {@link IDiagramContext}
+     *            the {@link DiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
      *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return a new instance or <code>null</code> if the creation failed
      */
-    public EObject createInHolder(EObject parent, String type, String referenceName, Node targetView, IDiagramContext diagramContext,
+    public EObject createInHolder(EObject parent, String type, String referenceName, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        return this.create(parent, type, referenceName, this.getParentNode(targetView, diagramContext.getDiagram()), diagramContext, capturedNodeDescriptions);
+        return this.create(parent, type, referenceName, this.getParentNode(targetView, diagramContext.diagram()), diagramContext, capturedNodeDescriptions);
     }
 
     /**
@@ -637,16 +636,16 @@ public abstract class AbstractDiagramService {
      * @param targetView
      *            the view on which the creation has been requested (<code>null</code> if request on the diagram root)
      * @param diagramContext
-     *            the {@link IDiagramContext}
+     *            the {@link DiagramContext}
      * @param capturedNodeDescriptions
      *            a map of all converted node descriptions of the current diagram description (
      *            {@link org.eclipse.sirius.components.view.diagram.NodeDescription} -> {@link NodeDescription})
      * @return a new instance or <code>null</code> if the creation failed
      */
-    public EObject createInCompartment(EObject parent, String type, String compartmentName, String referenceName, Node targetView, IDiagramContext diagramContext,
+    public EObject createInCompartment(EObject parent, String type, String compartmentName, String referenceName, Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
 
-        DiagramNavigator navigator = new DiagramNavigator(this.diagramNavigationService, diagramContext.getDiagram(), capturedNodeDescriptions);
+        DiagramNavigator navigator = new DiagramNavigator(this.diagramNavigationService, diagramContext.diagram(), capturedNodeDescriptions);
         Node compartmentNode = null;
         for (Node node : targetView.getChildNodes()) {
             Optional<org.eclipse.sirius.components.view.diagram.NodeDescription> nodeDescription = navigator.getDescription(node);
@@ -659,10 +658,10 @@ public abstract class AbstractDiagramService {
     }
 
     @Deprecated
-    public EObject createSibling(EObject sibling, String type, String referenceName, Node siblingView, IDiagramContext diagramContext,
+    public EObject createSibling(EObject sibling, String type, String referenceName, Node siblingView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         EObject parent = sibling.eContainer();
-        return new DiagramNavigator(this.diagramNavigationService, diagramContext.getDiagram(), capturedNodeDescriptions).getParentNode(siblingView).map(parentNode -> {
+        return new DiagramNavigator(this.diagramNavigationService, diagramContext.diagram(), capturedNodeDescriptions).getParentNode(siblingView).map(parentNode -> {
             return this.create(parent, type, referenceName, parentNode, diagramContext, capturedNodeDescriptions);
         }).orElseGet(() -> {
             String errorMessage = MessageFormat.format("Unable to get the parent view of {0}", sibling);
@@ -989,7 +988,7 @@ public abstract class AbstractDiagramService {
      * @return <code>true</code> if the resource is a profile model, <code>false</code> otherwise.
      */
     public List<Node> getAllSymbol(DiagramContext diagramContext) {
-        return diagramContext.getDiagram().getNodes();
+        return diagramContext.diagram().getNodes();
     }
 
     /**

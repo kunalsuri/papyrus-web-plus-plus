@@ -37,7 +37,7 @@ import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramOperationsService;
 import org.eclipse.papyrus.web.sirius.contributions.IViewDiagramDescriptionService;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -104,24 +104,24 @@ public class ComponentDiagramService extends AbstractDiagramService {
     }
 
     @Override
-    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebExternalSourceToRepresentationDropBehaviorProvider buildSemanticDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
                 capturedNodeDescriptions);
         IWebExternalSourceToRepresentationDropBehaviorProvider dropProvider = new ComponentSemanticDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
     @Override
-    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, IDiagramContext diagramContext,
+    protected IWebInternalSourceToRepresentationDropBehaviorProvider buildGraphicalDropBehaviorProvider(EObject semanticDroppedElement, IEditingContext editionContext, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         IViewHelper createViewHelper = ViewHelper.create(this.getIdentityService(), this.getLabelService(), this.getViewDiagramService(), this.getDiagramOperationsService(), diagramContext,
                 capturedNodeDescriptions);
         IWebInternalSourceToRepresentationDropBehaviorProvider dropProvider = new ComponentGraphicalDropBehaviorProvider(editionContext, createViewHelper, this.getObjectSearchService(),
                 this.getECrossReferenceAdapter(semanticDroppedElement), this.getEditableChecker(),
-                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.getDiagram(), capturedNodeDescriptions), this.logger);
+                new DiagramNavigator(this.getDiagramNavigationService(), diagramContext.diagram(), capturedNodeDescriptions), this.logger);
         return dropProvider;
     }
 
@@ -165,7 +165,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the created {@link Port}
      */
-    public EObject createPortCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+    public EObject createPortCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return this.createPropertyAndSubType(container, this.umlPackage.getPort().getName(), targetView, diagramContext, capturedNodeDescriptions);
     }
@@ -183,9 +183,9 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the created {@link Port}
      */
-    public EObject createPortInHolderCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+    public EObject createPortInHolderCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
-        return this.createPropertyAndSubType(container, this.umlPackage.getPort().getName(), this.getParentNode(targetView, diagramContext.getDiagram()), diagramContext, capturedNodeDescriptions);
+        return this.createPropertyAndSubType(container, this.umlPackage.getPort().getName(), this.getParentNode(targetView, diagramContext.diagram()), diagramContext, capturedNodeDescriptions);
     }
 
     /**
@@ -201,7 +201,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the created {@link Property}
      */
-    public EObject createPropertyCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+    public EObject createPropertyCPD(EObject container, org.eclipse.sirius.components.diagrams.Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         return this.createPropertyAndSubType(container, this.umlPackage.getProperty().getName(), targetView, diagramContext, capturedNodeDescriptions);
     }
@@ -221,7 +221,7 @@ public class ComponentDiagramService extends AbstractDiagramService {
      *            the {@link NodeDescription}s
      * @return the created {@link Property}
      */
-    private EObject createPropertyAndSubType(EObject container, String propertyClassName, org.eclipse.sirius.components.diagrams.Node targetView, IDiagramContext diagramContext,
+    private EObject createPropertyAndSubType(EObject container, String propertyClassName, org.eclipse.sirius.components.diagrams.Node targetView, DiagramContext diagramContext,
             Map<org.eclipse.sirius.components.view.diagram.NodeDescription, NodeDescription> capturedNodeDescriptions) {
         EObject newProperty = null;
         String containmentFeatureName = null;

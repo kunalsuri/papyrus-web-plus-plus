@@ -1,4 +1,4 @@
-= Documentation tests
+= Documentation Tests
 
 
 == CD01 - Documentation validity
@@ -7,7 +7,7 @@
 Check that the documentation content is still valid.
 
 .Recipe
-. Read the documentation and make sure that what is describe could be find in the product.
+. Read the documentation and make sure that what is described is available in the product.
 ** [ ] All elements described in the documentation should be validated in the product.
 . For each link check it is still valid
 ** [ ] All documentation links are valid and point on the correct page/section

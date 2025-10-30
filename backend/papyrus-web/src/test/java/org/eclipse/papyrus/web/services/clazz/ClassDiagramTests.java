@@ -1338,7 +1338,7 @@ public class ClassDiagramTests extends AbstractDiagramTest {
 
     /**
      * Creates the
-     * {@link ClassDiagramService#createCompositeAssociation(EObject, EObject, Node, Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext)}
+     * {@link ClassDiagramService#createCompositeAssociation(EObject, EObject, Node, Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext)}
      * service.
      */
     @Test
@@ -1376,7 +1376,7 @@ public class ClassDiagramTests extends AbstractDiagramTest {
 
     /**
      * Creates the
-     * {@link ClassDiagramService#createSharedAssociation(EObject, EObject, Node, Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext)}
+     * {@link ClassDiagramService#createSharedAssociation(EObject, EObject, Node, Node, org.eclipse.sirius.components.core.api.IEditingContext, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext)}
      * service.
      */
     @Test
@@ -1499,9 +1499,9 @@ public class ClassDiagramTests extends AbstractDiagramTest {
             assertEquals(this.getExpectedArrowStyle(association, true), edge.getStyle().getTargetArrow(), "Invalid end style for association " + association.getName());
 
             // Check labels are displayed (the content of each label is tested in UML domain services)
-            assertFalse(edge.getCenterLabel().getText().isBlank(), "No center label for association " + association.getName());
-            assertFalse(edge.getBeginLabel().getText().isBlank(), "No begin label for association " + association.getName());
-            assertFalse(edge.getEndLabel().getText().isBlank(), "No end label for association " + association.getName());
+            assertFalse(edge.getCenterLabel().text().isBlank(), "No center label for association " + association.getName());
+            assertFalse(edge.getBeginLabel().text().isBlank(), "No begin label for association " + association.getName());
+            assertFalse(edge.getEndLabel().text().isBlank(), "No end label for association " + association.getName());
         }
     }
 

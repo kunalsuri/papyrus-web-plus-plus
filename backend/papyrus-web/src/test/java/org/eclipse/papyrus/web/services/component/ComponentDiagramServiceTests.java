@@ -173,7 +173,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Component}.
      */
     @Test
@@ -201,7 +201,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Property} type by a {@link StructuredClassifier}.
      */
     @Test
@@ -235,7 +235,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Property} typed by a non-{@link StructuredClassifier}.
      */
     @Test
@@ -260,7 +260,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Comment}.
      */
     @Test
@@ -279,7 +279,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPortCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside an untyped {@link Property}. The creation of {@link Port} fails because there is no type.
      */
     @Test
@@ -302,7 +302,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Component}.
      */
     @Test
@@ -331,7 +331,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Property} typed by a {@link StructuredClassifier}.
      */
     @Test
@@ -367,7 +367,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Property} typed by a non-{@link StructuredClassifier}.
      */
     @Test
@@ -392,7 +392,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside an untyped {@link Property}. The creation of {@link Property} fails because there is no type.
      */
     @Test
@@ -415,7 +415,7 @@ public class ComponentDiagramServiceTests extends AbstractDiagramTest {
 
     /**
      * Test
-     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext, java.util.Map)}
+     * {@link ComponentDiagramService#createPropertyCPD(EObject, org.eclipse.sirius.components.diagrams.Node, org.eclipse.sirius.components.collaborative.diagrams.DiagramContext, java.util.Map)}
      * inside a {@link Comment}.
      */
     @Test

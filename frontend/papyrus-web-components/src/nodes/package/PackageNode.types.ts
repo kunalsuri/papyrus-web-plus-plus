@@ -26,5 +26,5 @@ export interface GQLPackageNodeStyle extends GQLNodeStyle {
   background: string;
   borderColor: string;
   borderStyle: string;
-  borderSize: string;
+  borderSize: number;
 }

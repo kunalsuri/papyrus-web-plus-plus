@@ -23,11 +23,11 @@ Check that the documentation for the diagram is available.
 * [ ] Open the documentation and check that the Activity Diagram section is present
 
 == AD03 Conditional Styles
-.Purpose 
+.Purpose
 Check that the conditional styles are applied when they should.
 
 .Recipe
-* Create/open a AD diagram
+* Create/open an AD diagram
 * Set the _is abstract_ attribute of the root _Activity_ to true
 ** [ ] The label of the root _Activity_ is displayed in italic
 
@@ -97,7 +97,7 @@ Check that the deletion of comment/constraint links works as expected and doesn'
 Check that the image inside the border nodes representing pins rotate around their container.
 
 .Recipe
-* Create/open a AD diagram
+* Create/open an AD diagram
 * Create a _TestIdentityAction_ using the tool in the palette
 * Move the _InputPin_ and _OutputPin_ around the _TestIdentityAction_
 ** [ ] The border node image direction changes according to its position around its container
@@ -107,7 +107,7 @@ Check that the image inside the border nodes representing pins rotate around the
 Check that border node creation aren't possible if their containment feature is already full.
 
 .Recipe
-* Create/open a AD diagram
+* Create/open an AD diagram
 * Create an _AddStructuralFeatureValueAction_ using the tool in the palette
 * Semantically delete the _OutputPin_ of the _AddStructuralFeatureValueAction_ using the palette
 * Create an _OutputPin_ on the _AddStructuralFeatureValueAction_ using the palette
@@ -120,7 +120,7 @@ Check that border node creation aren't possible if their containment feature is 
 Check that the DecisionNode note is visible if decision input is set.
 
 .Recipe
-* Create/open a AD diagram
+* Create/open an AD diagram
 * Create a _DecisionNode_ using the tool in the palette
 * Set the _decision input_ value of the _DecisionNode_ with the root _Activity_
 ** [ ] A note is displayed next to the _DecisionNode_ with the label "«decisionInput» Activity1". The note is connected to the _DecisionNode_ with a dotted edge.
@@ -130,7 +130,7 @@ Check that the DecisionNode note is visible if decision input is set.
 Check that the DecisionNode note is visible if decision input is set and that the note is in the ActivityPartition containing the DecisionNode.
 
 .Recipe
-* Create/open a AD diagram
+* Create/open an AD diagram
 * Create an _ActivityPartition_ on the diagram
 * Create a _DecisionNode_ in the _ActivityPartition_
 * Set the _decision input_ value of the _DecisionNode_ with the root _Activity_
@@ -141,7 +141,7 @@ Check that the DecisionNode note is visible if decision input is set and that th
 Check that it is not possible to graphically drag and drop the note associated to a DecisionNode.
 
 .Recipe
-* Create/open a AD diagram
+* Create/open an AD diagram
 * Create an _ActivityPartition_ on the diagram
 * Create a _DecisionNode_ in the _ActivityPartition_
 * Set the _decision input_ value of the _DecisionNode_ with the root _Activity_
@@ -150,7 +150,7 @@ Check that it is not possible to graphically drag and drop the note associated t
 
 
 == AD13 Semantic DnD of a Control Flow
-* Create/open a AD diagram
+* Create/open an AD diagram
 * Create an _ActivityParameterNode_ on the root _Activity_ and set its _is control type_ attribute to true
 * Create an _ExpansionRegion_ on the root _Activity_
 * Create an _ExpansionNode_ on the _ExpansionRegion_ and set its _is control type_ attribute to true

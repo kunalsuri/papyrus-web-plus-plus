@@ -104,7 +104,7 @@ public class ContainmentReferenceCreateElementHandler implements IReferenceWidge
     }
 
     @Override
-    public List<ChildCreationDescription> getChildCreationDescriptions(IEditingContext editingContext, String kind, String referenceKind, String descriptionId) {
+    public List<ChildCreationDescription> getChildCreationDescriptions(IEditingContext editingContext, String ownerId, String referenceKind, String descriptionId) {
         return this.getInstanciableTypesOf(editingContext, referenceKind) //
                 .stream() //
                 .map(this::createChildCreationDescription) //

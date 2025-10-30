@@ -59,12 +59,28 @@ The _Explorer toolbar_ contains global _Project_ actions:
 * _Filters_ +
   The list of filters that can applied to the explorer content (they depend on the current explorer)
 * _Explorers_ +
-  The list of explorers available to present the given project depending of its nature.
+  The list of explorers available to present the given project depending on its nature.
   As far as UML projects are concerned, a dedicated explorer has been introduced.
   If no specific explorers are defined for the current project, the explorer selector icon is hidden and the default explorer is used.
 * Synchronization with _Representation_ editor +
-  When Synchronization with _Representation_ is *enabled*, selecting a graphical element in the diagram will *_Reveal_* and *_Select_* the semantic element corresponding in the _Explorer_ tree. +
-  When Synchronization with _Representation_ is *disabled*, selecting a graphical element in the diagram will *_Select_* the semantic element corresponding in the _Explorer_ tree only if it has already been revealed.
+Since Papyrus web 2025.10.0, representations, mainly Explorer view and diagrams, have their own local selection tools. When the user interacts with a representation (e.g. item selection in the Explorer or a node on a diagram), both the local selection of that representation and the global workbench selection are updated.
+
+. A new toggle button is available in the _Details_ view, allowing the user to “pin” the view to the current selection and stop following global selection changes. When pin mode is disabled, the view resumes synchronization with the global selection.
+
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::unpinned_pinToggleButton.png[Selection follows global selection in Details view,300, align="center"]
+|image::pinned_unpinToggleButton.png[Automatic synchronization is disabled in Details view,300, align="center"]
+|===
+
+[start=2]
+. Another toggle button is available both in the diagram toolbar and in the Explorer view. It allows the user to highlight the local selection from one representation (Explorer or diagram) directly in the other.
+
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::selectToggleButtonFromDiagramToolbar.png[Highlight local selection from Diagram in Explorer,350, align="center"]
+|image::selectToggleButtonFromExplorer.png[Highlight local selection from Explorer in Diagram,400, align="center"]
+|===
 
 ==== _Explorer Tree (general)_
 
@@ -189,19 +205,19 @@ To apply a stereotype:
 * Use the contextual menu _Apply Stereotype_ on an element
 * Select the _Stereotype_ to apply
 
-The properties of this stereotype are now displayed in there own tab in the _Detail_ panel.
+The properties of this stereotype are now displayed in their own tab in the _Detail_ panel.
 
 === Validation panel
 
 The _Validation_ panel shares the left area of the workbench page with the _Explorer_.
-The validation view shows diagnostics of the whole project. Diagnostics are sorted by kind (for example ERROR, WARNING or INFO) and can be either hidden or displayed thanks to an accordeon widget.
+The validation view shows diagnostics of the whole project. Diagnostics are sorted by kind (e.g. ERROR, WARNING or INFO) and can be either hidden or displayed thanks to an accordion widget.
 
 [[diagram-panel]]
 === Diagrams
 
 ==== Generalities
 
-The diagram panel shows _Representation Diagrams_ created in the project. Several _Representations_ can be opened and they appear in separate tabs.
+The diagram panel shows _Representation Diagrams_ created in the project. Several _Representations_ can be opened, and they appear in separate tabs.
 Diagrams represent graphically a part of your semantic model. Each representation defines its own set of rules regarding its content. +
 Graphical elements can be selected by clicking on elements. The innermost clicked element is selected.
 A red border (with eight square handles) appears around the element when it is selected. +
@@ -219,7 +235,7 @@ As far as Edit is concerned, it is worth noting that names (or more generally te
 +
 WARNING: As far as _Edge_ elements are concerned, start and end labels cannot be edited on the diagram. The above ways will edit the edge label itself (the centered label of the edge), and double-clicking on them won't allow their edition.
 * Collapse / Expand tools +
-Those actions are only available for containers or compartments (e.g _Package_ or _Operations Compartment_ of a _Class_)
+Those actions are only available for containers or compartments (e.g. _Package_ or _Operations Compartment_ of a _Class_)
 
 The Diagram panel has global actions grouped in a horizontal toolbar underneath the diagram tabs.
 
@@ -232,17 +248,20 @@ This toolbar contains the following actions:
 * Zoom group
 * Share the diagram link
 * Export diagram as SVG
-* Arrange all elements
 * Display Grid
+* Helper lines
+* Arrange all elements
 * Reveal hidden elements of action
 * Reveal faded elements of action
 * Unpin all elements
+* Select _element_
+* Filter elements
 
 ===== Label
 Keywords on Nodes and Edges are displayed on the first separate line of the label. If the semantic element is stereotyped, the stereotype is displayed on a second separate line. Finally, the label will be displayed on the third line. The label can be the simple name of the element, or more complex in some specific cases detailed in the corresponding diagram section.
 Label of UML elements with the _isAbstract_ feature set to true is displayed in italic.
 Label of UML elements with the _isStatic_ feature set to true is displayed underlined.
-For element displayed in compartment node with list layout, the label composed of keyword, stereotype and name is diplayed on one line.
+For element displayed in compartment node with list layout, the label composed of keyword, stereotype and name is displayed on one line.
 
 image::labelsDisplayed.png[Labels Overview,400, align="center"]
 
@@ -257,7 +276,7 @@ Users can select elements in the Explorer view and drag and drop them into their
 Dragging and dropping an element represented as an Edge on the diagram will create the source/target elements of the Edge if they aren't already represented. Note that Edges can be dropped anywhere on the diagram, but they will only appear in their semantic container. 
 
 ===== Graphical Drag&Drop
-User can select a node on the diagram and drag and drop it in an other container node. Only authorized containers are revealed on the diagram, forbidden targets are faded. When user try to drag and drop a node, the target container node is highlighted.
+User can select a node on the diagram and drag and drop it in another container node. Only authorized containers are revealed on the diagram, forbidden targets are faded. When user try to drag and drop a node, the target container node is highlighted.
 
 image::graphicalDragAndDrop.png[Labels Overview,400, align="center"]
 
@@ -288,7 +307,7 @@ image::appearanceOnCuboid.png[Cuboid appearance,400, align="center"]
 ====
 ==== Symbols
 
-The goal of the sympbol support in Papyrus web is to give users access to some custom representations. They can use their own representation, i.e. their own svg and png files, in their diagrams, so the model can be easily read and understood. 
+The goal of the symbol support in Papyrus web is to give users access to some custom representations. They can use their own representation, i.e. their own svg and png files, in their diagrams, so the model can be easily read and understood.
 
 Symbols can be added on most diagram elements (except notes, constraints and elements represented by an icon).
 
@@ -298,7 +317,7 @@ For more information about the definition of a symbol on an element, please go t
 
 ===== Show / hide tools
 
-Once symbols are added on the diagram, it is possible to switch from the default representation with both symbols and default compartment, to symbol only representation or no symbol representation using show hide tools.
+Once symbols are added on the diagram, it is possible to switch from the default representation with both symbols and default compartment, to symbol only representation or no symbol representation using show hide tools available from the diagram background.
 
 image::symbolShowHideTools.png[Show hide symbol tools,300, align="center"]
 
@@ -327,14 +346,14 @@ The show symbol tool will allow to display again all the symbol defined in the d
 |image::symbolOnPackage.png[Symbols and others compartment displayed,300, align="center"]
 |===
 
-====== Show / hide all other compartment
+====== Show / hide all other compartments
 
 Hide all other compartment tool will hide compartments only when a symbol is defined on an element and when we are working with element using ListLayout.
 
 [NOTE]
 ====
 * List layout elements are elements that display their child using vertical compartment (like the class example used here).
-* Other compartment are free form, i.e that their child can be placed freely on the diagram (such as package used in this example).
+* Other compartment are free form, i.e. that their child can be placed freely on the diagram (such as package used in this example).
 ====
 
 [%autowidth, cols="a,a", frame=none, grid=none, role="center"]
@@ -365,7 +384,7 @@ image::diagActivity.png[Activity Diagram Overview,900, align="center"]
 
 ===== Specific Features on _Pin_
 - The _Pin_ creation tool is deactivated if several containment features are possible to own the _Pin_.
-- On an UML element, if the feature multiplicity is _[0..1]_ or _[1..1]_ or _[1..*]_, a _Pin_ is created at the same time as the element creation. 
+- On a UML element, if the feature multiplicity is _[0..1]_ or _[1..1]_ or _[1..*]_, a _Pin_ is created at the same time as the element creation.
 - The _Pin_ name is set with the name of the feature, if the feature is _[0..1]_ or _[1..1]_.
 
 ===== Specific Features on Container
@@ -464,7 +483,7 @@ See https://github.com/eclipse-sirius/sirius-web/blob/master/doc/iterations/2024
 
 ==== Profile Diagram
 
-The Profile diagram provide a way to extend an UML model. They are based on additional stereotypes (identified as classes with the «stereotype» stereotype) and labeled values that are applied to UML element thanks to the _extension_ relation.
+The Profile diagram provide a way to extend a UML model. They are based on additional stereotypes (identified as classes with the «stereotype» stereotype) and labeled values that are applied to UML element thanks to the _extension_ relation.
 
 image::diagProfile.png[Profile Diagram Overview,800, align="center"]
 
@@ -475,7 +494,7 @@ image::diagProfile.png[Profile Diagram Overview,800, align="center"]
 - The direct edit tool doesn't perform any modification on UML metaclasses, _Generalization_ and _Link_ (from _Constraint_ or _Comment_).
 
 ===== Specific Features on Semantic Drag&Drop
-- The semantic drag and drop of an _ElementImport_ with an UML metaclass as its _imported element_ on the Profile diagram produces a Node with the name of the UML metaclass as its label. Note that it is not possible to drag and drop _ElementImport_ with no _imported element_ or with an _imported element_ that is not an UML metaclass. 
+- The semantic drag and drop of an _ElementImport_ with a UML metaclass as its _imported element_ on the Profile diagram produces a Node with the name of the UML metaclass as its label. Note that it is not possible to drag and drop _ElementImport_ with no _imported element_ or with an _imported element_ that is not a UML metaclass.
 
 ===== Specific Features on Reconnection
 - Reconnecting an _Extension_ target to a different _Class_ updates the _Stereotype_ property _type_.
@@ -569,7 +588,7 @@ A language expression custom widget has been introduced to manage a couple of co
 * `OpaqueBehavior`
 * `OpaqueExpression`
 
-All those concepts manage a couple of lists of `strings` which are weakly connected via their index. The first list, called '[.code]``languages``' contains the name of languages, such as `"JAVA"` or `pass:c["C++"]`. The second one contains the body expression expressed in the language of the same rank in the list. Thus those lists could not be edited in Papyrus UI as separate ordinary lists of text fields. This is the reason why a new custom widget has been developed.
+All those concepts manage a couple of lists of `strings` which are weakly connected via their index. The first list, called '[.code]``languages``' contains the name of languages, such as `"JAVA"` or `pass:c["C++"]`. The second one contains the body expression expressed in the language of the same rank in the list. These lists could not be edited in Papyrus UI as separate ordinary lists of text fields. This is the reason why a new custom widget has been developed.
 
 image::languageexpression.png[language expression custom widget,400, align="center"]
 
@@ -595,8 +614,8 @@ For widgets used in the default pages of the _Details_ view, Papyrus Web uses pu
 It is also possible provide a strict list of candidates for enumeration or boolean, for example.
 In that case, the list of possible values are presented in a dropdown whereas the text field is used as a filter of those values.
 This list of possible values is requested to the back end only when it is necessary (when the dropdown menu is presented).
-In case of a _displayExpression_ is specified in the _PrimitiveList_ widget, this expression is evaluated for each candidate.
-Inside this expression, the AQL variable _candidate_ can be used to refer the current candidate value. 
+If a displayExpression is specified in the PrimitiveList widget, it is evaluated for each candidate.
+Inside this expression, the AQL variable _candidate_ can be used to refer the current candidate value.
 Once the user chooses the value, it may be added using the plus icon action.
 For example, for a _boolean_ feature, there are only two value allowed _true_ and _false_.
 
@@ -605,7 +624,7 @@ In the context of _UML_, for a more exhaustive list of conversion rule look at:
 * _org.eclipse.uml2.uml.internal.impl.UMLFactoryImpl.createFromString(EDataType, String)_
 * _org.eclipse.uml2.types.internal.impl.TypesFactoryImpl.createFromString(EDataType, String)_
 
-The primitive list has also the capability to reorder its items. This is an optional capability that is controlled by the presence of an expression inside the view model of the widget. If such an expression is provided an reorder icon appears on the left of the list title as displayed below:
+The primitive list has also the capability to reorder its items. This is an optional capability that is controlled by the presence of an expression inside the view model of the widget. If such an expression is provided, a reorder icon appears on the left of the list title as displayed below:
 
 image::primitive-list-with-reorder-action.png[primitive list with reorder action, 500, align="center"]
 
@@ -647,7 +666,7 @@ In case of mono-valued containment reference, if the value is already set, the u
  In this situation, the user has to remove first the current value before creating a new one.
 ====
 
- * The reorder icon to sort the reference values (optional: only for multi-valued references). +
+ * The reorder icon to sort the reference values (optional: only for multivalued references). +
  Reordering values can be done manually inside a dedicated dialog: 
 
 image::containment-reference-reorder-dialog.png[width=300, height=360, align="center"]
@@ -671,7 +690,7 @@ In a mono-valued reference, the user can select a compatible element to set in t
 
 image::reference-set-multi.png[multi-valued edit, 600, align="center"]
 
-Whereas in a multi-valued reference, the dialog allows the user to manage the list of reference values. 
+Whereas in a multivalued reference, the dialog allows the user to manage the list of reference values.
 The left panel contains compatible elements within the editing context.
 Elements  displayed with a bold label are elements that are currently present in the reference value list.
 This list can be seen in the right panel.
@@ -686,11 +705,11 @@ This is done inside the create dialog:
 image::reference-create.png[creation dialog, 500, align="center"]
 
 For a mono-value reference, once the new element is created it is set as the reference value and replaces its current value.
-In case of a multi-valued reference, the new element is added at the end of the value list.
+In case of a multivalued reference, the new element is added at the end of the value list.
 
 * The trash icon to clear the reference value.
 * The dropdown icon to choose a value among compatible elements (not already present in the reference value) found in the editing context. +
-For a mono-valued reference the selected value replace the existing one, whereas it is added to the value list in case of multi-valued.
+For a mono-valued reference the selected value replace the existing one, whereas it is added to the value list in case of multivalued.
 * The user can type some text in the values area to filter dropdown list content.
 * Each value element has a cross icon to remove it from the reference. +
 Since this is a non-containment reference, the removed element is only removed from its value and the referenced element still exists in the model.
@@ -703,7 +722,7 @@ In some widgets the following warning message will be displayed when trying to r
 
 The element is *not* removed from the list.
 This security prevents you to remove the element because this would cause the deletion of the current selected item.
-In most case, the currently edited reference is an _eOpposite_ of the reference that is currenlty containing the displayed element.
+In most case, the currently edited reference is an _eOpposite_ of the reference that is currently containing the displayed element.
 This is the case for the widget _Context_ on a _Constraint_.
 ====
 
@@ -742,16 +761,16 @@ Or
 when creating a new element using the + button.
 
 For most cases, it is caused by an incompatible type in an _eOpposite_ feature.
-It means that the selected type is valid for editing the current reference but it has an _eOpposite_ reference that cannot contain the current element.
-This is mostly caused by the use of reference type redifinition in the _UML_ metamodel (look for "redefine" _EAnnotations_).
+It means that the selected type is valid for editing the current reference, but it has an _eOpposite_ reference that cannot contain the current element.
+This is mostly caused by the use of reference type redefinition in the _UML_ metamodel (look for "redefine" _EAnnotations_).
 For example, this is the case when creating an _Activity_ in widget _Owned parameter element_ on _TemplateParameter_ concept.
 ====
 
 ===== Definition panel
 
 When a Profile element is selected (for instance inside the _Explorer_), the definition tab is shown in the Details panel.
-The _Definition_ page contains all profile's version detailed information. 
-These information are those typed inside the dialog each time the profile is published. 
+The _Definition_ page contains all profile's version detailed information.
+This information corresponds to what is entered in the dialog each time the profile is published.
 
 image::profile-definition-page.png[profile definition page, align="center"]
 
@@ -794,7 +813,7 @@ image::symbolImageAdded.png[Symbol added on right panel,300, align="center"]
 
 [NOTE]
 ====
-When the symbol is added, an annotation is created under the element to store the applied symbol (i.e the image id).
+When the symbol is added, an annotation is created under the element to store the applied symbol (i.e. the image id).
 ====
 
 image::symbolAnnotation.png[Symbol annotation,300, align="center"]
@@ -824,7 +843,7 @@ The feature _Annotated Element_ of the related _Comment_ element contains the se
 image::annotated-element.png[Annotated element of a comment, 500, align="center"]
 
 Both features, _Applied comments_ and _Annotated element_ work together and are in-sync.
-That means that adding (or removing) an element in _Annotated element_ of a _Comment_ automatically adds (or removes) this comment to the _Applied comments_ of the element and vice-versa.
+That means that adding (or removing) an element in _Annotated element_ of a _Comment_ automatically adds (or removes) this comment to the _Applied comments_ of the element and vice versa.
 Creating a new _Comment_ from the _Applied comments_ list of selected element has two actions:
 
 * first a new _Comment_ is created somewhere (as defined in the Creation dialog)

@@ -83,7 +83,7 @@ const toPackageNode = (
       borderStyle: convertLineStyle(style.borderStyle),
     },
     insideLabel: null,
-    outsideLabels: convertOutsideLabels(outsideLabels),
+    outsideLabels: convertOutsideLabels(outsideLabels, gqlDiagram.layoutData.labelLayoutData),
     faded: state === GQLViewModifier.Faded,
     pinned,
     isBorderNode: isBorderNode,
@@ -96,6 +96,7 @@ const toPackageNode = (
     isNew,
     resizedByUser,
     isListChild: isListLayoutStrategy(gqlParentNode?.style.childrenLayoutStrategy),
+    isDraggedNode: false,
     areChildNodesDraggable: isListLayoutStrategy(gqlNode.style.childrenLayoutStrategy)
       ? gqlNode.style.childrenLayoutStrategy.areChildNodesDraggable
       : true,

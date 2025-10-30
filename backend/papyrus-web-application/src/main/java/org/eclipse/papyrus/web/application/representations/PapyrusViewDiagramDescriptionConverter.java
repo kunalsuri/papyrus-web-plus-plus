@@ -13,7 +13,9 @@
 package org.eclipse.papyrus.web.application.representations;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -26,6 +28,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.web.application.representations.nodes.CustomImageNodeStyleProvider;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.CustomImageNodeStyleDescription;
+import org.eclipse.papyrus.web.sirius.contributions.ServiceOverride;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IIdentityService;
 import org.eclipse.sirius.components.core.api.ILabelService;
@@ -41,6 +44,7 @@ import org.eclipse.sirius.components.diagrams.LabelTextAlign;
 import org.eclipse.sirius.components.diagrams.ListLayoutStrategy;
 import org.eclipse.sirius.components.diagrams.OutsideLabelLocation;
 import org.eclipse.sirius.components.diagrams.UserResizableDirection;
+import org.eclipse.sirius.components.diagrams.components.BorderNodePosition;
 import org.eclipse.sirius.components.diagrams.components.LabelIdProvider;
 import org.eclipse.sirius.components.diagrams.description.DiagramDescription;
 import org.eclipse.sirius.components.diagrams.description.EdgeDescription;
@@ -93,7 +97,6 @@ import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConv
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverterContext;
 import org.eclipse.sirius.components.view.emf.diagram.api.IToolConverter;
 import org.eclipse.sirius.components.view.emf.diagram.tools.api.IToolExecutor;
-import org.springframework.stereotype.Service;
 
 /**
  * Converts a View-based diagram description into an equivalent {@link DiagramDescription}. <br>
@@ -106,7 +109,7 @@ import org.springframework.stereotype.Service;
  *
  * @author tiboue
  */
-@Service
+@ServiceOverride(ViewDiagramDescriptionConverter.class)
 public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescriptionConverter implements IRepresentationDescriptionConverter {
 
     public static final String CONVERTED_NODES_VARIABLE = "convertedNodes";
@@ -317,6 +320,8 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
         };
         /* Modified Code End */
 
+        Map<String, BorderNodePosition> initialBorderNodePositions = this.getInitialBorderNodePositions(viewNodeDescription);
+
         Predicate<VariableManager> isCollapsedByDefaultPredicate = variableManager -> this.computeBooleanProvider(viewNodeDescription.getIsCollapsedByDefaultExpression(), interpreter, variableManager);
 
         Predicate<VariableManager> isHiddenByDefaultPredicate = variableManager -> this.computeBooleanProvider(viewNodeDescription.getIsHiddenByDefaultExpression(), interpreter, variableManager);
@@ -364,7 +369,9 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .isFadedByDefaultPredicate(isFadedByDefaultPredicate)
                 .defaultWidthProvider(defaultWidthProvider)
                 .defaultHeightProvider(defaultHeightProvider)
-                .keepAspectRatio(viewNodeDescription.isKeepAspectRatio());
+                .keepAspectRatio(viewNodeDescription.isKeepAspectRatio())
+                .initialChildBorderNodePositions(initialBorderNodePositions);
+
         if (insideLabel != null) {
             builder.insideLabelDescription(insideLabel);
         }
@@ -374,6 +381,27 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
         NodeDescription result = builder.build();
         converterContext.getConvertedNodes().put(viewNodeDescription, result);
         return result;
+    }
+
+    private Map<String, BorderNodePosition> getInitialBorderNodePositions(org.eclipse.sirius.components.view.diagram.NodeDescription viewNodeDescription) {
+        Map<String, BorderNodePosition> initialBorderNodePositions = new LinkedHashMap<>();
+        LayoutStrategyDescription childrenLayoutStrategy = viewNodeDescription.getStyle().getChildrenLayoutStrategy();
+        if (childrenLayoutStrategy != null) {
+            this.addInitialPosition(initialBorderNodePositions, childrenLayoutStrategy.getOnEastAtCreationBorderNodes(), BorderNodePosition.EAST);
+            this.addInitialPosition(initialBorderNodePositions, childrenLayoutStrategy.getOnWestAtCreationBorderNodes(), BorderNodePosition.WEST);
+            this.addInitialPosition(initialBorderNodePositions, childrenLayoutStrategy.getOnSouthAtCreationBorderNodes(), BorderNodePosition.SOUTH);
+            this.addInitialPosition(initialBorderNodePositions, childrenLayoutStrategy.getOnNorthAtCreationBorderNodes(), BorderNodePosition.NORTH);
+        }
+
+        return initialBorderNodePositions;
+    }
+
+    private void addInitialPosition(Map<String, BorderNodePosition> borderNodePositions, List<org.eclipse.sirius.components.view.diagram.NodeDescription> borderNodeDescriptions, BorderNodePosition initialBorderNodePosition) {
+        borderNodeDescriptions.stream()
+                .map(this.diagramIdProvider::getId)
+                .forEach(id -> {
+                    borderNodePositions.put(id, initialBorderNodePosition);
+                });
     }
 
     private ILayoutStrategy getListLayoutStrategy(ListLayoutStrategyDescription listLayoutStrategyDescription, VariableManager variableManager, AQLInterpreter interpreter) {

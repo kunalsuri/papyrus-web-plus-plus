@@ -180,7 +180,7 @@ public class PackageDiagramTests extends AbstractDiagramTest {
                 .emulateCreationTool()//
                 .assertEdgeCreation();
 
-        assertEquals("", edge.getCenterLabel().getText());
+        assertEquals("", edge.getCenterLabel().text());
 
     }
 

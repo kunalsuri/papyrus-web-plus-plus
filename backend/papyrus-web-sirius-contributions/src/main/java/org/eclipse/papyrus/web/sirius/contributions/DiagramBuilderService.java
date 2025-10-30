@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2025 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
 import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramCreationService;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.api.IRepresentationDescriptionSearchService;
@@ -58,7 +57,7 @@ public class DiagramBuilderService implements IDiagramBuilderService {
     }
 
     @Override
-    public Optional<Diagram> updateDiagram(Diagram diagram, IEditingContext editingContext, Consumer<IDiagramContext> updater) {
+    public Optional<Diagram> updateDiagram(Diagram diagram, IEditingContext editingContext, Consumer<DiagramContext> updater) {
         DiagramContext diagramContext = new DiagramContext(diagram);
         if (updater != null) {
             updater.accept(diagramContext);
@@ -67,7 +66,7 @@ public class DiagramBuilderService implements IDiagramBuilderService {
     }
 
     @Override
-    public <T> Optional<Pair<Diagram, T>> updateDiagramAndGet(Diagram initialDiagramState, IEditingContext editingContext, Function<IDiagramContext, T> updater) {
+    public <T> Optional<Pair<Diagram, T>> updateDiagramAndGet(Diagram initialDiagramState, IEditingContext editingContext, Function<DiagramContext, T> updater) {
         DiagramContext diagramContext = new DiagramContext(initialDiagramState);
         final T result;
         if (updater != null) {

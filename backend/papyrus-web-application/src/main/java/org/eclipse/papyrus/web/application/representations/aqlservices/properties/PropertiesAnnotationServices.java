@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.web.application.representations.aqlservices.utils.ViewHelper;
-import org.eclipse.sirius.components.collaborative.diagrams.api.IDiagramContext;
+import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
 import org.eclipse.sirius.components.core.api.IEditingContext;
 import org.eclipse.sirius.components.core.services.ObjectService;
 import org.eclipse.sirius.components.diagrams.ListLayoutStrategy;
@@ -143,8 +143,8 @@ public class PropertiesAnnotationServices {
      *            the edition context
      * @return the list of nodes that are symbol
      */
-    public List<Node> getAllSymbol(IDiagramContext diagramContext, IEditingContext editionContext) {
-        List<Node> nodes = ViewHelper.getAllNodes(diagramContext.getDiagram());
+    public List<Node> getAllSymbol(DiagramContext diagramContext, IEditingContext editionContext) {
+        List<Node> nodes = ViewHelper.getAllNodes(diagramContext.diagram());
         List<Node> result = new ArrayList<>();
 
         for (Node node : nodes) {
@@ -169,8 +169,8 @@ public class PropertiesAnnotationServices {
      *            the edition context
      * @return the list of nodes that are not symbol
      */
-    public List<Node> getAllNonSymbol(IDiagramContext diagramContext, IEditingContext editionContext) {
-        List<Node> nodes = ViewHelper.getAllNodes(diagramContext.getDiagram());
+    public List<Node> getAllNonSymbol(DiagramContext diagramContext, IEditingContext editionContext) {
+        List<Node> nodes = ViewHelper.getAllNodes(diagramContext.diagram());
         List<Node> result = new ArrayList<>();
 
         for (Node node : nodes) {

@@ -32,9 +32,9 @@ export class Project {
     });
   }
 
-  public getProjectNavigationBar(projectName: string): ProjectNavigationBar {
+  public getProjectNavigationBar(): ProjectNavigationBar {
     this.isLoaded();
-    cy.getByTestId(`navbar-${projectName}`).should('be.visible');
+    cy.getByTestId(`navbar-title`).should('be.visible');
     cy.getByTestId('navigation-bar').findByTestId('more').click();
     return new ProjectNavigationBar();
   }
@@ -60,6 +60,10 @@ class ProjectNavigationBar {
   public getRenameDialog(): RenameProjectDialog {
     this.getRenameButton().should('exist').click();
     return new RenameProjectDialog();
+  }
+
+  public getShareButton(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.getByTestId('share');
   }
 
   public getDeleteButton(): Cypress.Chainable<JQuery<HTMLElement>> {
