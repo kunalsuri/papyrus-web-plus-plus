@@ -20,7 +20,7 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_MERGE_REQUEST_IID
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    #- if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_TAG
 
 include:
   - project: 'eclipsefdn/it/releng/gitlab-runner-service/gitlab-ci-templates'
@@ -40,7 +40,7 @@ stages:
 eca:
   extends: .eca
 
-docker-build:
+deploy docker:
   after_script:
     - echo 'print image name'
     - echo "$CI_REGISTRY_IMAGE${CONTAINER_NAME:+/$CONTAINER_NAME}:$IMAGE_TAG"
@@ -60,9 +60,9 @@ docker-build:
       file: false
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-    #- if: '$CI_COMMIT_TAG != null'
+    - if: '$CI_COMMIT_TAG != null'
 
-build_and_deploy:
+deploy maven:
   stage: build
   tags:
     - ctx:medium
@@ -110,7 +110,7 @@ build_and_deploy:
         # commit tag is unset (null)
         # Nightly build - just compile/verify
         echo "tag is unset - build without deploying"
-        mvn $MAVEN_CLI_OPTS verify --settings ../settings.xml
+         mvn $MAVEN_CLI_OPTS deploy -DdeployAtEnd=true -DaltDeploymentRepository=repo.eclipse.org::https://repo.eclipse.org/content/repositories/papyrus-snapshots/ --settings ../settings.xml
       else
         # Release build - deploy with repository configuration
         echo "tag is set - build with deploy"
@@ -127,15 +127,16 @@ build_and_deploy:
         - backend/papyrus-web/target/surefire-reports/
     expire_in: 1 week
   rules:
-    - when: always
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: '$CI_COMMIT_TAG != null'
 
-test_all:
-  stage: test
+buildAndTests:
+  stage: build
   tags:
     - ctx:medium  
-  needs:
-    - job: "build_and_deploy"
-      artifacts: true
+  #needs:
+  #  - job: "build_and_deploy"
+  #    artifacts: true
   services:
     - name: quay.io/sclorg/postgresql-15-c9s
       alias: postgres  
