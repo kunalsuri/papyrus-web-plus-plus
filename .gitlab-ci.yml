@@ -29,6 +29,15 @@ include:
       - '/jobs/buildkit.gitlab-ci.yml'
       - '/jobs/repo.eclipse.org.gitlab-ci.yml'
 
+variables:
+  MVN_TESTS_EXECUTIONS:
+    value: ""
+    description: "Indicates if we will execute the JUnit tests"
+    options:
+      - "-DskipTests" # no tests
+      - "-DallTests"  # all tests
+      - "" # smoke tests
+ 
 stages:
   - compliance
   - build
@@ -39,13 +48,16 @@ stages:
 # Note: this job has compliance stage (cf. parent job '.eca').
 eca:
   extends: .eca
+  rules:
+    - when: always
 
 # on all eclipse/papyrus branches, on schedule and commit tag ; no tests
-just build:
+build:
    stage: build
    tags:
      - ctx:medium
-   needs: []
+   needs:
+    - job: "eca"
    image: maven:3.9.9-eclipse-temurin-21
    extends: .ef-repo-eclipse-org
    variables:
@@ -97,11 +109,15 @@ just build:
 
  # Only on schedule and commit tag
 deploy docker:
+  stage: build
+  tags:
+    - ctx:medium
+  needs:
+    - job: "eca"
   after_script:
     - echo 'print image name'
     - echo "$CI_REGISTRY_IMAGE${CONTAINER_NAME:+/$CONTAINER_NAME}:$IMAGE_TAG"
     - echo -e "Building and shipping image to $CI_REGISTRY - $BUILD_IMAGE_NAME"
-  stage: build
   extends:
     - .ef-buildkit
   variables:
@@ -123,7 +139,8 @@ deploy maven:
   stage: build
   tags:
     - ctx:medium
-  needs: []
+  needs:
+    - job: "eca"
   image: maven:3.9.9-eclipse-temurin-21
   extends: .ef-repo-eclipse-org
   variables:
@@ -179,20 +196,38 @@ deploy maven:
       - backend/papyrus-web/target/papyrus-web-*.jar
       - backend/papyrus-web/target/classes/
       - backend/papyrus-web/target/test-classes/
+      - backend/papyrus-web/target/surefire-reports/
     reports:
       junit:
-        - backend/papyrus-web/target/surefire-reports/
+        - backend/**/target/surefire-reports/*.xml
     expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: '$CI_COMMIT_TAG != null'
 
-tests:
+smoke tests:
+  extends: .runTests
+  variables:
+    MVN_TESTS_EXECUTIONS: "" # execute just the smoke tests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" # on MR
+      when: never
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # on developper branch
+
+all tests:
+  extends: .runTests
+  variables:
+    MVN_TESTS_EXECUTIONS: "-DallTests" # execute all the tests
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event" # on MR
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+
+.runTests:
   stage: test
   tags:
     - ctx:medium  
   needs:
-    - job: "just build"
+    - job: "build"
       artifacts: true
   services:
     - name: quay.io/sclorg/postgresql-15-c9s
@@ -203,9 +238,8 @@ tests:
     MAVEN_VERSION: "3.9.9"
     NODE_VERSION: "22.16.0"
     NODE_DIR: "$CI_PROJECT_DIR/.node"  
-    ALL_TESTS: "-DallTests"
     MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-    MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=false $ALL_TESTS -Dpapyrusweb.testcontainers.use=false"
+    MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=false $MVN_TESTS_EXECUTIONS -Dpapyrusweb.testcontainers.use=false"
     SIRIUS_COMPONENTS_CORS_ALLOWEDORIGINPATTERNS: "*"   
     SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/papyrus-web-db"
     PAPYRUSWEB_INTEGRATION_TESTS_DATASOURCE_URL: "jdbc:postgresql://postgres/papyrus-web-db"
@@ -257,7 +291,7 @@ tests:
       - backend/papyrus-web/target/surefire-reports/
     reports:
       junit:
-        - backend/papyrus-web/target/surefire-reports/*.xml
+        - backend/**/target/surefire-reports/*.xml
       #- integration-tests/cypress/screenshots/
       #- integration-tests/cypress/videos/
       #- integration-tests/cypress/results/
