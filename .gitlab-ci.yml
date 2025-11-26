@@ -240,7 +240,6 @@ all tests:
     NODE_DIR: "$CI_PROJECT_DIR/.node"  
     MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
     MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=false $MVN_TESTS_EXECUTIONS -Dpapyrusweb.testcontainers.use=false"
-    SIRIUS_COMPONENTS_CORS_ALLOWEDORIGINPATTERNS: "*"   
     SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/papyrus-web-db"
     PAPYRUSWEB_INTEGRATION_TESTS_DATASOURCE_URL: "jdbc:postgresql://postgres/papyrus-web-db"
     PAPYRUSWEB_INTEGRATION_TESTS_DATASOURCE_USERNAME: "dbuser"
@@ -248,6 +247,13 @@ all tests:
     POSTGRESQL_DATABASE: papyrus-web-db
     POSTGRESQL_USER: dbuser
     POSTGRESQL_PASSWORD: dbpwd    
+  secrets:
+    GITHUB_COM_TOKEN:
+      vault: $EF_PROJECT_ID/github.com/registry-token@cbi
+      file: false
+    PASSWORD:
+      vault: $EF_PROJECT_ID/github.com/registry-token@cbi
+      file: false
   before_script:
     # Install Node.js
     #- mkdir -p "$NODE_DIR"
@@ -301,10 +307,62 @@ all tests:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "schedule"
 
-  secrets:
-    GITHUB_COM_TOKEN:
-      vault: $EF_PROJECT_ID/github.com/registry-token@cbi
-      file: false    
-    PASSWORD:
-      vault: $EF_PROJECT_ID/github.com/registry-token@cbi
-      file: false
+cypress tests:
+  stage: test
+  tags:
+    - ctx:medium
+  needs:
+    - job: "build"
+      artifacts: true
+  services:
+    - name: quay.io/sclorg/postgresql-15-c9s
+      alias: postgres
+  image: cypress/included:12.17.4
+  extends: .ef-repo-eclipse-org
+  variables:
+    NODE_VERSION: "22.16.0"
+    NODE_DIR: "$CI_PROJECT_DIR/.node"
+    SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/papyrus-web-db"
+    POSTGRESQL_DATABASE: papyrus-web-db # used by the postgre image
+    POSTGRESQL_USER: dbuser # used by the postgre image
+    POSTGRESQL_PASSWORD: dbpwd # used by the postgre image
+    SPRING_DATASOURCE_USERNAME : dbuser
+    SPRING_DATASOURCE_PASSWORD: dbpwd
+  before_script:
+    # Install Node.js
+    - mkdir -p "$NODE_DIR"
+    - wget https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz
+    - tar -xzf node-v$NODE_VERSION-linux-x64.tar.gz --strip-components=1 -C "$NODE_DIR"
+    - export PATH="$NODE_DIR/bin:$PATH"
+    # Install Java 17
+    - wget https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1+12/OpenJDK17U-jdk_x64_linux_hotspot_17.0.1_12.tar.gz
+    - tar -xzvf OpenJDK17U-jdk_x64_linux_hotspot_17.0.1_12.tar.gz
+    - export JAVA_HOME=./jdk-17.0.1+12
+    - export PATH=$JAVA_HOME/bin:$PATH
+  script:
+    # Start backend for Cypress tests in background
+    - export WEBAPP_VERSION=$(grep version frontend/package.json | awk -F \" '{print $4}')
+    - java -Dsirius.components.cors.allowedCredentials=true -Dsirius.components.cors.allowedOriginPatterns=* -jar backend/papyrus-web/target/papyrus-web-$WEBAPP_VERSION.jar --spring.datasource.url=$SPRING_DATASOURCE_URL --spring.datasource.username=$SPRING_DATASOURCE_USERNAME --spring.datasource.password=$SPRING_DATASOURCE_PASSWORD --spring.liquibase.change-log=classpath:db/changelog/papyrus-web.db.changelog.xml &
+    - BACKEND_PID=$!
+
+    # Wait for the backend to start
+    - sleep 200 # required
+
+    # Cypress tests
+    - cd integration-tests
+    - npm install
+    - npx cypress run --config baseUrl=http://127.0.0.1:8080 --env baseAPIUrl=http://127.0.0.1:8080
+
+    # Stop the backend server
+    - kill $BACKEND_PID
+  artifacts:
+    paths:
+      - integration-tests/target/screenshots/**/*.png
+    reports:
+      junit:
+        - integration-tests/target/*.xml
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # on developper branch
