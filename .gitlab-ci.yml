@@ -202,7 +202,7 @@ deploy maven:
         fi
         echo "tag is unset - build and deploy a snapshot"
         echo "Setting Maven version to: $SNAPSHOT_VERSION"
-        mvn versions:set -DnewVersion="$SNAPSHOT_VERSION"
+        mvn versions:set -DnewVersion="$SNAPSHOT_VERSION" -DprocessAllModules=true
         mvn versions:commit
       fi
     - mvn $MAVEN_CLI_OPTS clean deploy --settings ../settings.xml
