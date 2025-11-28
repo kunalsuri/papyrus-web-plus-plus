@@ -188,15 +188,24 @@ deploy maven:
     - cd backend
     - |
       if [ -z "${CI_COMMIT_TAG+x}" ]; then
-        # commit tag is unset (null)
-        # Snapshot build - build a snapshot
+        # commit tag is unset (null) - so we are building a snapshot
+        # Snapshot build
+        # extract version declared in pom.xml
+        
+        WEBAPP_DECLARED_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        if [[ "$WEBAPP_DECLARED_VERSION" == *-SNAPSHOT ]]; then
+           # already a snapshot -> append commit SHA
+           SNAPSHOT_VERSION="$WEBAPP_DECLARED_VERSION-${CI_COMMIT_SHORT_SHA}"
+        else
+           # it is a release version, convert it to a snapshot version + append commit SHA
+           SNAPSHOT_VERSION="${WEBAPP_DECLARED_VERSION}-SNAPSHOT-${CI_COMMIT_SHORT_SHA}"
+        fi
         echo "tag is unset - build and deploy a snapshot"
-        mvn $MAVEN_CLI_OPTS clean deploy -DaltDeploymentRepository=repo.eclipse.org::https://repo.eclipse.org/content/repositories/papyrus-snapshots/ --settings ../settings.xml
-      else
-        # Release build - deploy with repository configuration
-        echo "tag is set - build and deploy a release"
-        mvn $MAVEN_CLI_OPTS clean deploy -DaltDeploymentRepository=repo.eclipse.org::https://repo.eclipse.org/content/repositories/papyrus-releases/ --settings ../settings.xml
+        echo "Setting Maven version to: $SNAPSHOT_VERSION"
+        mvn versions:set -DnewVersion="$SNAPSHOT_VERSION"
+        mvn versions:commit
       fi
+    - mvn $MAVEN_CLI_OPTS clean deploy --settings ../settings.xml
   artifacts:
     paths:
       - backend/papyrus-web/target/papyrus-web-*.jar
