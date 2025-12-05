@@ -72,7 +72,7 @@ describe('Comment table tests', () => {
     cy.getByTestId('table-representation')
       .contains('Rows per page:')
       .parent()
-      .find('[aria-label="Rows per page"]')
+      .find('[aria-label="Rows per page:"]')
       .click();
     cy.get('.MuiPopover-root[id=menu-]').should('be.visible').find(`li[data-value="${num}"]`).click();
   };

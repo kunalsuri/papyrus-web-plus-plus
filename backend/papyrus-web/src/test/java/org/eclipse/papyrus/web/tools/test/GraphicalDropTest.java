@@ -56,14 +56,15 @@ public class GraphicalDropTest extends AbstractPapyrusWebTest {
     /**
      * Drops the provided {@code nodeToDrop} on the diagram.
      *
-     * @param nodeToDrop
-     *            the graphical {@link Node} to drop
+     * @param nodesToDrop
+     *            the list of graphical {@link Node}s to drop
      * @param checker
      *            the {@link Checker} to use to validate the operation
      */
-    public void graphicalDropOnDiagram(Node nodeToDrop, Checker checker) {
+    public void graphicalDropOnDiagram(List<Node> nodesToDrop, Checker checker) {
         List<String> initialDiagramNodeIds = this.getDiagram().getNodes().stream().map(Node::getId).toList();
-        this.applyDropNodeTool(nodeToDrop.getId(), this.representationId);
+        List<String> nodesToDropIds = nodesToDrop.stream().map(Node::getId).toList();
+        this.applyDropNodesTool(nodesToDropIds, this.representationId);
         Node droppedNode = this.getDiagram().getNodes().stream()
                 .filter(node -> !initialDiagramNodeIds.contains(node.getId()))
                 .findFirst()
@@ -74,17 +75,18 @@ public class GraphicalDropTest extends AbstractPapyrusWebTest {
     /**
      * Drops the provided {@code nodeToDrop} on the provided {@code targetNodeLabel}.
      *
-     * @param nodeToDrop
-     *            the graphical {@link Node} to drop
+     * @param nodesToDrop
+     *            the list of graphical {@link Node}s to drop
      * @param targetNodeLabel
      *            the label of the graphical element to drop onto
      * @param checker
      *            the {@link Checker} to use to validate the operation
      */
-    public void graphicalDropOnContainer(Node nodeToDrop, String targetNodeLabel, Checker checker) {
+    public void graphicalDropOnContainer(List<Node> nodesToDrop, String targetNodeLabel, Checker checker) {
         Node targetNode = (Node) this.findGraphicalElementContentByLabel(targetNodeLabel);
         List<String> initialTargetNodeChildrenIds = targetNode.getChildNodes().stream().map(Node::getId).toList();
-        this.applyDropNodeTool(nodeToDrop.getId(), targetNode.getId());
+        List<String> nodesToDropIds = nodesToDrop.stream().map(Node::getId).toList();
+        this.applyDropNodesTool(nodesToDropIds, targetNode.getId());
         Node updatedTargetNode = (Node) this.findGraphicalElementContentByLabel(targetNodeLabel);
         Node droppedNode = updatedTargetNode.getChildNodes().stream()
                 .filter(node -> !initialTargetNodeChildrenIds.contains(node.getId()))
@@ -97,8 +99,8 @@ public class GraphicalDropTest extends AbstractPapyrusWebTest {
      * Drops the provided {@code nodeToDrop} on the provided {@code compartmentName} compartment of the given
      * {@code targetNodeLabel}.
      *
-     * @param nodeToDrop
-     *            the graphical {@link Node} to drop
+     * @param nodesToDrop
+     *            the list of graphical {@link Node}s to drop
      * @param targetNodeLabel
      *            the label of the graphical element to drop onto
      * @param compartmentName
@@ -106,11 +108,12 @@ public class GraphicalDropTest extends AbstractPapyrusWebTest {
      * @param checker
      *            the {@link Checker} to use to validate the operation
      */
-    public void graphicalDropOnContainerCompartment(Node nodeToDrop, String targetNodeLabel, String compartmentName, Checker checker) {
+    public void graphicalDropOnContainerCompartment(List<Node> nodesToDrop, String targetNodeLabel, String compartmentName, Checker checker) {
         Node targetNode = (Node) this.findGraphicalElementExcludingContentByLabel(targetNodeLabel);
         Node targetCompartmentNode = this.getSubNode(targetNode, compartmentName);
         List<String> initialTargetCompartmentNodeChildrenIds = targetCompartmentNode.getChildNodes().stream().map(Node::getId).toList();
-        this.applyDropNodeTool(nodeToDrop.getId(), targetCompartmentNode.getId());
+        List<String> nodesToDropIds = nodesToDrop.stream().map(Node::getId).toList();
+        this.applyDropNodesTool(nodesToDropIds, targetCompartmentNode.getId());
         Node updatedTargetNode = (Node) this.findGraphicalElementExcludingContentByLabel(targetNodeLabel);
         Node updatedTargetCompartmentNode = this.getSubNode(updatedTargetNode, compartmentName);
         Node droppedNode = updatedTargetCompartmentNode.getChildNodes().stream()

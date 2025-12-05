@@ -16,10 +16,11 @@ package org.eclipse.papyrus.web.utils.mutations;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.eclipse.sirius.components.collaborative.diagrams.dto.DropNodeInput;
+import org.eclipse.sirius.components.collaborative.diagrams.dto.DropNodesInput;
 import org.springframework.stereotype.Service;
 
 import graphql.ExecutionInput;
@@ -39,8 +40,8 @@ import graphql.GraphQL;
 public class PapyrusDropNodeMutationRunner {
 
     private static String query = """
-            mutation dropNode($input: DropNodeInput!) {
-               dropNode(input: $input) {
+            mutation dropNodes($input: DropNodesInput!) {
+               dropNodes(input: $input) {
                  __typename
                  ... on ErrorPayload {
                    messages {
@@ -89,13 +90,13 @@ public class PapyrusDropNodeMutationRunner {
      *            the project containing the element to drop
      * @param representationId
      *            the representation where the element is dropped
-     * @param droppedElementId
-     *            the graphical identifier of the element to drop
+     * @param droppedElementIds
+     *            the list of graphical identifiers of the elements to drop
      * @param targetElementId
      *            the graphical identifier of the target container element
      */
-    public void dropNode(String editingContextId, String representationId, String droppedElementId, String targetElementId) {
-        DropNodeInput dropNodeInput = new DropNodeInput(UUID.randomUUID(), editingContextId, representationId, droppedElementId, targetElementId, 0, 0);
+    public void dropNodes(String editingContextId, String representationId, List<String> droppedElementIds, String targetElementId) {
+        DropNodesInput dropNodeInput = new DropNodesInput(UUID.randomUUID(), editingContextId, representationId, droppedElementIds, targetElementId, 0, 0);
         ExecutionInput executionInput = ExecutionInput.newExecutionInput(query) //
                 .variables(Map.of("input", this.objectMapper.convertValue(dropNodeInput, new TypeReference<Map<String, Object>>() {
                 })))

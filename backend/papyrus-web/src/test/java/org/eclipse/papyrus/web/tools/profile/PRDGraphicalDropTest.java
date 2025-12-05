@@ -14,6 +14,8 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.profile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EClass;
@@ -130,7 +132,8 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
     @MethodSource("packageAndProfileAndDiagramDropParameters")
     public void testDropOnDiagram(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
         Node containerNode = (Node) this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER);
-        Node nodeToDrop = this.createNodeWithLabel(containerNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(containerNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, null,
                 PRDMappingTypes.getMappingType(expectedType), this.getCapturedNodes());
@@ -142,13 +145,14 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), UML.getPackage_PackagedElement());
 
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnDiagram(nodeToDrop, checker);
+        this.graphicalDropOnDiagram(nodesToDrop, checker);
     }
 
     @ParameterizedTest
     @MethodSource("packageAndProfileAndDiagramDropParameters")
     public void testDropOnPackage(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER),
                 PRDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -160,13 +164,14 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, PACKAGE_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, PACKAGE_CONTAINER, checker);
     }
 
     @ParameterizedTest
     @MethodSource("packageAndProfileAndDiagramDropParameters")
     public void testDropOnProfile(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PROFILE_CONTAINER),
                 PRDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -178,7 +183,7 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, PROFILE_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, PROFILE_CONTAINER, checker);
     }
 
     @ParameterizedTest
@@ -195,7 +200,8 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
 
         Node parentClassNode = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getClass_()), CLASS_SOURCE);
         Node parentClassCompartmentNode = this.getSubNode(parentClassNode, compartmentMapping);
-        Node nodeToDrop = this.createNodeWithLabel(parentClassCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(parentClassCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.getSubNode(CLASS_CONTAINER, compartmentMapping),
                 PRDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -207,7 +213,7 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
                 () -> this.findSemanticElementByName(CLASS_SOURCE), containmentReference);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainerCompartment(nodeToDrop, CLASS_CONTAINER, compartmentMapping, checker);
+        this.graphicalDropOnContainerCompartment(nodesToDrop, CLASS_CONTAINER, compartmentMapping, checker);
     }
 
     @ParameterizedTest
@@ -224,7 +230,8 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
 
         Node parentStereotypeNode = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getStereotype()), "StereotypeSource");
         Node parentStereotypeCompartmentNode = this.getSubNode(parentStereotypeNode, compartmentMapping);
-        Node nodeToDrop = this.createNodeWithLabel(parentStereotypeCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(parentStereotypeCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.getSubNode(STEREOTYPE_CONTAINER, compartmentMapping),
                 PRDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -236,7 +243,7 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
                 () -> this.findSemanticElementByName("StereotypeSource"), containmentReference);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainerCompartment(nodeToDrop, STEREOTYPE_CONTAINER, compartmentMapping, checker);
+        this.graphicalDropOnContainerCompartment(nodesToDrop, STEREOTYPE_CONTAINER, compartmentMapping, checker);
     }
 
     @ParameterizedTest
@@ -253,7 +260,8 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
 
         Node parentDataTypeNode = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getDataType()), "DataTypeSource");
         Node parentDataTypeCompartmentNode = this.getSubNode(parentDataTypeNode, compartmentMapping);
-        Node nodeToDrop = this.createNodeWithLabel(parentDataTypeCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(parentDataTypeCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.getSubNode(DATA_TYPE_CONTAINER, compartmentMapping),
                 PRDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -265,7 +273,7 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
                 () -> this.findSemanticElementByName("DataTypeSource"), containmentReference);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainerCompartment(nodeToDrop, DATA_TYPE_CONTAINER, compartmentMapping, checker);
+        this.graphicalDropOnContainerCompartment(nodesToDrop, DATA_TYPE_CONTAINER, compartmentMapping, checker);
     }
 
     @ParameterizedTest
@@ -275,7 +283,8 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
 
         Node parentEnumerationNode = this.createNodeWithLabel(this.representationId, new CreationTool(ToolSections.NODES, UML.getEnumeration()), "EnumerationSource");
         Node parentEnumerationCompartmentNode = this.getSubNode(parentEnumerationNode, compartmentMapping);
-        Node nodeToDrop = this.createNodeWithLabel(parentEnumerationCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(parentEnumerationCompartmentNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.getSubNode(ENUMERATION_CONTAINER, compartmentMapping),
                 PRDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -287,6 +296,6 @@ public class PRDGraphicalDropTest extends GraphicalDropTest {
                 () -> this.findSemanticElementByName("EnumerationSource"), containmentReference);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainerCompartment(nodeToDrop, ENUMERATION_CONTAINER, compartmentMapping, checker);
+        this.graphicalDropOnContainerCompartment(nodesToDrop, ENUMERATION_CONTAINER, compartmentMapping, checker);
     }
 }

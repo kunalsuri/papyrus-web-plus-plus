@@ -489,13 +489,13 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      * This method invokes the {@code dropNode} GraphQL mutation to perform the drop.
      * </p>
      *
-     * @param droppedElementId
-     *            the graphical identifier of the element to drop
+     * @param droppedElementIds
+     *            the list of graphical identifiers of the elements to drop
      * @param targetElementId
      *            the graphical identifier of the target container element
      */
-    protected void applyDropNodeTool(String droppedElementId, String targetElementId) {
-        this.dropNodeRunner.dropNode(this.editingContextId, this.representationId, droppedElementId, targetElementId);
+    protected void applyDropNodesTool(List<String> droppedElementIds, String targetElementId) {
+        this.dropNodeRunner.dropNodes(this.editingContextId, this.representationId, droppedElementIds, targetElementId);
     }
 
     /**

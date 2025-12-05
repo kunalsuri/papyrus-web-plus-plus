@@ -14,6 +14,8 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.tools.deployment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EClass;
@@ -123,7 +125,8 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
     @MethodSource("modelAndPackageAndDiagramDropParameters")
     public void testDropOnDiagram(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
         Node containerNode = (Node) this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER);
-        Node nodeToDrop = this.createNodeWithLabel(containerNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(containerNode.getId(), nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, null,
                 DDMappingTypes.getMappingType(expectedType), this.getCapturedNodes());
@@ -135,13 +138,14 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
                 () -> this.findSemanticElementByName(PACKAGE_CONTAINER), UML.getPackage_PackagedElement());
 
         CombinedChecker checker = new CombinedChecker(graphicalChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnDiagram(nodeToDrop, checker);
+        this.graphicalDropOnDiagram(nodesToDrop, checker);
     }
 
     @ParameterizedTest
     @MethodSource("modelAndPackageAndDiagramDropParameters")
     public void testDropOnPackage(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(PACKAGE_CONTAINER),
                 DDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -153,13 +157,14 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, PACKAGE_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, PACKAGE_CONTAINER, checker);
     }
 
     @ParameterizedTest
     @MethodSource("modelAndPackageAndDiagramDropParameters")
     public void testDropOnModel(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(MODEL_CONTAINER),
                 DDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -171,13 +176,14 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, MODEL_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, MODEL_CONTAINER, checker);
     }
 
     @ParameterizedTest
     @MethodSource("artifactDropParameters")
     public void testDropOnArtifact(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(ARTIFACT_CONTAINER),
                 DDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -189,13 +195,14 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, ARTIFACT_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, ARTIFACT_CONTAINER, checker);
     }
 
     @ParameterizedTest
     @MethodSource("deviceDropParameters")
     public void testDropOnDevice(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(DEVICE_CONTAINER),
                 DDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -207,13 +214,14 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, DEVICE_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, DEVICE_CONTAINER, checker);
     }
 
     @ParameterizedTest
     @MethodSource("executionEnvironmentDropParameters")
     public void testDropOnExecutionEnvironment(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram,
                 () -> this.findGraphicalElementContentByLabel(EXECUTION_ENVIRONMENT_CONTAINER),
@@ -226,13 +234,14 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, EXECUTION_ENVIRONMENT_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, EXECUTION_ENVIRONMENT_CONTAINER, checker);
     }
 
     @ParameterizedTest
     @MethodSource("nodeDropParameters")
     public void testDropOnNode(CreationTool nodeCreationTool, EClass expectedType, EReference containmentReference) {
-        Node nodeToDrop = this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX);
+        List<Node> nodesToDrop = new ArrayList<>();
+        nodesToDrop.add(this.createNodeWithLabel(this.representationId, nodeCreationTool, expectedType.getName() + DROP_SUFFIX));
 
         NodeGraphicalDnDGraphicalChecker graphicalCreationChecker = new NodeGraphicalDnDGraphicalChecker(this::getDiagram, () -> this.findGraphicalElementContentByLabel(NODE_CONTAINER),
                 DDMappingTypes.getMappingTypeAsSubNode(expectedType), this.getCapturedNodes());
@@ -244,6 +253,6 @@ public class DDGraphicalDropTest extends GraphicalDropTest {
                 this::getRootSemanticElement, PACKAGED_ELEMENT);
 
         CombinedChecker checker = new CombinedChecker(graphicalCreationChecker, semanticCreationChecker, semanticDeletionChecker);
-        this.graphicalDropOnContainer(nodeToDrop, NODE_CONTAINER, checker);
+        this.graphicalDropOnContainer(nodesToDrop, NODE_CONTAINER, checker);
     }
 }
