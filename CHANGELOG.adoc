@@ -1,5 +1,11 @@
 = Changelog
 
+== v2025.12.0
+
+=== Dependency update
+
+Update the Sirius-Web version to the 2025.12.0
+
 == v2025.10.0
 
 === Dependency update

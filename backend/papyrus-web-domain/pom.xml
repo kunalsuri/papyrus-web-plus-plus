@@ -18,7 +18,7 @@
 	<parent>
 		<groupId>org.eclipse.papyrus.papyrus-web</groupId>
 		<artifactId>papyrus-web-parent</artifactId>
-		<version>2025.10.0</version>
+		<version>2025.12.0</version>
 		<relativePath>../papyrus-web-parent</relativePath>
 	</parent>
 	<artifactId>papyrus-web-domain</artifactId>
