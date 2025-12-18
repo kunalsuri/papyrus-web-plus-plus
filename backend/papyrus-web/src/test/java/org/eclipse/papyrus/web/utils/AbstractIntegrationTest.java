@@ -17,7 +17,6 @@ package org.eclipse.papyrus.web.utils;
 import org.eclipse.sirius.web.infrastructure.configuration.persistence.JDBCConfiguration;
 import org.eclipse.sirius.web.starter.SiriusWebStarterConfiguration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -31,7 +30,6 @@ import org.testcontainers.utility.DockerImageName;
  * @author Marcos Didonet Del Fabro
  */
 @SpringJUnitConfig(classes = { IntegrationTestConfiguration.class, SiriusWebStarterConfiguration.class, JDBCConfiguration.class })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AbstractIntegrationTest {
 
     // Emulate a POSTGRESQL database using testcontainers
