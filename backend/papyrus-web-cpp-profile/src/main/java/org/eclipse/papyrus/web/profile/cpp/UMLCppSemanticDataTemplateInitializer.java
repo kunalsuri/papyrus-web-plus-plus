@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,14 +13,6 @@
  *  Aurelien Didier (Artal Technologies) - Issue 190
  *****************************************************************************/
 package org.eclipse.papyrus.web.profile.cpp;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -36,7 +28,6 @@ import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramBuilderService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
-import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationMetadataPersistenceService;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationPersistenceService;
 import org.eclipse.sirius.components.collaborative.diagrams.DiagramContext;
@@ -50,7 +41,7 @@ import org.eclipse.sirius.components.events.ICause;
 import org.eclipse.sirius.components.representations.VariableManager;
 import org.eclipse.sirius.components.view.diagram.NodeDescription;
 import org.eclipse.sirius.web.application.editingcontext.EditingContext;
-import org.eclipse.sirius.web.application.project.services.api.IProjectTemplateInitializer;
+import org.eclipse.sirius.web.application.project.services.api.ISemanticDataInitializer;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Comment;
 import org.eclipse.uml2.uml.Model;
@@ -60,15 +51,23 @@ import org.eclipse.uml2.uml.StateMachine;
 import org.eclipse.uml2.uml.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Initializes the contents of projects created from a UML project template.
  *
  * @author Arthur Daussy
  */
-@Configuration
-public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitializer {
+@Service
+public class UMLCppSemanticDataTemplateInitializer implements ISemanticDataInitializer {
 
     private static final List<String> HANDLED_DIAGRAMS = List.of(UMLCppProjectTemplateProvider.UML_CPP_TEMPLATE_ID, UMLCppProjectTemplateProvider.UML_CPP_SM_TEMPLATE_ID);
 
@@ -76,7 +75,7 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
 
     private static final String CPP_SM_TEMPLATE_FILE = "SimpleSM.uml";
 
-    private final Logger logger = LoggerFactory.getLogger(UMLCppProjectTemplateInitializer.class);
+    private final Logger logger = LoggerFactory.getLogger(UMLCppSemanticDataTemplateInitializer.class);
 
     private final TemplateInitializer initializerHelper;
 
@@ -96,13 +95,13 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
 
     private final IDiagramConvertedElementProvider convertedNodeProvider;
 
-    public UMLCppProjectTemplateInitializer(TemplateInitializer templateInitializer,
-            StateMachineDiagramService stateMachineDiagramService,
-            GenericDiagramService packageDiagramService,
-            IDiagramBuilderService diagramBuilderService,
-            IDiagramNavigationService diagramNavigationService,
-            PapyrusProjectTemplateInitializerParameters papyrusProjectTemplateInitializerParameters,
-            IDiagramConvertedElementProvider convertedNodeProvider) {
+    public UMLCppSemanticDataTemplateInitializer(TemplateInitializer templateInitializer,
+                                                 StateMachineDiagramService stateMachineDiagramService,
+                                                 GenericDiagramService packageDiagramService,
+                                                 IDiagramBuilderService diagramBuilderService,
+                                                 IDiagramNavigationService diagramNavigationService,
+                                                 PapyrusProjectTemplateInitializerParameters papyrusProjectTemplateInitializerParameters,
+                                                 IDiagramConvertedElementProvider convertedNodeProvider) {
         this.stateMachineDiagramService = Objects.requireNonNull(stateMachineDiagramService);
         this.classDiagramService = Objects.requireNonNull(packageDiagramService);
         this.diagramBuilderService = Objects.requireNonNull(diagramBuilderService);
@@ -115,24 +114,22 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
     }
 
     @Override
-    public boolean canHandle(String templateId) {
-        return HANDLED_DIAGRAMS.contains(templateId);
+    public boolean canHandle(String projectTemplateId) {
+        return HANDLED_DIAGRAMS.contains(projectTemplateId);
     }
 
     @Override
-    public Optional<RepresentationMetadata> handle(ICause cause, String templateId, IEditingContext editingContext) {
-        Optional<RepresentationMetadata> result = Optional.empty();
+    public void handle(ICause cause, IEditingContext editingContext, String projectTemplateId) {
         if (editingContext instanceof EditingContext siriusEditingContext) {
-            if (UMLCppProjectTemplateProvider.UML_CPP_TEMPLATE_ID.equals(templateId)) {
-                result = this.initializeCppProjectContents(siriusEditingContext, cause);
-            } else if (UMLCppProjectTemplateProvider.UML_CPP_SM_TEMPLATE_ID.equals(templateId)) {
-                result = this.initializeCppSMProjectContents(siriusEditingContext, cause);
+            if (UMLCppProjectTemplateProvider.UML_CPP_TEMPLATE_ID.equals(projectTemplateId)) {
+                this.initializeCppProjectContents(siriusEditingContext, cause);
+            } else if (UMLCppProjectTemplateProvider.UML_CPP_SM_TEMPLATE_ID.equals(projectTemplateId)) {
+                this.initializeCppSMProjectContents(siriusEditingContext, cause);
             }
         }
-        return result;
     }
 
-    private Optional<RepresentationMetadata> initializeCppProjectContents(EditingContext editingContext, ICause cause) {
+    private void initializeCppProjectContents(EditingContext editingContext, ICause cause) {
         try {
             Optional<Resource> resource = this.initializerHelper.initializeResourceFromClasspathFile(editingContext, CPP_TEMPLATE_FILE, CPP_TEMPLATE_FILE, cause);
             var optionalDiagram = resource.flatMap(r -> this.createMainCppClassDiagram(editingContext, r, cause));
@@ -144,12 +141,10 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
                     this.representationMetadataPersistenceService.save(cause, editingContext, rm, diagram.getTargetObjectId());
                     this.representationPersistenceService.save(cause, editingContext, diagram);
                 });
-                return optionalRepresentationMetadata;
             }
         } catch (IOException e) {
             this.logger.error("Error while creating template", e);
         }
-        return Optional.empty();
     }
 
     private Optional<Diagram> createMainCppClassDiagram(EditingContext editingContext, Resource r, ICause cause) {
@@ -161,11 +156,11 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
     }
 
     private Optional<Diagram> semanticDropMainClassAndComment(IEditingContext editingContext, Resource r,
-            Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes, Diagram diagram) {
+                                                              Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes, Diagram diagram) {
         // Drop the main class and its comment
         Model model = (Model) r.getContents().get(0);
-        Class mainClass = (Class) model.getOwnedMembers().stream()
-                .filter(m -> m instanceof Class && "Main".equals(m.getName()))
+        org.eclipse.uml2.uml.Class mainClass = (org.eclipse.uml2.uml.Class) model.getOwnedMembers().stream()
+                .filter(m -> m instanceof org.eclipse.uml2.uml.Class && "Main".equals(m.getName()))
                 .findFirst()
                 .orElse(null);
         Comment comment = model.getOwnedComments().stream()
@@ -179,7 +174,7 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
     }
 
     private Optional<Diagram> semanticDropOperationsOnClass(IEditingContext editingContext, Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes,
-            Class mainClass, Diagram diag) {
+                                                            org.eclipse.uml2.uml.Class mainClass, Diagram diag) {
         return this.diagramBuilderService.updateDiagram(diag, editingContext, diagramContext -> {
             for (Operation operation : mainClass.getOwnedOperations()) {
                 NodeMatcher mainClassNodeMatcher = this.createOperationCompartmentNodeMatcher(mainClass, diag, convertedNodes);
@@ -189,32 +184,32 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
         });
     }
 
-    private NodeMatcher createOperationCompartmentNodeMatcher(Class mainClass, Diagram diagram,
-            Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes) {
+    private NodeMatcher createOperationCompartmentNodeMatcher(org.eclipse.uml2.uml.Class mainClass, Diagram diagram,
+                                                              Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes) {
         DiagramNavigator diagramNav = new DiagramNavigator(this.diagramNavigationService, diagram, convertedNodes);
-        return NodeMatcher.buildSemanticAndNodeMatcher(BorderNodeStatus.BASIC_NODE, o -> o == mainClass, v -> this.filter(diagramNav, v));
+        return NodeMatcher.buildSemanticAndNodeMatcher(NodeMatcher.BorderNodeStatus.BASIC_NODE, o -> o == mainClass, v -> this.filter(diagramNav, v));
     }
 
     private boolean filter(DiagramNavigator diagramNav, Node v) {
         return "CD_Class_Operations_SHARED_CompartmentNode".equals(diagramNav.getDescription(v).get().getName());
     }
 
-    private Optional<RepresentationMetadata> initializeCppSMProjectContents(EditingContext editingContext, ICause cause) {
+    private void initializeCppSMProjectContents(EditingContext editingContext, ICause cause) {
         List<Diagram> diagrams = new ArrayList<>();
         Optional<Resource> optionalResource = Optional.empty();
+
         try {
             optionalResource = this.initializerHelper.initializeResourceFromClasspathFile(editingContext, CPP_SM_TEMPLATE_FILE, CPP_SM_TEMPLATE_FILE, cause);
         } catch (IOException e) {
             this.logger.error("Error while creating template", e);
-            return Optional.empty();
         }
-        return optionalResource.flatMap(resource -> {
+
+        optionalResource.ifPresent(resource -> {
             var mainRepresentationMetadata = this.createMainCppSMClassDiagram(editingContext, resource, cause);
             if (mainRepresentationMetadata.isPresent()) {
                 EMFUtils.allContainedObjectOfType(resource, StateMachine.class)
                         .forEach(stateMachine -> this.createStateMachineDiagram(stateMachine, editingContext, cause));
             }
-            return mainRepresentationMetadata;
         });
     }
 
@@ -242,8 +237,8 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
     }
 
     private Optional<? extends Diagram> dropMainClassAndComment(IEditingContext editingContext, Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes,
-            Model model, Diagram diagram) {
-        Class mainClass = (Class) model.getOwnedMembers().stream()
+                                                                Model model, Diagram diagram) {
+        org.eclipse.uml2.uml.Class mainClass = (org.eclipse.uml2.uml.Class) model.getOwnedMembers().stream()
                 .filter(m -> m instanceof Class && "SimpleSM".equals(m.getName()))
                 .findFirst()
                 .orElse(null);
@@ -254,7 +249,7 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
                     .filter(c -> c.getAnnotatedElements().contains(mainClass))
                     .findFirst()
                     .orElse(null);
-            this.diagramNavigationService.getMatchingNodes(diagram, editingContext, NodeMatcher.buildSemanticMatcher(BorderNodeStatus.BASIC_NODE, sem -> sem == model)).forEach(packNode -> {
+            this.diagramNavigationService.getMatchingNodes(diagram, editingContext, NodeMatcher.buildSemanticMatcher(NodeMatcher.BorderNodeStatus.BASIC_NODE, sem -> sem == model)).forEach(packNode -> {
                 this.classDiagramService.semanticDrop(mainClass, packNode, editingContext, diagramContext, convertedNodes);
                 this.classDiagramService.semanticDrop(classComment, packNode, editingContext, diagramContext, convertedNodes);
             });
@@ -262,7 +257,7 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
     }
 
     private Optional<? extends Diagram> dropModelAndComment(IEditingContext editingContext, Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes,
-            Model model, Diagram diagram) {
+                                                            Model model, Diagram diagram) {
         // Get the linked comment
         Comment comment = model.getOwnedComments().stream()
                 .filter(c -> c.getAnnotatedElements().contains(model))
@@ -295,7 +290,7 @@ public class UMLCppProjectTemplateInitializer implements IProjectTemplateInitial
                 .getConvertedNode(SMDDiagramDescriptionBuilder.SMD_REP_NAME, editingContext);
         // Display all state in each region
         for (Region region : stateMachine.getRegions()) {
-            NodeMatcher regionNodeMatcher = NodeMatcher.buildSemanticMatcher(BorderNodeStatus.BASIC_NODE, o -> o == region);
+            NodeMatcher regionNodeMatcher = NodeMatcher.buildSemanticMatcher(NodeMatcher.BorderNodeStatus.BASIC_NODE, o -> o == region);
             List<Node> regionReps = this.diagramNavigationService.getMatchingNodes(diagram, editingContext, regionNodeMatcher);
             for (Node regionNode : regionReps) {
                 // Drop all states

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -140,15 +140,17 @@ public class MoveContainmentReferenceItemHandlerTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         MoveContainmentReferenceItemEventHandler handler = new MoveContainmentReferenceItemEventHandler(
                 formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry(),
                 objectSearchService);
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         ChangeDescription changeDescription = changeDescriptionSink.asFlux().blockFirst();
         assertThat(changeDescription.getKind()).isEqualTo(ChangeKind.SEMANTIC_CHANGE);
@@ -218,15 +220,17 @@ public class MoveContainmentReferenceItemHandlerTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         MoveContainmentReferenceItemEventHandler handler = new MoveContainmentReferenceItemEventHandler(
                 formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry(),
                 new IObjectSearchService.NoOp());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);

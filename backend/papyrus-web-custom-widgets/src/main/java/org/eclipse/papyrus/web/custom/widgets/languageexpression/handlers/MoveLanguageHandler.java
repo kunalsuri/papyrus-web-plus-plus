@@ -62,7 +62,7 @@ public class MoveLanguageHandler implements IFormEventHandler {
     }
 
     @Override
-    public boolean canHandle(IFormInput formInput) {
+    public boolean canHandle(IEditingContext editingContext, IFormInput formInput) {
         return formInput instanceof MoveLanguageInput;
     }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jayway.jsonpath.JsonPath;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,12 +55,12 @@ public class PapyrusPaletteToolQueryRunner {
      *         the project containing the element to retrieve the palette from
      * @param representationId
      *         the representation containing the element
-     * @param diagramElementId
+     * @param diagramElementIds
      *         the graphical identifier of the element to retrieve the palette from
      * @return the raw JSON of the palette
      */
-    private String getPalette(String editingContextId, String representationId, String diagramElementId) {
-        Map<String, Object> parameters = Map.of("editingContextId", editingContextId, "representationId", representationId, "diagramElementId", diagramElementId);
+    private String getPalette(String editingContextId, String representationId, List<String> diagramElementIds) {
+        Map<String, Object> parameters = Map.of("editingContextId", editingContextId, "representationId", representationId, "diagramElementIds", diagramElementIds);
         return this.runner.run(parameters);
     }
 
@@ -81,8 +82,8 @@ public class PapyrusPaletteToolQueryRunner {
      *         the name of the tool
      * @return the identifier of the tool if it exists, or an {@code empty} {@link Optional}
      */
-    public Optional<String> getTool(String editingContextId, String representationId, String diagramElementId, String toolSectionName, String toolName) {
-        String rawPalette = this.getPalette(editingContextId, representationId, diagramElementId);
+    public Optional<String> getTool(String editingContextId, String representationId, List<String> diagramElementIds, String toolSectionName, String toolName) {
+        String rawPalette = this.getPalette(editingContextId, representationId, diagramElementIds);
         Object palette = JsonPath.read(rawPalette,
                 "$.data.viewer.editingContext.representation.description.palette.paletteEntries[?(@.label=='" + toolSectionName + "')].tools[?(@.label=='" + toolName + "')]");
         assertThat(palette).isInstanceOf(JSONArray.class);
@@ -116,8 +117,8 @@ public class PapyrusPaletteToolQueryRunner {
      *         the name of the tool
      * @return the identifier of the tool if it exists, or an {@code empty} {@link Optional}
      */
-    public Optional<String> getQuickAccessTool(String editingContextId, String representationId, String diagramElementId , String toolName) {
-        String rawPalette = this.getPalette(editingContextId, representationId, diagramElementId);
+    public Optional<String> getQuickAccessTool(String editingContextId, String representationId, List<String> diagramElementIds, String toolName) {
+        String rawPalette = this.getPalette(editingContextId, representationId, diagramElementIds);
         Object palette = JsonPath.read(rawPalette,
                 "$.data.viewer.editingContext.representation.description.palette.quickAccessTools[?(@.label=='" + toolName + "')]");
         assertThat(palette).isInstanceOf(JSONArray.class);

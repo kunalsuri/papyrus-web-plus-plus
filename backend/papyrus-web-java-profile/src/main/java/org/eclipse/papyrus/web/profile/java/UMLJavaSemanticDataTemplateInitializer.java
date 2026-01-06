@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,12 +13,6 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.profile.java;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.web.application.representations.IDiagramConvertedElementProvider;
 import org.eclipse.papyrus.web.application.representations.aqlservices.utils.GenericDiagramService;
@@ -29,7 +23,6 @@ import org.eclipse.papyrus.web.sirius.contributions.DiagramNavigator;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramBuilderService;
 import org.eclipse.papyrus.web.sirius.contributions.IDiagramNavigationService;
 import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher;
-import org.eclipse.papyrus.web.sirius.contributions.query.NodeMatcher.BorderNodeStatus;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationMetadataPersistenceService;
 import org.eclipse.sirius.components.collaborative.api.IRepresentationPersistenceService;
 import org.eclipse.sirius.components.core.RepresentationMetadata;
@@ -42,25 +35,32 @@ import org.eclipse.sirius.components.events.ICause;
 import org.eclipse.sirius.components.representations.VariableManager;
 import org.eclipse.sirius.components.view.diagram.NodeDescription;
 import org.eclipse.sirius.web.application.editingcontext.EditingContext;
-import org.eclipse.sirius.web.application.project.services.api.IProjectTemplateInitializer;
+import org.eclipse.sirius.web.application.project.services.api.ISemanticDataInitializer;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Comment;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Initializes the contents of projects created from a UML project template.
  *
  * @author pcdavid
  */
-@Configuration
-public class UMLJavaProjectTemplateInitializer implements IProjectTemplateInitializer {
+@Service
+public class UMLJavaSemanticDataTemplateInitializer implements ISemanticDataInitializer {
+
     private static final String UML_MODEL_TITLE = "JavaTemplate.uml";
 
-    private final Logger logger = LoggerFactory.getLogger(UMLJavaProjectTemplateInitializer.class);
+    private final Logger logger = LoggerFactory.getLogger(UMLJavaSemanticDataTemplateInitializer.class);
 
     private final TemplateInitializer initializerHelper;
 
@@ -78,12 +78,12 @@ public class UMLJavaProjectTemplateInitializer implements IProjectTemplateInitia
 
     private final IDiagramConvertedElementProvider convertedNodeProvider;
 
-    public UMLJavaProjectTemplateInitializer(TemplateInitializer initializerHelper, //
-            IDiagramBuilderService diagramBuilderService, //
-            IDiagramNavigationService diagramNavigationService, //
-            GenericDiagramService classDiagramService, //
-            PapyrusProjectTemplateInitializerParameters papyrusProjectTemplateInitializerParameters,
-            IDiagramConvertedElementProvider convertedNodeProvider) {
+    public UMLJavaSemanticDataTemplateInitializer(TemplateInitializer initializerHelper, //
+                                                  IDiagramBuilderService diagramBuilderService, //
+                                                  IDiagramNavigationService diagramNavigationService, //
+                                                  GenericDiagramService classDiagramService, //
+                                                  PapyrusProjectTemplateInitializerParameters papyrusProjectTemplateInitializerParameters,
+                                                  IDiagramConvertedElementProvider convertedNodeProvider) {
         this.initializerHelper = Objects.requireNonNull(initializerHelper);
         this.diagramBuilderService = Objects.requireNonNull(diagramBuilderService);
         this.diagramNavigationService = Objects.requireNonNull(diagramNavigationService);
@@ -95,20 +95,19 @@ public class UMLJavaProjectTemplateInitializer implements IProjectTemplateInitia
     }
 
     @Override
-    public boolean canHandle(String templateId) {
-        return List.of(UMLJavaTemplateProvider.UML_JAVA_TEMPLATE_ID).contains(templateId);
+    public boolean canHandle(String projectTemplateId) {
+        return List.of(UMLJavaTemplateProvider.UML_JAVA_TEMPLATE_ID).contains(projectTemplateId);
+
     }
 
     @Override
-    public Optional<RepresentationMetadata> handle(ICause cause, String templateId, IEditingContext editingContext) {
-        Optional<RepresentationMetadata> result = Optional.empty();
-        if (UMLJavaTemplateProvider.UML_JAVA_TEMPLATE_ID.equals(templateId) && editingContext instanceof EditingContext siriusEditingContext) {
-            result = this.initializeUMLJavaProjectContents(siriusEditingContext, cause);
+    public void handle(ICause cause, IEditingContext editingContext, String projectTemplateId) {
+        if (UMLJavaTemplateProvider.UML_JAVA_TEMPLATE_ID.equals(projectTemplateId) && editingContext instanceof EditingContext siriusEditingContext) {
+            this.initializeUMLJavaProjectContents(siriusEditingContext, cause);
         }
-        return result;
     }
 
-    private Optional<RepresentationMetadata> initializeUMLJavaProjectContents(EditingContext editingContext, ICause cause) {
+    private void initializeUMLJavaProjectContents(EditingContext editingContext, ICause cause) {
         try {
             Optional<Resource> resource = this.initializerHelper.initializeResourceFromClasspathFile(editingContext, UML_MODEL_TITLE, "JavaTemplate.uml", cause);
             var optionalDiagram = resource.flatMap(r -> this.createMainClassDiagram(editingContext, r, cause));
@@ -120,12 +119,10 @@ public class UMLJavaProjectTemplateInitializer implements IProjectTemplateInitia
                     this.representationMetadataPersistenceService.save(cause, editingContext, rm, diagram.getTargetObjectId());
                     this.representationPersistenceService.save(cause, editingContext, diagram);
                 });
-                return optionalRepresentationMetadata;
             }
         } catch (IOException e) {
             this.logger.error("Error while creating template", e);
         }
-        return Optional.empty();
     }
 
     private Optional<Diagram> createMainClassDiagram(EditingContext editingContext, Resource r, ICause cause) {
@@ -137,8 +134,8 @@ public class UMLJavaProjectTemplateInitializer implements IProjectTemplateInitia
     }
 
     private Optional<Diagram> semanticDropClassAndComment(IEditingContext editingContext,
-            Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes, Model model, Diagram diagram) {
-        Class mainClass = (Class) model.getOwnedMembers().stream().filter(m -> m instanceof Class && "Main".equals(m.getName())).findFirst().orElse(null);
+                                                          Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes, Model model, Diagram diagram) {
+        org.eclipse.uml2.uml.Class mainClass = (org.eclipse.uml2.uml.Class) model.getOwnedMembers().stream().filter(m -> m instanceof org.eclipse.uml2.uml.Class && "Main".equals(m.getName())).findFirst().orElse(null);
         Comment classComment = model.getOwnedComments().stream().filter(c -> c.getAnnotatedElements().contains(mainClass)).findFirst().orElse(null);
         return this.diagramBuilderService.updateDiagram(diagram, editingContext, diagramContext -> {
             // Get the linked comment
@@ -148,7 +145,7 @@ public class UMLJavaProjectTemplateInitializer implements IProjectTemplateInitia
     }
 
     private Optional<Diagram> semanticDropOperationsOnClass(IEditingContext editingContext, Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes,
-            Class mainClass, Diagram diag) {
+                                                            org.eclipse.uml2.uml.Class mainClass, Diagram diag) {
         return this.diagramBuilderService.updateDiagram(diag, editingContext, diagramContext -> {
             for (Operation operation : mainClass.getOwnedOperations()) {
                 NodeMatcher mainClassNodeMatcher = this.createOperationCompartmentNodeMatcher(mainClass, diag, convertedNodes);
@@ -159,9 +156,9 @@ public class UMLJavaProjectTemplateInitializer implements IProjectTemplateInitia
     }
 
     private NodeMatcher createOperationCompartmentNodeMatcher(Class mainClass, Diagram diagram,
-            Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes) {
+                                                              Map<NodeDescription, org.eclipse.sirius.components.diagrams.description.NodeDescription> convertedNodes) {
         DiagramNavigator diagramNav = new DiagramNavigator(this.diagramNavigationService, diagram, convertedNodes);
-        return NodeMatcher.buildSemanticAndNodeMatcher(BorderNodeStatus.BASIC_NODE, o -> o == mainClass, v -> this.filter(diagramNav, v));
+        return NodeMatcher.buildSemanticAndNodeMatcher(NodeMatcher.BorderNodeStatus.BASIC_NODE, o -> o == mainClass, v -> this.filter(diagramNav, v));
     }
 
     private boolean filter(DiagramNavigator diagramNav, Node v) {

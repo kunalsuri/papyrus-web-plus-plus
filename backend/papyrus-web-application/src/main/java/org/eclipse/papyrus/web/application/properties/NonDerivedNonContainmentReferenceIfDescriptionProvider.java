@@ -25,7 +25,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.sirius.components.collaborative.api.ChangeKind;
 import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
 import org.eclipse.sirius.components.core.api.IIdentityService;
@@ -62,8 +61,6 @@ public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
 
     private static final String REFERENCE_WIDGET_DESCRIPTION_ID = "ReferenceWidget";
 
-    private final ComposedAdapterFactory composedAdapterFactory;
-
     private final ILabelService labelService;
 
     private final IPropertiesValidationProvider propertiesValidationProvider;
@@ -79,11 +76,10 @@ public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
     private final IIdentityService identityService;
 
     // CHECKSTYLE:OFF Injected parameters
-    public NonDerivedNonContainmentReferenceIfDescriptionProvider(ComposedAdapterFactory composedAdapterFactory, ILabelService labelService,
+    public NonDerivedNonContainmentReferenceIfDescriptionProvider(ILabelService labelService,
             Function<VariableManager, String> semanticTargetIdProvider, IPropertiesValidationProvider propertiesValidationProvider, IFeedbackMessageService feedbackMessageService,
             IEMFKindService emfKindService, IObjectSearchService objectSearchService, IIdentityService identityService) {
         // CHECKSTYLE:ON Injected parameters
-        this.composedAdapterFactory = Objects.requireNonNull(composedAdapterFactory);
         this.labelService = Objects.requireNonNull(labelService);
         this.propertiesValidationProvider = Objects.requireNonNull(propertiesValidationProvider);
         this.semanticTargetIdProvider = Objects.requireNonNull(semanticTargetIdProvider);
@@ -157,7 +153,7 @@ public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
     }
 
     private Function<VariableManager, List<?>> getOptionsProvider() {
-        return new EStructuralFeatureChoiceOfValueProvider(EMFFormDescriptionProvider.ESTRUCTURAL_FEATURE, this.composedAdapterFactory);
+        return new EStructuralFeatureChoiceOfValueProvider(EMFFormDescriptionProvider.ESTRUCTURAL_FEATURE);
     }
 
     private EStructuralFeature.Setting resolveSetting(VariableManager variableManager) {
@@ -200,7 +196,7 @@ public class NonDerivedNonContainmentReferenceIfDescriptionProvider {
     }
 
     private Function<VariableManager, String> getLabelProvider() {
-        return new EStructuralFeatureLabelProvider(EMFFormDescriptionProvider.ESTRUCTURAL_FEATURE, this.composedAdapterFactory);
+        return new EStructuralFeatureLabelProvider(EMFFormDescriptionProvider.ESTRUCTURAL_FEATURE);
     }
 
     private String getTypeName(VariableManager variableManager) {

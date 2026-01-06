@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -29,61 +29,37 @@ import org.eclipse.sirius.components.diagrams.Diagram;
 import org.eclipse.sirius.components.diagrams.description.DiagramDescription;
 import org.eclipse.sirius.components.events.ICause;
 import org.eclipse.sirius.components.representations.VariableManager;
-import org.eclipse.sirius.web.application.project.services.api.IProjectTemplateInitializer;
+import org.eclipse.sirius.web.application.project.services.api.ISemanticDataInitializer;
 import org.eclipse.uml2.uml.Profile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 /**
  * Initializes the contents of projects created from a Profile project template.
  *
  * @author <a href="mailto:jessy.mallet@obeo.fr">Jessy Mallet</a>
  */
-@Configuration
-public class ProfileProjectTemplateInitializer implements IProjectTemplateInitializer {
+@Service
+public class ProfileSemanticDataTemplateInitializer implements ISemanticDataInitializer {
 
-    /**
-     * Name of the new resource.
-     */
     private static final String PROFILE_MODEL_TITLE = "Profile.profile.uml";
 
-    /**
-     * Logger used to log error when model creation fails.
-     */
-    private final Logger logger = LoggerFactory.getLogger(ProfileProjectTemplateInitializer.class);
+    private final Logger logger = LoggerFactory.getLogger(ProfileSemanticDataTemplateInitializer.class);
 
-    /**
-     * Helper to create Project templates.
-     */
     private final TemplateInitializer initializerHelper;
 
-    /**
-     * Service used to create diagram programmatically.
-     */
     private final IDiagramBuilderService diagramBuilderService;
 
-    /**
-     * Service used to save new representations.
-     */
     private final IRepresentationPersistenceService representationPersistenceService;
 
     private final IRepresentationDescriptionSearchService representationDescriptionSearchService;
 
     private final IRepresentationMetadataPersistenceService representationMetadataPersistenceService;
-    /**
-     * Constructor.
-     *
-     * @param initializerHelper
-     *            Helper to create Project templates
-     * @param diagramBuilderService
-     *            Service used to create diagram programmatically
-     * @param papyrusProjectTemplateInitializerParameters
-     *            Services used
-     */
-    public ProfileProjectTemplateInitializer(TemplateInitializer initializerHelper, //
-            IDiagramBuilderService diagramBuilderService, //
-            PapyrusProjectTemplateInitializerParameters papyrusProjectTemplateInitializerParameters) {
+
+    public ProfileSemanticDataTemplateInitializer(TemplateInitializer initializerHelper, //
+                                                  IDiagramBuilderService diagramBuilderService, //
+                                                  PapyrusProjectTemplateInitializerParameters papyrusProjectTemplateInitializerParameters) {
         this.initializerHelper = initializerHelper;
         this.diagramBuilderService = diagramBuilderService;
         this.representationPersistenceService = papyrusProjectTemplateInitializerParameters.representationPersistenceService();
@@ -92,20 +68,18 @@ public class ProfileProjectTemplateInitializer implements IProjectTemplateInitia
     }
 
     @Override
-    public boolean canHandle(String templateId) {
-        return List.of(ProfileProjectTemplateProvider.PROFILE_WITH_PRIMITIVES_AND_UML_TEMPLATE_ID).contains(templateId);
+    public boolean canHandle(String projectTemplateId) {
+        return List.of(ProfileProjectTemplateProvider.PROFILE_WITH_PRIMITIVES_AND_UML_TEMPLATE_ID).contains(projectTemplateId);
     }
 
     @Override
-    public Optional<RepresentationMetadata> handle(ICause cause, String templateId, IEditingContext editingContext) {
-        Optional<RepresentationMetadata> result = Optional.empty();
-        if (ProfileProjectTemplateProvider.PROFILE_WITH_PRIMITIVES_AND_UML_TEMPLATE_ID.equals(templateId)) {
-            result = this.initializeProfileWithPrimitivesAndUmlProjectContents(editingContext, cause);
+    public void handle(ICause cause, IEditingContext editingContext, String projectTemplateId) {
+        if (ProfileProjectTemplateProvider.PROFILE_WITH_PRIMITIVES_AND_UML_TEMPLATE_ID.equals(projectTemplateId)) {
+            this.initializeProfileWithPrimitivesAndUmlProjectContents(editingContext, cause);
         }
-        return result;
     }
 
-    private Optional<RepresentationMetadata> initializeProfileWithPrimitivesAndUmlProjectContents(IEditingContext editingContext, ICause cause) {
+    private void initializeProfileWithPrimitivesAndUmlProjectContents(IEditingContext editingContext, ICause cause) {
         try {
             Optional<Resource> resource = this.initializerHelper.initializeResourceFromClasspathFile(editingContext, PROFILE_MODEL_TITLE, "DefaultProfileWithPrimitiveAndUml.uml", cause);
             var optionalDiagram = resource.flatMap(r -> this.createProfileDiagram(editingContext, r, cause));
@@ -117,12 +91,10 @@ public class ProfileProjectTemplateInitializer implements IProjectTemplateInitia
                     this.representationMetadataPersistenceService.save(cause, editingContext, rm, diagram.getTargetObjectId());
                     this.representationPersistenceService.save(cause, editingContext, diagram);
                 });
-                return optionalRepresentationMetadata;
             }
         } catch (IOException e) {
             this.logger.error("Error while creating template", e);
         }
-        return Optional.empty();
     }
 
     private Optional<? extends Diagram> createProfileDiagram(IEditingContext editingContext, Resource r, ICause cause) {

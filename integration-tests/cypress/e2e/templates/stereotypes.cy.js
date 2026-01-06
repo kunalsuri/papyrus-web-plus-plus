@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST
+ * Copyright (c) 2023, 2026 CEA LIST
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ const projectName = 'Cypress Project - stereotypes';
 describe('/projects', () => {
   beforeEach(() => {
     cy.deleteProjectByName(projectName);
-    cy.createProjectFromTemplateWithName(context, projectName, 'EmptyUMLTemplate');
+    cy.createProjectWithName(context, projectName, 'EmptyUMLTemplate');
   });
 
   afterEach(() => {

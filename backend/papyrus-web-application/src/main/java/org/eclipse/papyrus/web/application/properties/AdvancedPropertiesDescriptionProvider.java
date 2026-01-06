@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2025 Obeo.
+ * Copyright (c) 2019, 2026 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -21,10 +21,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
+import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory.Descriptor;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.sirius.components.core.api.IFeedbackMessageService;
@@ -62,7 +64,7 @@ public class AdvancedPropertiesDescriptionProvider {
 
     public static final String ESTRUCTURAL_FEATURE = "eStructuralFeature";
 
-    private final ComposedAdapterFactory composedAdapterFactory;
+    private final List<Descriptor> composedAdapterFactoryDescriptors;
 
     private final IPropertiesValidationProvider propertiesValidationProvider;
 
@@ -83,12 +85,12 @@ public class AdvancedPropertiesDescriptionProvider {
     private final IObjectSearchService objectSearchService;
 
     // CHECKSTYLE:OFF Injected parameters
-    public AdvancedPropertiesDescriptionProvider(IIdentityService identityService, ComposedAdapterFactory composedAdapterFactory, IEMFMessageService emfMessageService,
+    public AdvancedPropertiesDescriptionProvider(IIdentityService identityService, List<Descriptor> composedAdapterFactoryDescriptors, IEMFMessageService emfMessageService,
             IFeedbackMessageService feedbackMessageService, IEMFKindService emfKindService, IWidgetReadOnlyProvider widgetReadOnlyProvider, ILabelService labelService,
             IObjectSearchService objectSearchService) {
         this.identityService = Objects.requireNonNull(identityService);
         // CHECKSTYLE:ON Injected parameters
-        this.composedAdapterFactory = Objects.requireNonNull(composedAdapterFactory);
+        this.composedAdapterFactoryDescriptors = Objects.requireNonNull(composedAdapterFactoryDescriptors);
         this.widgetReadOnlyProvider = Objects.requireNonNull(widgetReadOnlyProvider);
         this.labelService = Objects.requireNonNull(labelService);
         this.objectSearchService = Objects.requireNonNull(objectSearchService);
@@ -166,7 +168,12 @@ public class AdvancedPropertiesDescriptionProvider {
             if (self instanceof EObject) {
                 EObject eObject = (EObject) self;
 
-                List<IItemPropertyDescriptor> propertyDescriptors = Optional.ofNullable(this.composedAdapterFactory.adapt(eObject, IItemPropertySource.class))
+                List<AdapterFactory> adapterFactories = this.composedAdapterFactoryDescriptors.stream()
+                        .map(Descriptor::createAdapterFactory)
+                        .toList();
+                var composedAdapterFactory = new ComposedAdapterFactory(adapterFactories);
+
+                List<IItemPropertyDescriptor> propertyDescriptors = Optional.ofNullable(composedAdapterFactory.adapt(eObject, IItemPropertySource.class))
                         .filter(IItemPropertySource.class::isInstance)
                         .map(IItemPropertySource.class::cast)
                         .map(iItemPropertySource -> iItemPropertySource.getPropertyDescriptors(eObject))
@@ -184,16 +191,18 @@ public class AdvancedPropertiesDescriptionProvider {
                         // https://github.com/eclipse-sirius/sirius-components/issues/1433
                         .filter(feature -> feature.getEType() != EcorePackage.eINSTANCE.getEObject() && feature.getEType() != EcorePackage.eINSTANCE.getEModelElement())
                         .forEach(objects::add);
+
+                composedAdapterFactory.dispose();
             }
             return objects;
         };
 
         List<AbstractControlDescription> ifDescriptions = new ArrayList<>();
-        ifDescriptions.addAll(new EStringIfDescriptionProvider(this.identityService, this.composedAdapterFactory, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
-        ifDescriptions.addAll(new EBooleanIfDescriptionProvider(this.identityService, this.composedAdapterFactory, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
-        ifDescriptions.addAll(new EEnumIfDescriptionProvider(this.identityService, this.composedAdapterFactory, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
+        ifDescriptions.addAll(new EStringIfDescriptionProvider(this.identityService, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
+        ifDescriptions.addAll(new EBooleanIfDescriptionProvider(this.identityService, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
+        ifDescriptions.addAll(new EEnumIfDescriptionProvider(this.identityService, this.propertiesValidationProvider, this.widgetReadOnlyProvider).getIfDescriptions());
 
-        ifDescriptions.add(new NonDerivedNonContainmentReferenceIfDescriptionProvider(this.composedAdapterFactory, this.labelService, this.semanticTargetIdProvider, this.propertiesValidationProvider,
+        ifDescriptions.add(new NonDerivedNonContainmentReferenceIfDescriptionProvider(this.labelService, this.semanticTargetIdProvider, this.propertiesValidationProvider,
                 this.feedbackMessageService, this.emfKindService, this.objectSearchService, this.identityService).getIfDescription());
 
         var numericDataTypes = List.of(
@@ -208,7 +217,7 @@ public class AdvancedPropertiesDescriptionProvider {
                 EcorePackage.Literals.ESHORT,
                 EcorePackage.Literals.ESHORT_OBJECT);
         for (var dataType : numericDataTypes) {
-            ifDescriptions.add(new NumberIfDescriptionProvider(dataType, this.composedAdapterFactory, this.propertiesValidationProvider, this.emfMessageService, this.semanticTargetIdProvider,
+            ifDescriptions.add(new NumberIfDescriptionProvider(dataType, this.propertiesValidationProvider, this.emfMessageService, this.semanticTargetIdProvider,
                     this.widgetReadOnlyProvider)
                             .getIfDescription());
         }

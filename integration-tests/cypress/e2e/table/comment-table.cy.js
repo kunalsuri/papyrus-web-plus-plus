@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2025 CEA LIST.
+ * Copyright (c) 2025, 2026 CEA LIST.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ describe('Comment table tests', () => {
   });
 
   const createTestProjectForCommentTable = () => {
-    cy.createProjectFromTemplateWithName(context, projectName, 'EmptyUMLTemplate').then((res) => {
+    cy.createProjectWithName(context, projectName, 'EmptyUMLTemplate').then((res) => {
       cy.visit(`/projects/${context.projectId}/edit`).then((res) => {
         cy.getByTestId('upload-document-icon').click();
         cy.fixture('CommentTableTestModel.uml', { mimeType: 'text/xml' }).as('CommentTableTestModel');

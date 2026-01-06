@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021, 2023, 2025 Obeo.
+ * Copyright (c) 2021, 2026 Obeo.
  * This program and the accompanying materials
  * are made available under the erms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -115,7 +115,7 @@ Cypress.Commands.add('deleteAllProjects', () => {
   });
 });
 
-Cypress.Commands.add('createProject', (name) => {
+Cypress.Commands.add('createProject', (name, templateId, libraryIds = []) => {
   const query = `
    mutation createProject($input: CreateProjectInput!) {
      createProject(input: $input) {
@@ -132,8 +132,8 @@ Cypress.Commands.add('createProject', (name) => {
     input: {
       id: uuid(),
       name,
-      natures: [],
-      libraryIds: [],
+      templateId,
+      libraryIds,
     },
   };
 
@@ -320,43 +320,3 @@ Cypress.Commands.add(
       });
   }
 );
-
-Cypress.Commands.add('createProjectFromTemplate', (name, templateId, natures = ['papyrusweb://nature?kind=uml']) => {
-  const query = `
-  mutation createProjectFromTemplate($input: CreateProjectFromTemplateInput!) {
-    createProjectFromTemplate(input: $input) {
-      __typename
-      ... on CreateProjectFromTemplateSuccessPayload {
-        project {
-          id
-        }
-        representationToOpen {
-          id
-        }
-      }
-      ... on ErrorPayload {
-        message
-      }
-    }
-  }
-  `;
-  const variables = {
-    input: {
-      id: uuid(),
-      name,
-      templateId,
-      natures,
-    },
-  };
-
-  const body = {
-    query,
-    variables,
-  };
-  return cy.request({
-    method: 'POST',
-    mode: 'cors',
-    url,
-    body,
-  });
-});

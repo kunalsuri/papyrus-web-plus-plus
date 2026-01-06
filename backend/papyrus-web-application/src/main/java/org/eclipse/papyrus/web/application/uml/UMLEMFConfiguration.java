@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,13 +15,13 @@ package org.eclipse.papyrus.web.application.uml;
 
 import java.util.Map;
 
-import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.provider.EcoreItemProviderAdapterFactory;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Factory.Registry;
 import org.eclipse.emf.ecore.resource.impl.ResourceFactoryRegistryImpl;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.papyrus.web.application.pathmap.PathmapResourceFactory;
 import org.eclipse.papyrus.web.application.pathmap.services.api.IStaticPathmapResourceRegistry;
 import org.eclipse.papyrus.web.domain.boundedcontext.profile.service.api.IProfileSearchService;
@@ -43,13 +43,13 @@ import org.springframework.context.annotation.Configuration;
 public class UMLEMFConfiguration {
 
     @Bean
-    public AdapterFactory umlAdapterFactory() {
-        return new UMLItemProviderAdapterFactory();
+    public ComposedAdapterFactory.Descriptor umlAdapterFactory() {
+        return UMLItemProviderAdapterFactory::new;
     }
 
     @Bean
-    public AdapterFactory ecoreAdapterFactory() {
-        return new EcoreItemProviderAdapterFactory();
+    public ComposedAdapterFactory.Descriptor ecoreAdapterFactory() {
+        return EcoreItemProviderAdapterFactory::new;
     }
 
     @Bean

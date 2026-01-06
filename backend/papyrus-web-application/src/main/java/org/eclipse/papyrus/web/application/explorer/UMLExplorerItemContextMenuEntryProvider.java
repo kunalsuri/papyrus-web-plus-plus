@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2025 CEA LIST.
+ * Copyright (c) 2025, 2026 CEA LIST.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -40,6 +40,8 @@ import org.eclipse.sirius.web.domain.boundedcontexts.representationdata.Represen
 import org.eclipse.sirius.web.domain.boundedcontexts.semanticdata.services.api.ISemanticDataSearchService;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Service;
+
+import static org.eclipse.sirius.web.application.views.explorer.services.ExplorerTreeItemContextMenuEntryProvider.DUPLICATE_OBJECT;
 
 /**
  * {@link ITreeItemContextMenuEntryProvider} in charge of contributing contextual menu in the UML default tree explorer.
@@ -95,7 +97,6 @@ public class UMLExplorerItemContextMenuEntryProvider implements ITreeItemContext
                 .filter(Resource.class::isInstance)
                 .map(Resource.class::cast);
         if (optionalResource.isPresent()) {
-            var resource = optionalResource.get();
 
             List<ITreeItemContextMenuEntry> entries = new ArrayList<>();
             entries.add(new SingleClickTreeItemContextMenuEntry(ExplorerTreeItemContextMenuEntryProvider.NEW_ROOT_OBJECT, "", List.of(), false));
@@ -110,12 +111,11 @@ public class UMLExplorerItemContextMenuEntryProvider implements ITreeItemContext
                 .filter(EObject.class::isInstance)
                 .map(EObject.class::cast);
         if (optionalEObject.isPresent()) {
-            var object = optionalEObject.get();
 
             return List.of(
                     new SingleClickTreeItemContextMenuEntry(ExplorerTreeItemContextMenuEntryProvider.NEW_OBJECT, "", List.of(), false),
-                    new SingleClickTreeItemContextMenuEntry(ExplorerTreeItemContextMenuEntryProvider.NEW_REPRESENTATION, "", List.of(), false));
-
+                    new SingleClickTreeItemContextMenuEntry(ExplorerTreeItemContextMenuEntryProvider.NEW_REPRESENTATION, "", List.of(), false),
+                    new SingleClickTreeItemContextMenuEntry(DUPLICATE_OBJECT, "", List.of(), false));
         }
         return List.of();
     }

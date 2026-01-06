@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -120,25 +120,27 @@ public class CustomImageTest {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         NewUuidHandler newUUidhandler = new NewUuidHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(newUUidhandler.canHandle(newUuidinput)).isTrue();
+        assertThat(newUUidhandler.canHandle(editingContext, newUuidinput)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        newUUidhandler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, newUuidinput);
+        newUUidhandler.handle(payloadSink, changeDescriptionSink, editingContext, form, newUuidinput);
         changeDescriptionSink.asFlux().blockFirst();
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(SuccessPayload.class);
         assertThat(hasBeenExecuted.get()).isTrue();
 
         RemoveUuidHandler removeUUidHandler = new RemoveUuidHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(removeUUidHandler.canHandle(removeUuidinput)).isTrue();
+        assertThat(removeUUidHandler.canHandle(editingContext, removeUuidinput)).isTrue();
 
         changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         payloadSink = Sinks.one();
 
-        removeUUidHandler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, removeUuidinput);
+        removeUUidHandler.handle(payloadSink, changeDescriptionSink, editingContext, form, removeUuidinput);
         changeDescriptionSink.asFlux().blockFirst();
         payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(SuccessPayload.class);
@@ -192,13 +194,15 @@ public class CustomImageTest {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         NewUuidHandler newUUidhandler = new NewUuidHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(newUUidhandler.canHandle(newUuidinput)).isTrue();
+        assertThat(newUUidhandler.canHandle(editingContext, newUuidinput)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        newUUidhandler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, newUuidinput);
+        newUUidhandler.handle(payloadSink, changeDescriptionSink, editingContext, form, newUuidinput);
         changeDescriptionSink.asFlux().blockFirst();
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);
@@ -206,12 +210,12 @@ public class CustomImageTest {
         assertThat(hasBeenExecuted.get()).isFalse();
 
         RemoveUuidHandler removeUUidHandler = new RemoveUuidHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(removeUUidHandler.canHandle(removeUuidinput)).isTrue();
+        assertThat(removeUUidHandler.canHandle(editingContext, removeUuidinput)).isTrue();
 
         changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         payloadSink = Sinks.one();
 
-        removeUUidHandler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, removeUuidinput);
+        removeUUidHandler.handle(payloadSink, changeDescriptionSink, editingContext, form, removeUuidinput);
         changeDescriptionSink.asFlux().blockFirst();
         payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);

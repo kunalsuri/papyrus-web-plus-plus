@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -128,13 +128,15 @@ public class RemoveContainmentReferenceItemHandlerTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         RemoveContainmentReferenceItemEventHandler handler = new RemoveContainmentReferenceItemEventHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         ChangeDescription changeDescription = changeDescriptionSink.asFlux().blockFirst();
         assertThat(changeDescription.getKind()).isEqualTo(ChangeKind.SEMANTIC_CHANGE);
@@ -197,6 +199,8 @@ public class RemoveContainmentReferenceItemHandlerTests {
                 .build();
         // @formatter:on
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         IFormQueryService formQueryService = new IFormQueryService.NoOp() {
             @Override
             public Optional<AbstractWidget> findWidget(Form form, String widgetId) {
@@ -205,12 +209,12 @@ public class RemoveContainmentReferenceItemHandlerTests {
         };
 
         RemoveContainmentReferenceItemEventHandler handler = new RemoveContainmentReferenceItemEventHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);

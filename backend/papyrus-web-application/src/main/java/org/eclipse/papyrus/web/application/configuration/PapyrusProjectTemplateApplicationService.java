@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2025 CEA LIST, Obeo.
+ * Copyright (c) 2025, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@
 package org.eclipse.papyrus.web.application.configuration;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -25,23 +24,13 @@ import java.util.stream.Stream;
 
 import org.eclipse.papyrus.web.application.templates.projects.ProfileProjectTemplateProvider;
 import org.eclipse.papyrus.web.application.templates.projects.UMLProjectTemplateProvider;
-
-import org.eclipse.sirius.components.core.api.ErrorPayload;
-import org.eclipse.sirius.components.core.api.IPayload;
 import org.eclipse.sirius.web.application.capability.SiriusWebCapabilities;
 import org.eclipse.sirius.web.application.capability.services.api.ICapabilityEvaluator;
-import org.eclipse.sirius.web.application.project.dto.CreateProjectFromTemplateInput;
-import org.eclipse.sirius.web.application.project.dto.CreateProjectInput;
-import org.eclipse.sirius.web.application.project.dto.CreateProjectSuccessPayload;
 import org.eclipse.sirius.web.application.project.dto.ProjectTemplateContext;
 import org.eclipse.sirius.web.application.project.dto.ProjectTemplateDTO;
-import org.eclipse.sirius.web.application.project.services.api.IProjectApplicationService;
 import org.eclipse.sirius.web.application.project.services.api.IProjectTemplateApplicationService;
 import org.eclipse.sirius.web.application.project.services.api.IProjectTemplateProvider;
-import org.eclipse.sirius.web.application.project.services.api.ITemplateBasedProjectInitializer;
 import org.eclipse.sirius.web.application.project.services.api.ProjectTemplate;
-import org.eclipse.sirius.web.application.project.services.api.ProjectTemplateNature;
-import org.eclipse.sirius.web.domain.services.api.IMessageService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -75,25 +64,11 @@ public class PapyrusProjectTemplateApplicationService implements IProjectTemplat
 
     private final List<IProjectTemplateProvider> projectTemplateProviders;
 
-    private final IProjectApplicationService projectApplicationService;
-
-    private final ITemplateBasedProjectInitializer templateBasedProjectInitializer;
-
     private final ICapabilityEvaluator capabilityEvaluator;
 
-    private final IMessageService messageService;
-
-    public PapyrusProjectTemplateApplicationService(
-            List<IProjectTemplateProvider> projectTemplateProviders,
-            IProjectApplicationService projectApplicationService,
-            ITemplateBasedProjectInitializer templateBasedProjectInitializer,
-            ICapabilityEvaluator capabilityEvaluator,
-            IMessageService messageService) {
+    public PapyrusProjectTemplateApplicationService(List<IProjectTemplateProvider> projectTemplateProviders, ICapabilityEvaluator capabilityEvaluator) {
         this.projectTemplateProviders = Objects.requireNonNull(projectTemplateProviders);
-        this.projectApplicationService = Objects.requireNonNull(projectApplicationService);
-        this.templateBasedProjectInitializer = Objects.requireNonNull(templateBasedProjectInitializer);
         this.capabilityEvaluator = Objects.requireNonNull(capabilityEvaluator);
-        this.messageService = Objects.requireNonNull(messageService);
     }
 
     @Override
@@ -103,6 +78,13 @@ public class PapyrusProjectTemplateApplicationService implements IProjectTemplat
             case ProjectTemplateContext.PROJECT_TEMPLATE_MODAL -> this.handleProjectTemplateModal(pageable);
             default -> this.handleProjectTemplateModal(pageable);
         };
+    }
+
+    @Override
+    public List<ProjectTemplateDTO> findAll() {
+        return this.getProjectTemplatesSortedByName().stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     private List<ProjectTemplate> getProjectTemplatesSortedByName() {
@@ -127,7 +109,7 @@ public class PapyrusProjectTemplateApplicationService implements IProjectTemplat
         int startIndex = (int) pageable.getOffset() * pageable.getPageSize();
         int endIndex = Math.min(((int) pageable.getOffset() + 1) * pageable.getPageSize(), projectTemplates.size() + siriusWebProjectTemplate.size());
         var projectTemplateDTOs = Stream.concat(projectTemplates.subList(startIndex, endIndex - siriusWebProjectTemplate.size()).stream(), siriusWebProjectTemplate.stream())
-                .map(projectTemplate -> new ProjectTemplateDTO(projectTemplate.id(), projectTemplate.label(), projectTemplate.imageURL(), projectTemplate.natures().stream().map(ProjectTemplateNature::id).toList()))
+                .map(projectTemplate -> this.toDTO(projectTemplate))
                 .toList();
 
         return new PageImpl<>(projectTemplateDTOs, pageable, projectTemplates.size());
@@ -140,10 +122,14 @@ public class PapyrusProjectTemplateApplicationService implements IProjectTemplat
         int endIndex = Math.min(((int) pageable.getOffset() + 1) * pageable.getPageSize(), projectTemplates.size());
 
         var projectTemplateDTOs = projectTemplates.subList(startIndex, endIndex).stream()
-                .map(projectTemplate -> new ProjectTemplateDTO(projectTemplate.id(), projectTemplate.label(), projectTemplate.imageURL(), projectTemplate.natures().stream().map(ProjectTemplateNature::id).toList()))
+                .map(projectTemplate -> this.toDTO(projectTemplate))
                 .toList();
 
         return new PageImpl<>(projectTemplateDTOs, pageable, projectTemplates.size());
+    }
+
+    private ProjectTemplateDTO toDTO(ProjectTemplate projectTemplate) {
+        return new ProjectTemplateDTO(projectTemplate.id(), projectTemplate.label(), projectTemplate.imageURL());
     }
 
     private Optional<ProjectTemplate> getUploadProject() {
@@ -162,33 +148,5 @@ public class PapyrusProjectTemplateApplicationService implements IProjectTemplat
             result = Optional.of(new ProjectTemplate("browse-all-project-templates", "", "", List.of()));
         }
         return result;
-    }
-
-    @Override
-    public IPayload createProjectFromTemplate(CreateProjectFromTemplateInput input) {
-        IPayload payload = null;
-
-        var optionalProjectTemplate = this.projectTemplateProviders.stream()
-                .map(IProjectTemplateProvider::getProjectTemplates)
-                .flatMap(Collection::stream)
-                .filter(projectTemplate -> projectTemplate.id().equals(input.templateId()))
-                .findFirst();
-        if (optionalProjectTemplate.isPresent()) {
-            var projectTemplate = optionalProjectTemplate.get();
-            var natures = projectTemplate.natures().stream()
-                    .map(ProjectTemplateNature::id)
-                    .toList();
-            var projectCreationPayload = this.projectApplicationService.createProject(new CreateProjectInput(input.id(), projectTemplate.label(), natures, List.of()));
-            if (projectCreationPayload instanceof CreateProjectSuccessPayload createProjectSuccessPayload) {
-                var projectId = createProjectSuccessPayload.project().id();
-                payload = this.templateBasedProjectInitializer.initializeProjectFromTemplate(input, projectId, input.templateId());
-            } else {
-                payload = projectCreationPayload;
-            }
-        } else {
-            payload = new ErrorPayload(input.id(), this.messageService.notFound());
-        }
-
-        return payload;
     }
 }

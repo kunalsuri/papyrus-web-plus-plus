@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2025 Obeo, CEA LIST, Artal Technologies.
+ * Copyright (c) 2022, 2026 Obeo, CEA LIST, Artal Technologies.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -90,14 +90,12 @@ import org.eclipse.sirius.components.view.emf.diagram.IDiagramIdProvider;
 import org.eclipse.sirius.components.view.emf.diagram.INodeStyleProvider;
 import org.eclipse.sirius.components.view.emf.diagram.IViewDiagramCreationPredicate;
 import org.eclipse.sirius.components.view.emf.diagram.IViewEdgeLabelEditHandler;
-import org.eclipse.sirius.components.view.emf.diagram.IViewNodeDeleteHandler;
 import org.eclipse.sirius.components.view.emf.diagram.RelationBasedSemanticElementsProvider;
 import org.eclipse.sirius.components.view.emf.diagram.TargetProvider;
 import org.eclipse.sirius.components.view.emf.diagram.ToolFinder;
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramConversionData;
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverter;
 import org.eclipse.sirius.components.view.emf.diagram.ViewDiagramDescriptionConverterContext;
-import org.eclipse.sirius.components.view.emf.diagram.api.IToolConverter;
 import org.eclipse.sirius.components.view.emf.diagram.tools.api.IToolExecutor;
 
 /**
@@ -122,8 +120,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private final ILabelService labelService;
 
-    private final IToolConverter toolConverter;
-
     private final IToolExecutor toolExecutor;
 
     private final IDiagramIdProvider diagramIdProvider;
@@ -136,11 +132,10 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
 
     private final List<INodeStyleProvider> nodeStyleProviders;
 
-    public PapyrusViewDiagramDescriptionConverter(IIdentityService identityService, ILabelService labelService, IToolConverter toolConverter, IToolExecutor toolExecutor, List<INodeStyleProvider> nodeStyleProviders, IDiagramIdProvider diagramIdProvider) {
-        super(identityService, labelService, toolConverter, toolExecutor, nodeStyleProviders, diagramIdProvider);
+    public PapyrusViewDiagramDescriptionConverter(IIdentityService identityService, ILabelService labelService, IToolExecutor toolExecutor, List<INodeStyleProvider> nodeStyleProviders, IDiagramIdProvider diagramIdProvider) {
+        super(identityService, labelService, toolExecutor, nodeStyleProviders, diagramIdProvider);
         this.identityService = Objects.requireNonNull(identityService);
         this.labelService = Objects.requireNonNull(labelService);
-        this.toolConverter = Objects.requireNonNull(toolConverter);
         this.toolExecutor = Objects.requireNonNull(toolExecutor);
         this.diagramIdProvider = Objects.requireNonNull(diagramIdProvider);
         this.nodeStyleProviders = Objects.requireNonNull(nodeStyleProviders);
@@ -191,7 +186,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .targetObjectIdProvider(this.semanticTargetIdProvider)
                 .nodeDescriptions(nodeDescriptions)
                 .edgeDescriptions(edgeDescriptions)
-                .palettes(this.toolConverter.createPaletteBasedToolSections(viewDiagramDescription, converterContext))
                 .dropHandler(this.createDiagramDropHandler(viewDiagramDescription, converterContext))
                 .iconURLsProvider(new ViewIconURLsProvider(interpreter, viewDiagramDescription.getIconExpression()));
 
@@ -364,7 +358,6 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .reusedChildNodeDescriptionIds(reusedChildNodeDescriptionIds)
                 .reusedBorderNodeDescriptionIds(reusedBorderNodeDescriptionIds)
                 .userResizable(userResizableDirection)
-                .deleteHandler(this.createDeleteHandler(viewNodeDescription, converterContext))
                 .shouldRenderPredicate(shouldRenderPredicate)
                 .isCollapsedByDefaultPredicate(isCollapsedByDefaultPredicate)
                 .isHiddenByDefaultPredicate(isHiddenByDefaultPredicate)
@@ -373,6 +366,9 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .defaultHeightProvider(defaultHeightProvider)
                 .keepAspectRatio(viewNodeDescription.isKeepAspectRatio())
                 .initialChildBorderNodePositions(initialBorderNodePositions);
+
+        this.createDeleteHandler(viewNodeDescription, converterContext)
+                .ifPresent(builder::deleteHandler);
 
         if (insideLabel != null) {
             builder.insideLabelDescription(insideLabel);
@@ -637,8 +633,9 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
                 .synchronizationPolicy(synchronizationPolicy)
                 .sourceProvider(sourceProvider)
                 .targetProvider(targetProvider)
-                .styleProvider(styleProvider)
-                .deleteHandler(this.createDeleteHandler(viewEdgeDescription, converterContext));
+                .styleProvider(styleProvider);
+
+        this.createDeleteHandler(viewEdgeDescription, converterContext).ifPresent(builder::deleteHandler);
 
         this.getSpecificEdgeLabelDescription(viewEdgeDescription, viewEdgeDescription.getBeginLabelExpression(), LabelIdProvider.EDGE_BEGIN_LABEL_SUFFIX, interpreter, stylesFactory)
                 .ifPresent(builder::beginLabelDescription);
@@ -653,33 +650,21 @@ public class PapyrusViewDiagramDescriptionConverter extends ViewDiagramDescripti
         return result;
     }
 
-    private Function<VariableManager, IStatus> createDeleteHandler(DiagramElementDescription diagramElementDescription, ViewDiagramDescriptionConverterContext converterContext) {
-        Function<VariableManager, IStatus> handler = variableManager -> {
-            IStatus result;
-            VariableManager childVariableManager = variableManager.createChild();
-            var convertedNodes = Collections.unmodifiableMap(converterContext.getConvertedNodes());
-            childVariableManager.put(CONVERTED_NODES_VARIABLE, convertedNodes);
+    private Optional<Function<VariableManager, IStatus>> createDeleteHandler(DiagramElementDescription diagramElementDescription, ViewDiagramDescriptionConverterContext converterContext) {
+        var optionalDeleteTool = new ToolFinder().findDeleteTool(diagramElementDescription);
+        if (optionalDeleteTool.isPresent()) {
+            var deleteTool = optionalDeleteTool.get();
+            Function<VariableManager, IStatus> handler = variableManager -> {
+                VariableManager childVariableManager = variableManager.createChild();
+                var convertedNodes = Collections.unmodifiableMap(converterContext.getConvertedNodes());
+                childVariableManager.put(CONVERTED_NODES_VARIABLE, convertedNodes);
+                return this.toolExecutor.executeTool(deleteTool, converterContext.getInterpreter(), childVariableManager);
+            };
 
-            var optionalDeleteTool = new ToolFinder().findDeleteTool(diagramElementDescription);
-            if (optionalDeleteTool.isPresent()) {
-                result = this.toolExecutor.executeTool(optionalDeleteTool.get(), converterContext.getInterpreter(), childVariableManager);
-            } else {
-                result = new Failure("No deletion tool configured");
-            }
-            return result;
-        };
-
-        return new IViewNodeDeleteHandler() {
-            @Override
-            public boolean hasSemanticDeleteTool() {
-                return new ToolFinder().findDeleteTool(diagramElementDescription).isPresent();
-            }
-
-            @Override
-            public IStatus apply(VariableManager variableManager) {
-                return handler.apply(variableManager);
-            }
-        };
+            return Optional.of(handler::apply);
+        } else {
+            return Optional.empty();
+        }
     }
 
     private BiFunction<VariableManager, String, IStatus> createNodeLabelEditHandler(org.eclipse.sirius.components.view.diagram.NodeDescription nodeDescription,

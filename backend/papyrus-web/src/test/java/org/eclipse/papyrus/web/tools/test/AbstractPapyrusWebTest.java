@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -35,7 +35,7 @@ import org.eclipse.papyrus.web.application.representations.IDiagramConvertedElem
 import org.eclipse.papyrus.web.application.representations.PapyrusRepresentationDescriptionRegistry;
 import org.eclipse.papyrus.web.application.representations.view.IdBuilder;
 import org.eclipse.papyrus.web.application.templates.documents.UMLStereotypeProvider;
-import org.eclipse.papyrus.web.application.templates.projects.PapyrusUMLNatures;
+import org.eclipse.papyrus.web.application.templates.projects.UMLProjectTemplateProvider;
 import org.eclipse.papyrus.web.tools.configuration.ProjectInitializerInput;
 import org.eclipse.papyrus.web.tools.utils.CreationTool;
 import org.eclipse.papyrus.web.utils.AbstractWebUMLTest;
@@ -270,7 +270,7 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      *            the type of the intermediate element to create
      */
     public void setUpWithIntermediateRoot(String intermediateRootName, EClass intermediateRootType) {
-        String projectId = this.projectCreator.createProject("Instance", List.of(PapyrusUMLNatures.UML));
+        String projectId = this.projectCreator.createProject("Instance", UMLProjectTemplateProvider.EMPTY_UML_TEMPLATE);
 
         this.editingContextId = this.getEditingContext(projectId).getId();
 
@@ -295,7 +295,7 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      * </p>
      */
     public void setUpWithoutRepresentation() {
-        String projectId = this.projectCreator.createProject("Instance", List.of(PapyrusUMLNatures.UML));
+        String projectId = this.projectCreator.createProject("Instance", UMLProjectTemplateProvider.EMPTY_UML_TEMPLATE);
         this.editingContextId = this.getEditingContext(projectId).getId();
 
         ProjectInitializerInput input = new ProjectInitializerInput(UUID.randomUUID());
@@ -346,10 +346,10 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      * @see PapyrusInvokeSingleClickOnDiagramElementToolRunner
      */
     protected void applyNodeCreationTool(String parentDiagramElementId, CreationTool nodeCreationTool) {
-        Optional<String> toolId = this.getPaletteQueryRunner.getTool(this.editingContextId, this.representationId, parentDiagramElementId, nodeCreationTool.getToolSection(),
+        Optional<String> toolId = this.getPaletteQueryRunner.getTool(this.editingContextId, this.representationId, List.of(parentDiagramElementId), nodeCreationTool.getToolSection(),
                 nodeCreationTool.getToolName());
         assertThat(toolId).as(MessageFormat.format("The tool {0} | {1} doesn't exist", nodeCreationTool.getToolSection(), nodeCreationTool.getToolName())).isPresent();
-        this.invokeToolOnOneElementRunner.invokeTool(this.editingContextId, this.representationId, parentDiagramElementId, toolId.get());
+        this.invokeToolOnOneElementRunner.invokeTool(this.editingContextId, this.representationId, List.of(parentDiagramElementId), toolId.get());
     }
 
     /**
@@ -369,7 +369,7 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      * @see PapyrusInvokeSingleClickOnTwoDiagramElementsToolRunner
      */
     protected void applyEdgeCreationTool(String sourceDiagramElementId, String targetDiagramElementId, CreationTool edgeCreationTool) {
-        Optional<String> toolId = this.getPaletteQueryRunner.getTool(this.editingContextId, this.representationId, sourceDiagramElementId, edgeCreationTool.getToolSection(),
+        Optional<String> toolId = this.getPaletteQueryRunner.getTool(this.editingContextId, this.representationId, List.of(sourceDiagramElementId), edgeCreationTool.getToolSection(),
                 edgeCreationTool.getToolName());
         assertThat(toolId).isPresent();
         this.invokeToolOnTwoElementsRunner.invokeTool(this.editingContextId, this.representationId, sourceDiagramElementId, targetDiagramElementId, toolId.get());
@@ -384,8 +384,8 @@ public abstract class AbstractPapyrusWebTest extends AbstractWebUMLTest {
      *            the graphical identifier of the element to delete
      */
     protected void applyNodeGraphicalDeletionTool(String diagramElementToDeleteId) {
-        Optional<String> toolId = getPaletteQueryRunner.getQuickAccessTool(editingContextId, representationId, diagramElementToDeleteId, "Delete from diagram");
-        this.invokeToolOnOneElementRunner.invokeTool(this.editingContextId, this.representationId, diagramElementToDeleteId, toolId.get());
+        Optional<String> toolId = getPaletteQueryRunner.getQuickAccessTool(editingContextId, representationId, List.of(diagramElementToDeleteId), "Delete from diagram");
+        this.invokeToolOnOneElementRunner.invokeTool(this.editingContextId, this.representationId, List.of(diagramElementToDeleteId), toolId.get());
     }
 
 

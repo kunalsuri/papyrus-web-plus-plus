@@ -56,6 +56,7 @@ const toNoteNode = (
     pinned,
     style,
     labelEditable,
+    deletable,
   } = gqlNode;
 
   console.log('GLNode', gqlNode);
@@ -110,6 +111,7 @@ const toNoteNode = (
     },
     minComputedWidth: gqlNodeLayoutData?.minComputedSize.width ?? null,
     minComputedHeight: gqlNodeLayoutData?.minComputedSize.height ?? null,
+    deletable,
   };
 
   data.insideLabel = convertInsideLabel(

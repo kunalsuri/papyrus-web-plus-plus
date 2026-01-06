@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -49,9 +49,16 @@ Cypress.Commands.add('renameProject', (projectId, newProjectName) => {
 /**
  * Creates a project from a template and create a document from a stereotype.
  */
-Cypress.Commands.add('createProjectFromStereotype', (projectName, templateName, stereotypeName, resourceName, natures) => {
-  cy.createProjectFromTemplate(projectName, templateName, natures).then((res) => {
-    const projectId = res.body.data.createProjectFromTemplate.project.id;
+Cypress.Commands.add('createProjectFromStereotype', (projectName, templateName, stereotypeName, resourceName, libraryIds = []) => {
+  cy.createProject(projectName, templateName, libraryIds).then((res) => {
+    const payload = res.body.data?.createProject;
+     if (!payload || !payload.project?.id) {
+       throw new Error(
+        `createProject failed:\n${JSON.stringify(res.body, null, 2)}`
+       );
+     }
+
+    const projectId = payload.project.id;
 
     cy.renameProject(projectId, projectName).then((res) => {
       cy.wrap(projectId).as('projectId');
@@ -70,9 +77,9 @@ Cypress.Commands.add('createProjectFromStereotype', (projectName, templateName, 
 /*
  * Create a project from a template.
  */
-Cypress.Commands.add('createProjectFromTemplateWithName', (context, projectName, templateName, natures) => {
-    cy.createProjectFromTemplate(projectName, templateName, natures).then((res) => {
-    context.projectId = res.body.data.createProjectFromTemplate.project.id;
+Cypress.Commands.add('createProjectWithName', (context, projectName, templateName, libraryIds) => {
+    cy.createProject(projectName, templateName, libraryIds).then((res) => {
+    context.projectId = res.body.data.createProject.project.id;
     cy.renameProject(context.projectId, projectName).then((res) => {
       return cy.visit(`/projects/${context.projectId}/edit`);
     });
@@ -89,7 +96,7 @@ Cypress.Commands.add('createProjectFromTemplateWithName', (context, projectName,
  * @param tabToSelect an optional tab to select
  */
 Cypress.Commands.add('createTestProject', (context, projectName, elementToSelect, tabToSelect) => {
-  context.projectId = cy.createProjectFromTemplateWithName(context, projectName, 'EmptyUMLTemplate').then((res) => {
+  context.projectId = cy.createProjectWithName(context, projectName, 'EmptyUMLTemplate').then((res) => {
     cy.visit(`/projects/${context.projectId}/edit`).then((res) => {
       cy.getByTestId('upload-document-icon').click();
       cy.fixture('model4test.uml', { mimeType: 'text/xml' }).as('model4test');
@@ -129,7 +136,7 @@ Cypress.Commands.add('createTestProject', (context, projectName, elementToSelect
  */
 Cypress.Commands.add('createTestProfileProject', (context, projectName, profileName, publishProfile = true) => {
   // first load and publish the profile
-  cy.createProjectFromTemplateWithName(context, projectName, 'EmptyUMLTemplate').then((res) => {
+  cy.createProjectWithName(context, projectName, 'EmptyUMLTemplate').then((res) => {
     context.profileProjectId = context.projectId;
     cy.visit(`/projects/${context.profileProjectId}/edit`).then((res) => {
       cy.getByTestId('upload-document-icon').click();

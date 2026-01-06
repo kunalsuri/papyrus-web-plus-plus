@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -65,7 +65,7 @@ public class ClickContainmentReferenceItemEventHandler implements IFormEventHand
     }
 
     @Override
-    public boolean canHandle(IFormInput formInput) {
+    public boolean canHandle(IEditingContext editingContext, IFormInput formInput) {
         return formInput instanceof ClickContainmentReferenceItemInput;
     }
 

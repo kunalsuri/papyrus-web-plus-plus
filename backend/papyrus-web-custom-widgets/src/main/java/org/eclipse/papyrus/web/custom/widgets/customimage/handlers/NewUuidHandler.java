@@ -64,7 +64,7 @@ public class NewUuidHandler implements IFormEventHandler {
     }
 
     @Override
-    public boolean canHandle(IFormInput formInput) {
+    public boolean canHandle(IEditingContext editingContext, IFormInput formInput) {
         return formInput instanceof NewUuidInput;
     }
 

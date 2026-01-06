@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ package org.eclipse.papyrus.web.application.representations.nodes;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.PapyrusCustomNodesPackage;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.provider.PapyrusCustomNodesItemProviderAdapterFactory;
 import org.eclipse.papyrus.web.customnodes.papyruscustomnodes.provider.customimpl.PapyrusCustomNodesItemProviderAdapterFactoryCustomImpl;
@@ -47,8 +48,8 @@ public class PapyrusCustomNodeEMFConfiguration {
      * @return custom {@link AdapterFactory}
      */
     @Bean
-    public AdapterFactory papyrusCustomNodeAdapterFactory() {
-        return new PapyrusCustomNodesItemProviderAdapterFactoryCustomImpl();
+    public ComposedAdapterFactory.Descriptor papyrusCustomNodeAdapterFactory() {
+        return PapyrusCustomNodesItemProviderAdapterFactoryCustomImpl::new;
     }
 
     /**

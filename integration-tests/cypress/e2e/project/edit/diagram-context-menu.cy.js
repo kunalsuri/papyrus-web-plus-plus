@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -18,10 +18,9 @@ describe('/projects/:projectId/edit - Diagram Context Menu', () => {
   beforeEach(() => {
     cy.deleteProjectByName(projectName);
     const templateId = 'UMLCppSMProject';
-    cy.createProjectFromTemplate(projectName, templateId).then((res) => {
-      const projectId = res.body.data.createProjectFromTemplate.project.id;
-      const repToOpen = res.body.data.createProjectFromTemplate.representationToOpen.id;
-      cy.visit(`/projects/${projectId}/edit/${repToOpen}`);
+    cy.createProject(projectName, templateId).then((res) => {
+      const projectId = res.body.data.createProject.project.id;
+      cy.visit(`/projects/${projectId}/edit/`);
     });
   });
 

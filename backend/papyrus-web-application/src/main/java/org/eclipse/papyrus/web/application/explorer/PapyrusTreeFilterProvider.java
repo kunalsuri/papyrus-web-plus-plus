@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -33,10 +33,9 @@ public class PapyrusTreeFilterProvider implements ITreeFilterProvider {
     public static final String HIDE_PATHMAP_URI_TREE_ITEM_FILTER_ID = UUID.nameUUIDFromBytes("Papyrus.HideResourceReadonlyResources".getBytes()).toString();
 
     @Override
-    public List<TreeFilter> get(String editingContextId, TreeDescription treeDescription, String representationId) {
+    public List<TreeFilter> get(String editingContextId, TreeDescription treeDescription) {
         List<TreeFilter> filters = new ArrayList<>();
         filters.add(new TreeFilter(HIDE_PATHMAP_URI_TREE_ITEM_FILTER_ID, "Hide read only resources", true));
         return filters;
     }
-
 }

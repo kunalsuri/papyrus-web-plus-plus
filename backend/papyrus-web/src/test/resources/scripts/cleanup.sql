@@ -6,3 +6,4 @@ DELETE FROM representation_content;
 DELETE FROM image;
 DELETE FROM nature;
 DELETE FROM project;
+DELETE FROM project_semantic_data;

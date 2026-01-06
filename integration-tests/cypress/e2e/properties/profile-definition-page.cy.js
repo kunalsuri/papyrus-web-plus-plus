@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,11 +19,10 @@ describe('Profile definition page test', () => {
     cy.deleteProjectByName(projectName);
     // create a new project with profile UML template
     const templateId = 'DefaultProfileWithPrimitiveAndUml';
-    cy.createProjectFromTemplate(projectName, templateId)
+    cy.createProject(projectName, templateId)
       .then((res) => {
-        const projectId = res.body.data.createProjectFromTemplate.project.id;
-        const repToOpen = res.body.data.createProjectFromTemplate.representationToOpen.id;
-        cy.visit(`/projects/${projectId}/edit/${repToOpen}`);
+        const projectId = res.body.data.createProject.project.id;
+        cy.visit(`/projects/${projectId}/edit`);
       })
       .then(() => {
         cy.expandAll('Profile.profile.uml');

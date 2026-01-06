@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -120,13 +120,15 @@ public class LanguageExpressionTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         AddLanguageHandler handler = new AddLanguageHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
         changeDescriptionSink.asFlux().blockFirst();
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(SuccessPayload.class);
@@ -167,6 +169,8 @@ public class LanguageExpressionTests {
                 .pages(Collections.singletonList(page))
                 .build();
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         IFormQueryService formQueryService = new IFormQueryService.NoOp() {
             @Override
             public Optional<AbstractWidget> findWidget(Form form, String widgetId) {
@@ -175,12 +179,12 @@ public class LanguageExpressionTests {
         };
 
         DeleteLanguageHandler handler = new DeleteLanguageHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
         changeDescriptionSink.asFlux().blockFirst();
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(SuccessPayload.class);
@@ -228,13 +232,15 @@ public class LanguageExpressionTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         EditLanguageBodyHandler handler = new EditLanguageBodyHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
         changeDescriptionSink.asFlux().blockFirst();
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(SuccessPayload.class);
@@ -282,13 +288,15 @@ public class LanguageExpressionTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         MoveLanguageHandler handler = new MoveLanguageHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
         changeDescriptionSink.asFlux().blockFirst();
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(SuccessPayload.class);
@@ -337,13 +345,15 @@ public class LanguageExpressionTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         AddLanguageHandler handler = new AddLanguageHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);
@@ -393,13 +403,15 @@ public class LanguageExpressionTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         DeleteLanguageHandler handler = new DeleteLanguageHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);
@@ -449,13 +461,15 @@ public class LanguageExpressionTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         EditLanguageBodyHandler handler = new EditLanguageBodyHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);
@@ -505,13 +519,15 @@ public class LanguageExpressionTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         MoveLanguageHandler handler = new MoveLanguageHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         IPayload payload = payloadSink.asMono().block();
         assertThat(payload).isInstanceOf(ErrorPayload.class);

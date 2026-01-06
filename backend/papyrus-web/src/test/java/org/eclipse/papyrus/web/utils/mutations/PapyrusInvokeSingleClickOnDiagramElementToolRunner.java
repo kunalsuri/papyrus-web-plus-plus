@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -47,7 +47,7 @@ public class PapyrusInvokeSingleClickOnDiagramElementToolRunner {
     /**
      * Invokes the {@code toolId} tool on the {@code diagramElementId} element.
      * <p>
-     * This method invokes the given tool on a single element, see {@link #invokeTool(UUID, UUID, UUID, UUID, UUID)} to invoke a tool on two elements.
+     * This method invokes the given tool on a single element, see {@link #invokeTool(UUID, UUID, UUID, List<UUID>, UUID)} to invoke a tool on two elements.
      * </p>
      * <p>
      * This method produces a test failure if the underlying GraphQL query returns an error.
@@ -57,16 +57,16 @@ public class PapyrusInvokeSingleClickOnDiagramElementToolRunner {
      *         the project containing the element on which the tool is invoked
      * @param representationId
      *         the representation containing the element
-     * @param diagramElementId
-     *         the graphical identifier of the element on which the tool is invoked
+     * @param diagramElementIds
+     *         the graphical identifiers of the elements on which the tool is invoked
      * @param toolId
      *         the identifier of the tool to invoke
      */
-    public void invokeTool(String editingContextId, String representationId, String diagramElementId, String toolId) {
+    public void invokeTool(String editingContextId, String representationId, List<String> diagramElementIds, String toolId) {
         // Starting position and selected objects aren't relevant when invoking the tool manually, so we set them to 0
         // and null, respectively
         InvokeSingleClickOnDiagramElementToolInput invokeSingleClickOnDiagramElementToolInput = new InvokeSingleClickOnDiagramElementToolInput(UUID.randomUUID(), editingContextId, representationId,
-                diagramElementId, toolId, 0, 0, List.of());
+                diagramElementIds, toolId, 0, 0, List.of());
 
         String jsonResult = this.runner.run(invokeSingleClickOnDiagramElementToolInput);
 

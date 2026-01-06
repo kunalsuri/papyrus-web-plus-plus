@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -50,7 +50,7 @@ public class DiagramBuilderService implements IDiagramBuilderService {
         var optionalDiagramDescription = this.findDiagramDescription(editingContext, diagramDescriptionMatcher);
         if (optionalDiagramDescription.isPresent()) {
             DiagramDescription diagramDescription = optionalDiagramDescription.get();
-            return Optional.of(this.diagramCreationService.create(semanticTarget, diagramDescription, editingContext));
+            return Optional.of(this.diagramCreationService.create(editingContext, diagramDescription, semanticTarget));
         } else {
             return Optional.empty();
         }

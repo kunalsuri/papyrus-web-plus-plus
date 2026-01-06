@@ -111,13 +111,15 @@ public class NewValuePrimitiveRadioHandlerTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         NewValueHandler handler = new NewValueHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         ChangeDescription changeDescription = changeDescriptionSink.asFlux().blockFirst();
         assertThat(changeDescription.getKind()).isEqualTo(ChangeKind.SEMANTIC_CHANGE);
@@ -171,13 +173,15 @@ public class NewValuePrimitiveRadioHandlerTests {
             }
         };
 
+        IEditingContext editingContext = new IEditingContext.NoOp();
+
         NewValueHandler handler = new NewValueHandler(formQueryService, new ICollaborativeFormMessageService.NoOp(), new SimpleMeterRegistry());
-        assertThat(handler.canHandle(input)).isTrue();
+        assertThat(handler.canHandle(editingContext, input)).isTrue();
 
         Sinks.Many<ChangeDescription> changeDescriptionSink = Sinks.many().unicast().onBackpressureBuffer();
         Sinks.One<IPayload> payloadSink = Sinks.one();
 
-        handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
+        handler.handle(payloadSink, changeDescriptionSink, editingContext, form, input);
 
         handler.handle(payloadSink, changeDescriptionSink, new IEditingContext.NoOp(), form, input);
 

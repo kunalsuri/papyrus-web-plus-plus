@@ -56,6 +56,7 @@ const toOuterFlagNode = (
     pinned,
     style,
     labelEditable,
+    deletable,
   } = gqlNode;
 
   const handleLayoutData: GQLHandleLayoutData[] = gqlDiagram.layoutData.nodeLayoutData
@@ -108,6 +109,7 @@ const toOuterFlagNode = (
     },
     minComputedWidth: gqlNodeLayoutData?.minComputedSize.width ?? null,
     minComputedHeight: gqlNodeLayoutData?.minComputedSize.height ?? null,
+    deletable,
   };
 
   data.insideLabel = convertInsideLabel(
