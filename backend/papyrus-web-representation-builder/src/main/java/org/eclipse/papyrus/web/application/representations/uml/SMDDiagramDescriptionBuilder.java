@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 199, 229
+ *  Aurelien Didier (Artal Technologies) - Issue 199, 229, 232
  *  Titouan BOUETE-GIRAUD (Artal Technologies) - titouan.bouete-giraud@artal.fr - Issues 219, 227
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.uml;
@@ -83,11 +83,12 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
     private NodeDescription smSharedDescription;
 
     public SMDDiagramDescriptionBuilder() {
-        super(SMD_PREFIX, SMD_REP_NAME, UMLPackage.eINSTANCE.getStateMachine());
+        super(SMD_PREFIX, SMD_REP_NAME, UMLPackage.eINSTANCE.getNamedElement());
     }
 
     @Override
     protected void fillDescription(DiagramDescription diagramDescription) {
+        diagramDescription.setPreconditionExpression(CallQuery.queryServiceOnSelf(StateMachineDiagramServices.CAN_CREATE_DIAGRAM));
 
         this.createDefaultToolSectionInDiagramDescription(diagramDescription);
 
@@ -96,19 +97,28 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
                 this.umlPackage.getState(),
                 this.umlPackage.getStateMachine());
 
-        // DOIT ON INVERSER OU PAS AVEC LE SYMBOL ?
         this.symbolNodeDescription = this.createSymbolSharedNodeDescription(diagramDescription, symbolOwners, List.of(this.umlPackage.getRegion()), SYMBOLS_COMPARTMENT_SUFFIX);
+        // root StateMachine node when the diagram is created on a StateMachine
         NodeDescription stateMachineNodeDescription = this.createStateMachineNodeDescription(diagramDescription);
+        // root State Node when the diagram is created on a State
+        NodeDescription stateNodeDescription = this.createStateNodeDescription(diagramDescription);
+
         this.createTransitionEdgeDescription(diagramDescription);
         this.createCommentTopNodeDescription(diagramDescription, NODES);
 
         this.createRegionSharedNodeDescription(diagramDescription);
-        NodeDescription stateNodeDescription = this.createStateSharedNodeDescription(diagramDescription);
+        // the state node description when it is not the root of the diagram
+        NodeDescription stateSharedNodeDescription = this.createStateSharedNodeDescription(diagramDescription);
         this.createFinalStateSharedNodeDescription(diagramDescription);
         this.createPseudostateSharedNodeDescription(diagramDescription);
+        // define PseudoState border nodes for StateMachine
         this.createPseudostateBorderSharedNodeDescription(stateMachineNodeDescription, diagramDescription, this.umlPackage.getStateMachine_ConnectionPoint(), this.umlPackage.getStateMachine(),
-                "StateMachine");
-        this.createPseudostateBorderSharedNodeDescription(stateNodeDescription, diagramDescription, this.umlPackage.getState_ConnectionPoint(), this.umlPackage.getState(), "State");
+                "StateMachine", true);
+        // define PseudoState border nodes for State which are not on the root of the diagram
+        this.createPseudostateBorderSharedNodeDescription(stateSharedNodeDescription, diagramDescription, this.umlPackage.getState_ConnectionPoint(), this.umlPackage.getState(), "SharedState", true);
+        // define PseudoState border nodes for State used as root of the diagram. We don't redefined the creation tools
+        // for these bordered nodes to avoid to get them twice
+        this.createPseudostateBorderSharedNodeDescription(stateNodeDescription, diagramDescription, this.umlPackage.getState_ConnectionPoint(), this.umlPackage.getState(), "State", false);
 
         this.createCommentSubNodeDescription(diagramDescription, this.smSharedDescription, NODES,
                 this.getIdBuilder().getSpecializedDomainNodeName(this.umlPackage.getComment(), SHARED_SUFFIX),
@@ -168,6 +178,41 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
             smGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
         return smdStateMachineNodeDesc;
+    }
+
+    /**
+     *
+     * @param diagramDescription
+     * @return the NodeDescription to use for State on the root of the diagram. This Node is synchronized and has no working Delete Tool.
+     */
+    private NodeDescription createStateNodeDescription(DiagramDescription diagramDescription) {
+        RectangularNodeStyleDescription rectangularNodeStyle = this.getViewBuilder().createRectangularNodeStyle();
+        rectangularNodeStyle.setBorderRadius(STATEMACHINE_NODE_BORDER_RADIUS);
+        ListLayoutStrategyDescription listLayoutStrategyDescription = this.createListLayoutStrategy();
+        InsideLabelStyle createDefaultInsideLabelStyle = this.getViewBuilder().createDefaultInsideLabelStyle(false, true);
+        createDefaultInsideLabelStyle.setHeaderSeparatorDisplayMode(HeaderSeparatorDisplayMode.ALWAYS);
+        NodeDescription smdStateNodeDesc = this.newNodeBuilder(this.umlPackage.getState(), rectangularNodeStyle)//
+                .layoutStrategyDescription(listLayoutStrategyDescription)//
+                .semanticCandidateExpression(this.getQueryBuilder().querySelf())//
+                .synchronizationPolicy(SynchronizationPolicy.SYNCHRONIZED)//
+                .labelEditTool(this.getViewBuilder().createDirectEditTool(this.umlPackage.getState().getName()))//
+                .insideLabelDescription(this.getQueryBuilder().queryRenderLabel(), createDefaultInsideLabelStyle)
+                .build();
+        diagramDescription.getNodeDescriptions().add(smdStateNodeDesc);
+        this.createDefaultToolSectionsInNodeDescription(smdStateNodeDesc);
+
+        // workaround to overcome missing enhancement https://github.com/PapyrusSirius/papyrus-web/issues/121
+        // It is not possible to define that there is no delete tool.
+        // The only way is to define a delete tool that does nothing
+        smdStateNodeDesc.getPalette().setDeleteTool(DiagramFactory.eINSTANCE.createDeleteTool());
+
+        DropNodeTool smGraphicalDropTool = this.getViewBuilder().createGraphicalDropTool(this.getIdBuilder().getNodeGraphicalDropToolName(smdStateNodeDesc));
+        List<EClass> children = List.of(this.umlPackage.getRegion(), this.umlPackage.getPseudostate());
+        this.registerCallback(smdStateNodeDesc, () -> {
+            List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
+            smGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
+        });
+        return smdStateNodeDesc;
     }
 
     private NodeDescription createRegionSharedNodeDescription(DiagramDescription diagramDescription) {
@@ -273,7 +318,7 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
 
         String specializedDomainNodeName = this.getIdBuilder().getSpecializedDomainNodeName(this.umlPackage.getPseudostate(), SHARED_SUFFIX);
         NodeDescription pseudostateNodeDesc = this.createPseudostateNodeDescription(diagramDescription, this.umlPackage.getRegion_Subvertex(), this.umlPackage.getRegion(), pseudostateKinds,
-                specializedDomainNodeName);
+                specializedDomainNodeName, true);
 
         //
         this.smSharedDescription.getChildrenDescriptions().add(pseudostateNodeDesc);
@@ -284,18 +329,17 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
 
     }
 
-    private void createPseudostateBorderSharedNodeDescription(NodeDescription parentNode, DiagramDescription diagramDescription, EReference containmentFeature, EClass owner, String name) {
+    private void createPseudostateBorderSharedNodeDescription(NodeDescription parentNode, DiagramDescription diagramDescription, EReference containmentFeature, EClass owner, String name,
+            boolean withTool) {
         List<PseudostateKind> pseudostateKinds = List.of(PseudostateKind.ENTRY_POINT_LITERAL, PseudostateKind.EXIT_POINT_LITERAL);
         String suffix = name + "_BorderedNode_SHARED";
         String specializedDomainNodeName = this.getIdBuilder().getSpecializedDomainNodeName(this.umlPackage.getPseudostate(), suffix);
-        NodeDescription pseudostateBorderNodeDesc = this.createPseudostateNodeDescription(diagramDescription, containmentFeature, owner, pseudostateKinds, specializedDomainNodeName);
-
+        NodeDescription pseudostateBorderNodeDesc = this.createPseudostateNodeDescription(diagramDescription, containmentFeature, owner, pseudostateKinds, specializedDomainNodeName, withTool);
         parentNode.getBorderNodesDescriptions().add(pseudostateBorderNodeDesc);
-
     }
 
     private NodeDescription createPseudostateNodeDescription(DiagramDescription diagramDescription, EReference containmentFeature, EClass ownerClass,
-            List<PseudostateKind> pseudostateKinds, String name) {
+            List<PseudostateKind> pseudostateKinds, String name, boolean withTool) {
         List<ConditionalNodeStyle> conditionalNodeStyles = new ArrayList<>();
         List<NodeTool> creationTools = new ArrayList<>();
 
@@ -347,10 +391,11 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
 
             creationTools.add(creationTool);
 
-            List<EClass> owners = List.of(ownerClass);
-            this.reuseTool(pseudostateNodeDesc, diagramDescription, creationTool, owners, List.of(),
-                    nodeDescription -> nodeDescription != null);
-
+            if (withTool) {
+                List<EClass> owners = List.of(ownerClass);
+                this.reuseTool(pseudostateNodeDesc, diagramDescription, creationTool, owners, List.of(),
+                        nodeDescription -> nodeDescription != null);
+            }
         }
 
         pseudostateNodeDesc.getConditionalStyles().addAll(conditionalNodeStyles);

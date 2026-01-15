@@ -10,7 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
- *  Aurelien Didier (Artal Technologies) - Issue 190
+ *  Aurelien Didier (Artal Technologies) - Issue 190, 232
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.aqlservices.statemachine;
 
@@ -36,9 +36,13 @@ import org.eclipse.sirius.components.core.api.ILabelService;
 import org.eclipse.sirius.components.core.api.IObjectSearchService;
 import org.eclipse.sirius.components.diagrams.Node;
 import org.eclipse.sirius.components.diagrams.description.NodeDescription;
+import org.eclipse.uml2.uml.BehavioredClassifier;
+import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.NamedElement;
+import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.Pseudostate;
 import org.eclipse.uml2.uml.PseudostateKind;
+import org.eclipse.uml2.uml.State;
 import org.springframework.stereotype.Service;
 
 /**
@@ -69,6 +73,21 @@ public class StateMachineDiagramService extends AbstractDiagramService {
         super(identityService, labelService, objectSearchService, diagramNavigationService, diagramOperationsService,
                 editableChecker, viewDiagramService, logger);
         this.logger = logger;
+    }
+
+    /**
+     * Checks if an StateMachine diagram can be created from the given {@code context}.
+     *
+     * @param context
+     *            the target element used to create the StateMachine description
+     * @return {@code true} if the StateMachine diagram can be created, {@code false} otherwise
+     */
+    public boolean canCreateDiagramSM(EObject context) {
+        boolean isAllowedContext = context instanceof Package ||
+                context instanceof BehavioredClassifier ||
+                context instanceof Interface ||
+                context instanceof State;
+        return isAllowedContext && !this.isContainedInProfileResource(context);
     }
 
     @Override

@@ -77,7 +77,7 @@ public class StateMachineDiagramTests extends AbstractDiagramTest {
 
     private static final String SMD_PSEUDOSTATE_BORDERNODE_IN_STATE_MACHINE_NAME = ID_BUILDER.getSpecializedDomainNodeName(UML.getPseudostate(), "StateMachine_BorderedNode_SHARED");
 
-    private static final String SMD_PSEUDOSTATE_BORDERNODE_IN_STATE_NAME = ID_BUILDER.getSpecializedDomainNodeName(UML.getPseudostate(), "State_BorderedNode_SHARED");
+    private static final String SMD_PSEUDOSTATE_BORDERNODE_IN_STATE_NAME = ID_BUILDER.getSpecializedDomainNodeName(UML.getPseudostate(), "SharedState_BorderedNode_SHARED");
 
     private static final String SMD_TRANSITION_EDGE_NAME = ID_BUILDER.getDomainBaseEdgeId(UML.getTransition());
 

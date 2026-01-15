@@ -16,12 +16,34 @@
 :toclevels: 3 
 
 == Can create 
-Can be created under a StateMachine.
+Can be created under a StateMachine, a State, a Package, a BehavioredClassifier and an Interface.
 
 == Initialization
+=== Creation on a StateMachine
 Display the StateMachine as the root of the Diagram (labeled with a &laquo;stateMachine&raquo; prefix). 
 
-image::StateMachineDiagram/StateMachineDiagram.png[title="Representation State Machine Diagram"]
+image::StateMachineDiagram/StateMachineDiagram.png[title="Representation State Machine Diagram on a StateMachine"]
+
+=== Creation on a State
+Display the State as the root of the Diagram
+
+image::StateMachineDiagram/StateMachineDiagramOnState.png[title="Representation State Machine Diagram on a State"]
+
+=== Creation on a Package
+Create a StateMachine inside the Package, owned by the feature **packagedElement**, then it is the same behavior than the creation in a StateMachine.
+
+image::StateMachineDiagram/StateMachineDiagramOnPackage.png[title="Representation State Machine Diagram on a Package"]
+
+=== Creation on a BehavioredClassifier 
+Create a StateMachine inside the BehavioredClassifier, owned by the feature **ownedBehavior**, then it is the same behavior than the creation in a StateMachine.
+
+image::StateMachineDiagram/StateMachineDiagramOnClass.png[title="Representation State Machine Diagram on a Class"]
+
+
+=== Creation on an Interface
+Create a ProtocolStateMachine inside the Interface, owned by the feature **protocol**, then it is the same behavior than the creation in a StateMachine, then we display the ProtocolStateMachine as the root of the diagram (labeled with a &laquo;protocol&raquo; prefix).
+
+image::StateMachineDiagram/StateMachineDiagramOnInterface.png[title="Representation State Machine Diagram on an Interface"]
 
 == Nodes
 
