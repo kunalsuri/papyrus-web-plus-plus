@@ -24,33 +24,32 @@ import java.util.stream.Stream;
 
 import org.eclipse.papyrus.web.application.templates.projects.ProfileProjectTemplateProvider;
 import org.eclipse.papyrus.web.application.templates.projects.UMLProjectTemplateProvider;
+import org.eclipse.papyrus.web.sirius.contributions.ServiceOverride;
 import org.eclipse.sirius.web.application.capability.SiriusWebCapabilities;
 import org.eclipse.sirius.web.application.capability.services.api.ICapabilityEvaluator;
 import org.eclipse.sirius.web.application.project.dto.ProjectTemplateContext;
 import org.eclipse.sirius.web.application.project.dto.ProjectTemplateDTO;
+import org.eclipse.sirius.web.application.project.services.BlankProjectTemplateProvider;
 import org.eclipse.sirius.web.application.project.services.api.IProjectTemplateApplicationService;
 import org.eclipse.sirius.web.application.project.services.api.IProjectTemplateProvider;
 import org.eclipse.sirius.web.application.project.services.api.ProjectTemplate;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 /**
  * Custom implementation of IProjectTemplateApplicationService for Papyrus Web.
  * This implementation provides custom ordering of project templates on the home page.
  * The blank project template is excluded from the list of templates.
- * 
+ *
  * NOTE : This class overrides Sirius Web's ProjectTemplateApplicationService.
- * When updating the Sirius Web dependency, check if IProjectTemplateApplicationService 
+ * When updating the Sirius Web dependency, check if IProjectTemplateApplicationService
  * has changed as it may require updating this class accordingly to avoid breaking the build.
  * </p>
  *
  * @author sbegaudeau
  */
-@Service
-@Primary
+@ServiceOverride(IProjectTemplateApplicationService.class)
 public class PapyrusProjectTemplateApplicationService implements IProjectTemplateApplicationService {
 
     // Custom ordering for project template cards on the home page.
@@ -87,10 +86,12 @@ public class PapyrusProjectTemplateApplicationService implements IProjectTemplat
                 .toList();
     }
 
+
     private List<ProjectTemplate> getProjectTemplatesSortedByName() {
         return this.projectTemplateProviders.stream()
                 .map(IProjectTemplateProvider::getProjectTemplates)
                 .flatMap(List::stream)
+                .filter(projectTemplate -> !projectTemplate.id().equals(BlankProjectTemplateProvider.BLANK_PROJECT_TEMPLATE_ID))
                 .sorted(Comparator
                         .comparingInt((ProjectTemplate pt) -> TEMPLATE_ORDER.getOrDefault(pt.id(), Integer.MAX_VALUE))
                         .thenComparing(ProjectTemplate::label))

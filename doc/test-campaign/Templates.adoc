@@ -20,10 +20,13 @@ Check that all templates are available from the home page
 
 . Click on _Show all templates_
 ** [ ] All previous cards should be available
-** [ ] Check that the following project cards are available:
+** [ ] Check that *only* the following project cards are also available:
 *** _+ {cpp} SM_
 *** _+ Java_
 *** _+ Papyrus Studio_
+
+
+For example, the `Blank Project` card does not appear on the home page nor in the "all templates" dialog
 
 == PT10 - _UML_ template
 
