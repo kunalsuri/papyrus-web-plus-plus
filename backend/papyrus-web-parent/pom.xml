@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.9</version>
+		<version>3.5.10</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.eclipse.papyrus.papyrus-web</groupId>
@@ -30,7 +30,7 @@
 
     <properties>
         <java.version>17</java.version>
-		<sirius.components.version>2026.1.0</sirius.components.version>
+		<sirius.components.version>2026.1.2</sirius.components.version>
         <eef.version>2.1.5-SNAPSHOT</eef.version>
         <uml2.version>5.5.0-SNAPSHOT</uml2.version>
 		<papyrus-uml-domain-services-version>1.0.0</papyrus-uml-domain-services-version>
