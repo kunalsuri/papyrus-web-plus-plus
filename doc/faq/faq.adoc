@@ -1,0 +1,118 @@
+ifndef::imagesdir[:imagesdir: imgs]
+
+= Frequently Asked Questions
+:toc:
+:toclevels: 4
+
+In this section you will find the answers to your questions! Enjoy! 
+
+== How to create a new project? [[HowTo_ProjectCreation]]
+The projects can be created from the xref:../user/userdoc.adoc#Homepage[home page].
+
+=== From a template + [[FromATemplate]]
+Click on the wanted template, here *UML* for the example and you a new dialog appears. This dialog allows to edit the name:
+. The name of the project to create,
+. The project template to use (expanding the section),
+. The library to use (expanding the section).
+
+Click on *Create* and the xref:../user/userdoc.adoc#Workbench[workbench] page appears to start the model edition. 
+
+image::homepage_createUMLProject.png[title="Create UML Project",800, align="left"]
+
+=== From a zipped project + [[FromAZippedProject]] 
+If you are here, it means you already downloaded an existing project, as described xref:../user/userdoc.adoc#HowTo_DownloadProject[here].
+
+image::homepage_createProjectFromZip.png[title="Upload project",800, align="left"]
+
+Select the *Upload project* template, then a selection dialog appears. Select your *zip* archive and click on *Upload*. A new project is created and the *Workbench* is displayed.
+
+NOTE: Warning, the system doesn't ask you for the new project name, and the system supports to have several projects with the same name.
+
+[%autowidth, cols="a,a", frame=none, grid=none, role="center"]
+|===
+|image::homepage_selectArchiveDialog.png[title="Select project archive",400]
+|image::homepage_uploadProject.png[title="Upload project",400]
+|===
+
+== How to save a project locally?/How to download a project as zip? [[HowTo_SaveLocally]]
+The *Papyrus-Web* user can download its project locally. The project is downloaded as a zip archive. 
+This download menu is available in two locations:
+
+- from the *homepage*, the Project Browner provides the *Download* action.
+- from the *workbench*, so when the project to download is opened, the project menu also provides the *Download* action. +
+This action opens a system dialog to select the target folder.
+
+image::downloadMenuFromProjectBrowser.png[title="Download from home page",700,align="left"]
+
+image::downloadMenuFromWorkbench.png[title="Download from workbench",700,align="left"]
+
+
+== How to create a project from a zip archive? [[HowTo_CreateProjectFromZip]]
+You can refers to the section <<HowTo_ProjectCreation, How to create a new project?>>.
+
+== What is a profile? [[What_IsAProfile]]
+A *Profile* is the way defined in the *UML* standard to extend the *UML* concepts. This mechanism has been defined to be able to adapt *UML* to every domain of application.
+Basically a *Profile* is a kind of *Package* whom contains a specific concept named *Steretoype*. A *Steretoype* looks like a *Class* and can contains *Property* and *Operation*.
+A *Stereotype* is linked to at least one *Metaclass* with an *Extension* link. A such link allows to define on which *UML* concept the stereotype can be applied.
+To know how to create a *Profile*, you can refers to the section <<HowTo_CreateAndPublishProfile, How to create and deploy a new Profile>>.
+
+== How to create and publish a new Profile? [[HowTo_CreateAndPublishProfile]]
+The *Papyrus-Web* user can create and deploy its own profile in the application. Here, we will present the basic to do that.
+For further informations about *Profile*, refers to the section <<What_IsAProfile, What is a Profile?>>.
+
+- from the *Home page*, click on the *Profile* card image:HowTo_Profile_ProfileCard.png[fit=line]
+- a dialog appears, enter the name of your profile, then click on *Create*
+- the workbench opens to allow the profile edition
+
+WARNING: The root of the model is named following this pattern ``[ProfileName].profile.uml``. If you rename your profile, be careful, the extension ``*.profile.uml`` must be preserved to ensure the well behavior of the tools.
+
+- expand the tree displayed in the *ModelExplorer*
+- find the root *Profile* element and change its default name (in order to be able to distinguish easily your profile from others profile).
+- find the *Profile Diagram*, and open it (single click)
+- the editor opens and you can edit the diagram as usually
+- right click on the diagram background, the contextuel menu appears
+- click on the *Metaclass* icon image:HowTo_Profile_MetaclassIcon.png[], to import a *Metaclass*
+
+
+image::HowTo_Profile_ImportMetaclassAction.png[title="Import Metaclass action",300,align="left"]
+
+This action opens the *Select Metaclass* dialog, select a concept, moving it from the left to the right.
+
+image::HowTo_Profile_SelectMetaclass.png[title="Select Metaclass",700,align="left"]
+
+- create a *Stereotype* (From the diagram background: ``Right-Click -> Nodes -> New Stereotype``)
+- create an *Extension* link between the *Stereotype* and the *Metaclass*
+- in addition, you can create a *Property* in the Stereotype (Select the Stereotype in the diagram, then ``Right-Click -> Nodes -> New Property``)
+- now you need to *publish* your profile to be able to use it in other models. From the *Explorer* view, select the Profile and click on image:three_vertical_point.png[], then on *Public Profile*
+
+image::HowTo_Profile_PublishProfile_Menu.png[title="Publish Profile menu",700,align="left"]
+
+- a dialog appears where you can enter the version of your profile and several other informations, then click on *Publish*.
+- your profile is now available for all the users of the instance of *Papyrus-Web*.
+
+== How to use a Profile? [[HowTo_UseAProfile]]
+The user can use the *Profiles* available in the *Papyrus-Web* instance from its model.
+
+- in the *Explorer* view, select the *Model* root element and click on image:three_vertical_point.png[] to get the menu.
+- click on *Apply a Profile*, a drop down list appears, so select the *Profile* to apply
+- a *Profile Application* has been created in your model, using the name of the applied profile.
+
+image::HowTo_UseProfile_ApplyProfile.png[title="Apply Profile Menu",700,align="left"]
+
+image::HowTo_UseProfile_ProfileIsApplied.png[title="*Profile* is applied",700,align="left"]
+
+- now the user can use the *Stereotypes* provided by the *Profile*
+- in the *Explorer* view, select a model element, and click on image:three_vertical_point.png[] to get the menu
+- click on *Apply a Stereotype*, a drop down list appears, so select the *Stereotype* to apply
+
+image::HowTo_UseProfile_ApplyStereotype.png[title="Apply Stereotype menu",700,align="left"]
+
+image::HowTo_UseProfile_StereotypeIsApplied.png["*Stereotype* is applied",700,align="left"]
+
+NOTE: The *Details* view provides the *Profile* tab, accessible when you select a UML element in the *Explorer* or in the *Diagram*. This tab also allows to the user to apply/unapply *Stereotype* on the selected element. In addition, if the selected element is a UML *Model* or a UML *Package*, the user can also apply/unapply *Profile*.
+
+image::HowTo_UseProfile_FromDetailsView.png[title="Profile tab on Details View for a UML *Package* or *Model*",700,align="left"]
+
+
+
+

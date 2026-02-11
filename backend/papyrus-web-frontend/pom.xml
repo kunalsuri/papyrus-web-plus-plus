@@ -91,10 +91,24 @@
 								<resource>
 									<!-- (Mandatory) Directory to copy from. Paths are relative to maven's 
 										${baseDir} -->
-									<directory>../../doc/user/imgs</directory>
+									<directory>../../doc/imgs</directory>
 									<!-- (Optional) Directory to copy to. By default uses the option 
 										`outputDirectory` -->
-									<targetPath>user/imgs</targetPath>
+									<targetPath>imgs</targetPath>
+									<!-- (Optional) If not set, includes all files but default exceptions 
+										mentioned -->
+									<includes>
+										<include>**/*.png</include>
+										<include>**/*.svg</include>
+									</includes>
+								</resource>
+								<resource>
+									<!-- (Mandatory) Directory to copy from. Paths are relative to maven's 
+										${baseDir} -->
+									<directory>../../doc/deploy/imgs</directory>
+									<!-- (Optional) Directory to copy to. By default uses the option 
+										`outputDirectory` -->
+									<targetPath>deploy/imgs</targetPath>
 									<!-- (Optional) If not set, includes all files but default exceptions 
 										mentioned -->
 									<includes>
@@ -119,10 +133,52 @@
 								<resource>
 									<!-- (Mandatory) Directory to copy from. Paths are relative to maven's 
 										${baseDir} -->
+									<directory>../../doc/faq/imgs</directory>
+									<!-- (Optional) Directory to copy to. By default uses the option 
+										`outputDirectory` -->
+									<targetPath>faq/imgs</targetPath>
+									<!-- (Optional) If not set, includes all files but default exceptions 
+										mentioned -->
+									<includes>
+										<include>**/*.png</include>
+										<include>**/*.svg</include>
+									</includes>
+								</resource>
+								<resource>
+									<!-- (Mandatory) Directory to copy from. Paths are relative to maven's 
+										${baseDir} -->
+									<directory>../../doc/user/imgs</directory>
+									<!-- (Optional) Directory to copy to. By default uses the option 
+										`outputDirectory` -->
+									<targetPath>user/imgs</targetPath>
+									<!-- (Optional) If not set, includes all files but default exceptions 
+										mentioned -->
+									<includes>
+										<include>**/*.png</include>
+										<include>**/*.svg</include>
+									</includes>
+								</resource>
+								<resource>
+									<!-- (Mandatory) Directory to copy from. Paths are relative to maven's 
+										${baseDir} -->
 									<directory>../../doc/spec/diagram-spec/imgs</directory>
 									<!-- (Optional) Directory to copy to. By default uses the option 
 										`outputDirectory` -->
 									<targetPath>spec/diagram-spec/imgs</targetPath>
+									<!-- (Optional) If not set, includes all files but default exceptions 
+										mentioned -->
+									<includes>
+										<include>**/*.png</include>
+										<include>**/*.svg</include>
+									</includes>
+								</resource>
+								<resource>
+									<!-- (Mandatory) Directory to copy from. Paths are relative to maven's 
+										${baseDir} -->
+									<directory>../../doc/welcome/imgs</directory>
+									<!-- (Optional) Directory to copy to. By default uses the option 
+										`outputDirectory` -->
+									<targetPath>welcome/imgs</targetPath>
 									<!-- (Optional) If not set, includes all files but default exceptions 
 										mentioned -->
 									<includes>

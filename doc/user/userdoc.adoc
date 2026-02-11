@@ -4,16 +4,26 @@ ifndef::imagesdir[:imagesdir: imgs]
 :toc:
 :toclevels: 4
 
-== Home page
+== Home page [[Homepage]]
 
 The home page is the starting point of a modeling project. It is where user can initiate a new project or manage an existing one.
+The next image shows the home page, with no project (first run of the *Papyrus-Web* instance).
 
+image::homepage_empty.png[title="Empty Papyrus-Web home page",1000, align="left"]
+
+After two project creations, the home page looks to the next image. 
+
+image::homepage_projectMenu.png[title="Papyrus-Web home page with 2 created projects",800, align="left"]
+
+=== Project Creation 
 Creating a new project in the platform can be done in the following ways:
 
-* Create a blank UML project (template UML empty)
 * Create a project from existing templates
 * Upload a previously exported project
 
+For further informations about project creation go to xref:../faq/faq.adoc#HowTo_ProjectCreation[this section].
+
+=== Project Edition
 As far as existing projects are concerned, the following actions are available:
 
 * Open an existing project +
@@ -21,25 +31,38 @@ To open an existing project, the user has to locate the project in the Project l
 * Delete a project +
 You can delete a Project from the Projects Browser:
 
-. In the Project list, go over the Project to get the Delete button,
-. Click on the Delete button.
+. In the Project list, go over the Project to get the *Delete* button,
+. Click on the *Delete* button.
 
 * Rename a project +
 You can update the Project name from the Projects Browser:
 
-. In the Project list, go over the Project to get the Rename button,
-. Click on the Rename button,
+. In the Project list, go over the Project to get the *Rename* button,
+. Click on the *Rename* button,
 . Update the name in the editable field,
-. Click on Rename.
+. Click on *Rename*.
 
-Once the project (new or existing) is chosen, the workbench page is presented.
+* Duplicate a project +
+You can duplicate a project from the Projects Browser:
+. In the Project list, go over the Project to get the *Duplicate* button,
+. Click on the *Duplicate* button.
 
-== Workbench
+* Download a project[[HowTo_DownloadProject]] +
+You can download a project as a zip archive from the Projects Browser:
+. In the Project list, go over the Project to get the *Download* button,
+. Click on the *Download* button, then a system dialog appears to ask you the location to save the Project. +
+The section xref:../faq/faq.adoc#HowTo_ProjectCreation[How to create a new project?] explain how to start a project from a *zip* archive.
+
+Once the project (new or existing) is chosen, the <<Workbench,workbench>> page is displayed.
+
+== Workbench [[Workbench]]
 
 The Workbench page is the main page where Projects are edited.
 It is basically composed of one main central area and two side panels. +
 The <<project-explorer-panel,`left panel`>> is mainly used to see the structure of the Project as a tree of all its parts.
 The <<diagram-panel,`central area`>> is the place where diagrams and others representations live and the <<right-side-panel,`right panel`>> can display the Properties of the current project explorer selection.
+
+image::workbench_presentation.png[title="Papyrus-Web workbench",1000, align="left"]
 
 [[project-explorer-panel]]
 === Project Explorer panel

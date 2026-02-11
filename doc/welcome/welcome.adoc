@@ -1,0 +1,79 @@
+ifndef::imagesdir[:imagesdir: imgs]
+
+= Welcome
+
+:toc:
+:toclevels: 4
+
+== What is Papyrus-Web?[[WhatIsPapyrus-Web]]
+*Papyrus-Web* is an open source software dedicated to the *UML* diagrams modeling. *Papyrus-Web* is the modern version of *Papyrus-Desktop*, another UML modeling tools Eclipse based. 
+*Papyrus-Web* is built on the top of *Sirius-Web*, a generic modeling tool. We use a Client-Server architecture, with a PostGreSQL database to save the models. This architecture allows to centralize the models and avoid the installation to the final user. Due to its construction, *Papyrus-Web* fully support the Collaborative Work.
+
+The purpose of the *Papyrus* project is to provide a UML editors fully compliant with the UML standard defined by the https://www.omg.org/[OMG] (Object Management Group).
+
+*Papyrus-Web* provides to the final user the main UML Diagrams, with three views to edit its models:
+ 
+* the Explorer,  on the left. This view allows to navigate in the model;
+* the editor view, on the center. This place is used to edit the diagrams, the tables and some other views;
+* the Details view, on the right. This view allows to edit the properties of the selected element.
+
+image::classDiagramExample.png[title="Example of Model, with a ClassDiagram", align="left"]
+
+*Papyrus-Web* has be designed to be reusable and extensible (under the criteria covered by the https://www.eclipse.org/legal/epl-2.0/[license EPL v2]). So, first at all, *Papyrus-Web* provides the *UML Profile diagram* which allows to specialize the concepts provided by UML to adapt them to specific domain. In addition, the final user can customize the exiting diagrams and create new ones for its domain. In addition, the final user can connect its own tools (code generator, validator, ...) to target its specific needs.
+
+
+== What is UML? 
+*UML* means Unified Modeling Language. It is a standard defined by the Object Management Group (https://www.omg.org/spec/UML/[UML Norm]).
+*UML* is a graphical language providing around than 250 concepts (like Class, Package, Lifeline, Usecase, ...) and defining 14 diagrams. There are three kinds of diagrams:
+
+=== Structure Diagrams
+
+* Class Diagram, 
+* Component Diagram, 
+* Composite Structure Diagram,
+* Deployment Diagram, 
+* Object Diagram, 
+* Package Diagram, 
+* Profile Diagram.
+
+=== Behavior Diagrams
+
+* Activity Diagram,
+* StateMachine Diagram, 
+* Use case Diagram.
+
+=== Interaction Diagrams
+
+* Communication Diagram,
+* Interaction Overview Diagram,
+* Sequence Diagram,
+* Timing Diagram.
+
+*UML* provides an extension mechanism called ``Profile``. This mechanism allows to specialize the generic UML language to the requirements of each domain. This capabilities is fully supported by *Papyrus-Web*
+This language.
+
+Code-based development does not overcome these problems (Schmidt, Balasubramanian, et al. 2005).
+A greater degree of abstraction becomes necessary.
+
+This abstraction is made possible by the use of application models.
+Modeling not only offers more abstract concepts to better understand the design of a system, but also allows for the description of different aspects of the system through views.
+In the context of the UML (2004) formalism, now considered the de facto standard for modeling, state machine diagrams and sequence diagrams focus on the behavioral view of the system, while class diagrams focus on the architecture.
+
+== Who are we?[[WhoAreWe]]
+*Papyrus-Web* is developed by the https://list.cea.fr/en/[CEA-List], with contributions from the french companies *Obeo* and *Artal Group*.
+
+*CEA-List* is a specialist in smart digital systems. We develop innovative, competitiveness-boosting tech-driven solutions—protected by a broad portfolio of patents—and transfer them to our R&D partners.
+
+We work with over 200 companies every year, with small and mid-sized businesses accounting for half our partnerships. We also run open innovation platforms to help our partners get their products to market quickly and effectively, and are very active internationally through our partnerships with academic research labs around the globe and our engagement in multi-partner European projects.
+
+*CEA-List* is one of the three institutes of the *CEA* (French Alternative Energies and Atomic Energy Commission) Technology Research Division. It has sites in the innovation hubs of *Paris-Saclay* and *Grenoble*, France and is home to around 1,000 scientists, engineers, and technicians.
+
+
+Before launching *Papyrus-Web*, we accumulated many years of experience about modeling tools, particularly in *UML*, with *Papyrus-Desktop*.
+
+For further information about *Papyrus*, you can refer to the official https://eclipse.dev/papyrus/[Papyrus website].
+
+image::logo_cea_list.png[CEA LIST,500, align="center"]
+
+== License
+*Papyrus-Web* is published under the https://www.eclipse.org/legal/epl-2.0/[Eclipse Public License - v2] (EPL2).

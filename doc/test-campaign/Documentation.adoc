@@ -11,3 +11,17 @@ Check that the documentation content is still valid.
 ** [ ] All elements described in the documentation should be validated in the product.
 . For each link check it is still valid
 ** [ ] All documentation links are valid and point on the correct page/section
+
+== CD02 - Documentation contents
+
+.Purpose
+Check the documentation entries.
+
+.Recipe
+. The documentation must contains at least these entries with a valid hyperlink:
+** [ ] Welcome
+** [ ] User documentation
+** [ ] FAQ
+** [ ] How to deploy Papyrus-Web locally
+** [ ] Developer documentation
+** [ ] Diagram specification

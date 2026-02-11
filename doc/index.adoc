@@ -1,5 +1,5 @@
 ////
- Copyright (c) 2024 CEA LIST, Artal Technologies.
+ Copyright (c) 2024, 2026 CEA LIST, Artal Technologies.
  This program and the accompanying materials
  are made available under the terms of the Eclipse Public License v2.0
  which accompanies this distribution, and is available at
@@ -10,10 +10,19 @@
  Contributors:
      Obeo - Initial API and implementation 
      Aurelien Didier (Artal Technologies) - Issue 201
+     Vincent LORENZO (CEA LIST) - vincent.lorenzo@cea.fr - Issue 
 ////
-= Papyrus Web Documentation
-Papyrus web v{papyrus-web-version} - {git-commit-id-abbrev}
 
+ifndef::imagesdir[:imagesdir: imgs]
+
+= Papyrus-Web Documentation
+Papyrus-Web v{papyrus-web-version} - {git-commit-id-abbrev}
+
+- xref:welcome/welcome.adoc[Welcome]
 - xref:user/userdoc.adoc[User documentation]
-- xref:dev/dev-doc-index.adoc[Developper documentation]
+- xref:faq/faq.adoc[FAQ]
+- xref:deploy/HowToDeploy.adoc[How to deploy Papyrus-Web locally]
+- xref:dev/dev-doc-index.adoc[Developer documentation]
 - xref:spec/diagrams-spec-index.adoc[Diagram specification]
+
+image::Papyrus-Web-logo.png[PapyrusLogo,500, align="center"]

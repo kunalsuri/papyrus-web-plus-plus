@@ -10,8 +10,8 @@
  Contributors:
      Aurelien Didier (Artal Technologies) - Issue 201
 ////
-= Papyrus Web specification
-Papyrus web v{papyrus-web-version} - {git-commit-id-abbrev}
+= Papyrus-Web specifications
+Papyrus-Web v{papyrus-web-version} - {git-commit-id-abbrev}
 
 - xref:diagram-spec/ActivityDiagramSpec.adoc[Activity diagram specification]
 - xref:diagram-spec/ClassDiagramSpec.adoc[Class diagram specification]

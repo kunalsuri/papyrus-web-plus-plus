@@ -1,0 +1,145 @@
+ifndef::imagesdir[:imagesdir: imgs]
+
+= How to deploy Papyrus-Web locally
+
+:toc:
+:toclevels: 4
+
+You can easily deploy *Papyrus-Web* on your own computer in order to a get a local instance of it.
+At the end of the process, the *Papyrus-Web* instance will be available at the location http://localhost:8080.
+
+== Deploy with Docker Desktop [[Deploy_With_Docker_Desktop]]
+You can easily run the application using *Docker Desktop*.
+
+* https://docs.docker.com/desktop/setup/install/windows-install/[Installation on Windows]
+* https://docs.docker.com/desktop/setup/install/linux/[Installation on Linux]
+* https://docs.docker.com/desktop/setup/install/mac-install/[Installation on Mac]
+
+*Docker Desktop* embeds a terminal where you can easily paste the installation script. On the botton right, find and click on the terminal icon like done in this picture
+
+image::DockerDesktop_HowToOpenTerminal.png[How to open terminal,900, align="center"]
+
+* [[Docker_Desktop_Deploy_on_Windows]] On *Windows* the opened terminal is a Powershell terminal, paste the <<Windows_script, script>> in the terminal. 
+* [[Docker_Desktop_Deploy_on_Linux]] On *Linux* the opened terminal is a bash terminal, paste the <<Linux_script, script>> in the terminal. 
+* [[Docker_Desktop_Deploy_on_MacOS]] On *MacOS* the opened terminal is a bash terminal, paste the <<Linux_script, script>> in the terminal. 
+
+This script downloads 2 *Docker* images (*postgres* and *papyrus-web*), then it creates 2 containers, one per each image.
+
+NOTE: In *Docker Desktop* these containers are grouped as children of a *papyrusweb* container. 
+
+image::DockerDesktop_ImagesTabs.png[Downloaded images,900, align="center"]
+
+
+=== How to start/stop/destroy the server?
+After executing the script, the server is started.
+
+* You can *stop* the server from *Docker Desktop* on the tab Containers, clicking on the stop icon.
+* You can *start* the server from *Docker Desktop* on the tab Containers, clicking on the play icon.
+* You can *delete* the server from *Docker Desktop* on the tab Containers, clicking on the trash icon.
+
+image::DockerDesktop_Stop_And_Trash.png[Running containers,900, align="center"]
+image::DockerDesktop_StartAndTrash.png[Stopping containers,900, align="center"]
+
+
+== Deploy with Docker Compose
+To run the application using *Docker Compose*, it is necessary to have https://docs.docker.com/compose/install/[*Docker Compose*] installed.
+The script to execute is the same than for *Docker Desktop*.
+
+* [[Docker_Compose_Deploy_on_Windows]] On *Windows*, open a Powershell terminal, then paste the <<Windows_script, script>> in the terminal. 
+* [[Docker_Compose_Deploy_on_Linux]] On *Linux*, open a bash terminal, then paste the <<Linux_script, script>> in the terminal. 
+
+=== How to start/stop/destroy the server?
+If you have *Docker Desktop* installed, the instructions are the same than for <<Deploy_With_Docker_Desktop, deploying with *Docker Desktop*>>.
+
+If not, these command lines can be used in your terminal (Windows Powershell or Linux Bash or MacOS shell):
+
+* Start the *Papyrus-Web* instance 
+[source,sh]
+----
+docker compose -p papyrusweb start
+----
+
+* Stop the *Papyrus-Web* instance
+[source,sh]
+----
+docker compose -p papyrusweb stop
+----
+
+* Destroy the container (and the associated volumes with the ``-v`` option)
+[source,sh]
+----
+docker compose -p papyrusweb down -v
+----
+
+
+== How to update to a newer version?
+You just need to re-execute the <<Docker_Compose_Scripts, script>> to install a newer *latest* version. 
+
+== Find Papyrus-Web Docker images
+All the provided images are available on the https://hub.docker.com/r/eclipsepapyrus/papyrus-web/tags[Papyrus Docker Page].
+
+== Deploy a specific version 
+To deploy a specific Docker image, you just need to update the *image* field in the <<Docker_Compose_Scripts, script>>. For example, replacing ``eclipsepapyrus/papyrus-web:latest`` with ``eclipsepapyrus/papyrus-web:2025.12.0`` allows you use the image tagged ``2025.12.0`` instead of the ``latest`` image.
+
+== Docker Scripts [[Docker_Compose_Scripts]]
+This script downloads 2 Docker images (*postgres* and *papyrus-web*), then it creates a container named *papyrusweb* embedding these two images. At the end, it launches a *Papyrus-Web* instance at the location http://localhost:8080.
+
+=== Windows script [[Windows_script]]
+Find below the Windows PowerShell script to deploy and start the latest version of *Papyrus-Web*. 
+
+- Return to <<Docker_Desktop_Deploy_on_Windows, Deployment with *Docker Desktop* on Windows>>
+- Return to <<Docker_Compose_Deploy_on_Windows, Deployment with *Docker Compose* on Windows>>
+
+[source,sh]
+----
+@'
+services:
+  database:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: test_username
+      POSTGRES_PASSWORD: test_password
+  papyrus-web:
+    image: eclipsepapyrus/papyrus-web:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database/postgres
+      SPRING_DATASOURCE_USERNAME: test_username
+      SPRING_DATASOURCE_PASSWORD: test_password
+      SIRIUS_COMPONENTS_CORS_ALLOWEDORIGINPATTERNS: "*"
+    depends_on:
+      - database
+'@ | docker compose -p papyrusweb -f - up
+----
+
+=== Linux/MacOs script [[Linux_script]]
+Find below the Linux bash script to deploy and start the latest version of *Papyrus-Web*.
+
+- Return to <<Docker_Desktop_Deploy_on_MacOS, Deployment with *Docker Desktop* on MacOS>>
+- Return to <<Docker_Compose_Deploy_on_Linux, Deployment with *Docker Compose* on Linux>>
+
+[source,sh]
+----
+echo '
+services:
+  database:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: test_username
+      POSTGRES_PASSWORD: test_password
+  papyrus-web:
+    image: eclipsepapyrus/papyrus-web:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database/postgres
+      SPRING_DATASOURCE_USERNAME: test_username
+      SPRING_DATASOURCE_PASSWORD: test_password
+      SIRIUS_COMPONENTS_CORS_ALLOWEDORIGINPATTERNS: "*"  
+    depends_on:
+      - database
+' | docker compose -p papyrusweb -f - up
+----
