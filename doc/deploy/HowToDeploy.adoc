@@ -45,8 +45,9 @@ image::DockerDesktop_StartAndTrash.png[Stopping containers,900, align="center"]
 To run the application using *Docker Compose*, it is necessary to have https://docs.docker.com/compose/install/[*Docker Compose*] installed.
 The script to execute is the same than for *Docker Desktop*.
 
-* [[Docker_Compose_Deploy_on_Windows]] On *Windows*, open a Powershell terminal, then paste the <<Windows_script, script>> in the terminal. 
-* [[Docker_Compose_Deploy_on_Linux]] On *Linux*, open a bash terminal, then paste the <<Linux_script, script>> in the terminal. 
+* [[Docker_Compose_Deploy_on_Windows]] On *Windows*, open a Powershell terminal, then paste the <<Windows_script, script>> in the terminal.
+* [[Docker_Compose_Deploy_on_Linux]] On *Linux*, open a bash terminal, then paste the <<Linux_script, script>> in the terminal.
+* [[Docker_Compose_Deploy_on_Linux]] On *MacOS*, you can also use the <<Linux_script, Linux script>> in the provided bash terminal.
 
 === How to start/stop/destroy the server?
 If you have *Docker Desktop* installed, the instructions are the same than for <<Deploy_With_Docker_Desktop, deploying with *Docker Desktop*>>.
