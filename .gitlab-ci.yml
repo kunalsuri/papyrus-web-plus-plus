@@ -30,11 +30,11 @@ workflow:
     - if: $CI_COMMIT_BRANCH #to launch a build on all branches of the Papyrus repo
 
 include:
-  - project: 'eclipsefdn/it/releng/gitlab-runner-service/gitlab-ci-templates'
-    file: 
-      - '/jobs/eca.gitlab-ci.yml'
-      - '/jobs/buildkit.gitlab-ci.yml'
-      - '/jobs/repo.eclipse.org.gitlab-ci.yml'
+  - project: "eclipsefdn/it/releng/gitlab-runner-service/gitlab-ci-templates"
+    file:
+      - "/jobs/eca.gitlab-ci.yml"
+      - "/jobs/buildkit.gitlab-ci.yml"
+      - "/jobs/repo.eclipse.org.gitlab-ci.yml"
 
 variables:
   MVN_TESTS_EXECUTIONS:
@@ -42,9 +42,9 @@ variables:
     description: "Indicates if we will execute the JUnit tests"
     options:
       - "-DskipTests" # no tests
-      - "-DallTests"  # all tests
+      - "-DallTests" # all tests
       - "" # smoke tests
- 
+
 stages:
   - compliance
   - build
@@ -60,61 +60,61 @@ eca:
 
 # on all eclipse/papyrus branches, on schedule and commit tag ; no tests
 build:
-   stage: build
-   tags:
-     - ctx:medium
-   needs:
+  stage: build
+  tags:
+    - ctx:medium
+  needs:
     - job: "eca"
-   image: maven:3.9.9-eclipse-temurin-21
-   extends: .ef-repo-eclipse-org
-   variables:
-     MAVEN_OPTS: "-DskipTests -Dcheckstyle.skip -Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-     MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DskipTests"
-     NODE_VERSION: "22.16.0"
-     NODE_DIR: "$CI_PROJECT_DIR/.node"
-   secrets:
-     GITHUB_COM_TOKEN:
-       vault: $EF_PROJECT_ID/github.com/registry-token@cbi
-       file: false
-     PASSWORD:
-       vault: $EF_PROJECT_ID/github.com/registry-token@cbi
-       file: false
-     REPO_USERNAME:
-       vault: $EF_PROJECT_ID/repo.eclipse.org/username@cbi
-       file: false
-     REPO_PASSWORD:
-       vault: $EF_PROJECT_ID/repo.eclipse.org/password@cbi
-       file: false
-   before_script:
-     - mkdir -p "$NODE_DIR"
-     - curl -o node.tar.gz -fsSL "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz"
-     - tar -xzf node.tar.gz --strip-components=1 -C "$NODE_DIR"
-     - export PATH="$NODE_DIR/bin:$PATH"
-     - node --version
-   script:
-     # Frontend build
-     - pwd
-     - echo '//npm.pkg.github.com/:_authToken=${GITHUB_COM_TOKEN}' >> frontend/.npmrc
-     - cd frontend && npm install && npm ci && NODE_OPTIONS="--max-old-space-size=4096" npm run build
-     - cd ..
-     - mkdir -p backend/papyrus-web-frontend/src/main/resources/static
-     - cp -R frontend/papyrus-web/dist/* backend/papyrus-web-frontend/src/main/resources/static
+  image: maven:3.9.9-eclipse-temurin-21
+  extends: .ef-repo-eclipse-org
+  variables:
+    MAVEN_OPTS: "-DskipTests -Dcheckstyle.skip -Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+    MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DskipTests"
+    NODE_VERSION: "22.16.0"
+    NODE_DIR: "$CI_PROJECT_DIR/.node"
+  secrets:
+    GITHUB_COM_TOKEN:
+      vault: $EF_PROJECT_ID/github.com/registry-token@cbi
+      file: false
+    PASSWORD:
+      vault: $EF_PROJECT_ID/github.com/registry-token@cbi
+      file: false
+    REPO_USERNAME:
+      vault: $EF_PROJECT_ID/repo.eclipse.org/username@cbi
+      file: false
+    REPO_PASSWORD:
+      vault: $EF_PROJECT_ID/repo.eclipse.org/password@cbi
+      file: false
+  before_script:
+    - mkdir -p "$NODE_DIR"
+    - curl -o node.tar.gz -fsSL "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz"
+    - tar -xzf node.tar.gz --strip-components=1 -C "$NODE_DIR"
+    - export PATH="$NODE_DIR/bin:$PATH"
+    - node --version
+  script:
+    # Frontend build
+    - pwd
+    - echo '//npm.pkg.github.com/:_authToken=${GITHUB_COM_TOKEN}' >> frontend/.npmrc
+    - cd frontend && npm install && npm ci && NODE_OPTIONS="--max-old-space-size=4096" npm run build
+    - cd ..
+    - mkdir -p backend/papyrus-web-frontend/src/main/resources/static
+    - cp -R frontend/papyrus-web/dist/* backend/papyrus-web-frontend/src/main/resources/static
 
-     # Conditional backend build/deploy
-     - cd backend
-     - mvn $MAVEN_CLI_OPTS verify --settings ../settings.xml
-   artifacts:
-     paths:
-       - backend/papyrus-web/target/papyrus-web-*.jar
-       - backend/papyrus-web/target/classes/
-       - backend/papyrus-web/target/test-classes/
-     expire_in: 1 week
-   rules:
-     - if: $CI_PIPELINE_SOURCE == "schedule"
-     - if: '$CI_COMMIT_TAG != null'
-     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    # Conditional backend build/deploy
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS verify --settings ../settings.xml
+  artifacts:
+    paths:
+      - backend/papyrus-web/target/papyrus-web-*.jar
+      - backend/papyrus-web/target/classes/
+      - backend/papyrus-web/target/test-classes/
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: "$CI_COMMIT_TAG != null"
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
 
- # Only on schedule and commit tag
+  # Only on schedule and commit tag
 deploy docker:
   stage: deploy
   tags:
@@ -139,7 +139,7 @@ deploy docker:
       file: false
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: '$CI_COMMIT_TAG != null'
+    - if: "$CI_COMMIT_TAG != null"
 
 # Only on schedule and commit tag
 deploy maven:
@@ -216,7 +216,7 @@ deploy maven:
     expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: '$CI_COMMIT_TAG != null'
+    - if: "$CI_COMMIT_TAG != null"
 
 smoke tests:
   extends: .runTests
@@ -232,34 +232,34 @@ all tests:
   variables:
     MVN_TESTS_EXECUTIONS: "-DallTests" # execute all the tests
   rules:
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event" # on MR
-  - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" # on MR
+    - if: $CI_PIPELINE_SOURCE == "schedule"
 
 .runTests:
   stage: test
   tags:
-    - ctx:medium  
+    - ctx:medium
   needs:
     - job: "build"
       artifacts: true
   services:
     - name: quay.io/sclorg/postgresql-15-c9s
-      alias: postgres  
+      alias: postgres
   image: cypress/included:12.17.4
   extends: .ef-repo-eclipse-org
   variables:
     MAVEN_VERSION: "3.9.9"
     NODE_VERSION: "22.16.0"
-    NODE_DIR: "$CI_PROJECT_DIR/.node"  
+    NODE_DIR: "$CI_PROJECT_DIR/.node"
     MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
     MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=false $MVN_TESTS_EXECUTIONS -Dpapyrusweb.testcontainers.use=false"
     SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/papyrus-web-db"
     PAPYRUSWEB_INTEGRATION_TESTS_DATASOURCE_URL: "jdbc:postgresql://postgres/papyrus-web-db"
     PAPYRUSWEB_INTEGRATION_TESTS_DATASOURCE_USERNAME: "dbuser"
-    PAPYRUSWEB_INTEGRATION_TESTS_DATASOURCE_PASSWORD: "dbpwd"    
+    PAPYRUSWEB_INTEGRATION_TESTS_DATASOURCE_PASSWORD: "dbpwd"
     POSTGRESQL_DATABASE: papyrus-web-db
     POSTGRESQL_USER: dbuser
-    POSTGRESQL_PASSWORD: dbpwd    
+    POSTGRESQL_PASSWORD: dbpwd
   secrets:
     GITHUB_COM_TOKEN:
       vault: $EF_PROJECT_ID/github.com/registry-token@cbi
@@ -273,19 +273,19 @@ all tests:
     # curl -o node.tar.gz -fsSL "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz"
     #- wget https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz
     #- tar -xzf node-v$NODE_VERSION-linux-x64.tar.gz --strip-components=1 -C "$NODE_DIR"
-    #- export PATH="$NODE_DIR/bin:$PATH"    
+    #- export PATH="$NODE_DIR/bin:$PATH"
     # Install Maven
-    - wget https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz 
+    - wget https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz
     - tar -xzvf apache-maven-${MAVEN_VERSION}-bin.tar.gz
-    - export PATH=./apache-maven-$MAVEN_VERSION/bin:$PATH    
-    # Install Java 17 
+    - export PATH=./apache-maven-$MAVEN_VERSION/bin:$PATH
+    # Install Java 17
     - wget https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1+12/OpenJDK17U-jdk_x64_linux_hotspot_17.0.1_12.tar.gz
-    - tar -xzvf OpenJDK17U-jdk_x64_linux_hotspot_17.0.1_12.tar.gz 
-    - export JAVA_HOME=./jdk-17.0.1+12 
-    - export PATH=$JAVA_HOME/bin:$PATH    
+    - tar -xzvf OpenJDK17U-jdk_x64_linux_hotspot_17.0.1_12.tar.gz
+    - export JAVA_HOME=./jdk-17.0.1+12
+    - export PATH=$JAVA_HOME/bin:$PATH
   script:
     # Backend tests
-    - mvn $MAVEN_CLI_OPTS test -f backend/pom.xml --settings settings.xml    
+    - mvn $MAVEN_CLI_OPTS test -f backend/pom.xml --settings settings.xml
     - export WEBAPP_VERSION=$(grep version frontend/package.json | awk -F \" '{print $4}')
 
     # Start backend for Cypress tests in background
@@ -293,15 +293,15 @@ all tests:
     #- BACKEND_PID=$!
 
     # Wait for the backend to start
-    #- sleep 200 
+    #- sleep 200
 
     # Cypress tests
-    #- cd integration-tests 
+    #- cd integration-tests
     #- npm install
     #- npx cypress run
 
     # Stop the backend server
-    #- kill $BACKEND_PID    
+    #- kill $BACKEND_PID
   artifacts:
     paths:
       - backend/papyrus-web/target/papyrus-web-*.jar
@@ -339,7 +339,7 @@ cypress tests:
     POSTGRESQL_DATABASE: papyrus-web-db # used by the postgre image
     POSTGRESQL_USER: dbuser # used by the postgre image
     POSTGRESQL_PASSWORD: dbpwd # used by the postgre image
-    SPRING_DATASOURCE_USERNAME : dbuser
+    SPRING_DATASOURCE_USERNAME: dbuser
     SPRING_DATASOURCE_PASSWORD: dbpwd
   before_script:
     # Install Node.js
@@ -369,6 +369,7 @@ cypress tests:
     # Stop the backend server
     - kill $BACKEND_PID
   artifacts:
+    when: always
     paths:
       - integration-tests/target/screenshots/**/*.png
     reports:
