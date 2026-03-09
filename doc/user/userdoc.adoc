@@ -21,7 +21,7 @@ Creating a new project in the platform can be done in the following ways:
 * Create a project from existing templates
 * Upload a previously exported project
 
-For further informations about project creation go to xref:../faq/faq.adoc#HowTo_ProjectCreation[this section].
+For further information about project creation go to xref:../faq/faq.adoc#HowTo_ProjectCreation[this section].
 
 === Project Edition
 As far as existing projects are concerned, the following actions are available:
@@ -235,6 +235,12 @@ The properties of this stereotype are now displayed in their own tab in the _Det
 The _Validation_ panel shares the left area of the workbench page with the _Explorer_.
 The validation view shows diagnostics of the whole project. Diagnostics are sorted by kind (e.g. ERROR, WARNING or INFO) and can be either hidden or displayed thanks to an accordion widget.
 
+=== Views Explorer
+The Views Explorer is an additional view available in the workbench that focuses on the exploration and management of representations (such as diagrams and other views) contained in the project.
+A simple click on a representation opens it immediately, which can be inconvenient when the user only wants to manage the representation (for example rename it, delete it, or inspect its properties).
+
+image::views-explorer-panel.png[title="Views Explorer panel",500, align="center"]
+
 [[diagram-panel]]
 === Diagrams
 
@@ -260,7 +266,7 @@ WARNING: As far as _Edge_ elements are concerned, start and end labels cannot be
 * Collapse / Expand tools +
 Those actions are only available for containers or compartments (e.g. _Package_ or _Operations Compartment_ of a _Class_)
 
-The Diagram panel has global actions grouped in a horizontal toolbar underneath the diagram tabs.
+The Diagram panel has global actions grouped in a horizontal toolbar underneath the diagram tabs. This toolbar can be collapsed or expanded as needed.
 
 image::diagramPalette.png[Labels Overview,400, align="center"]
 
@@ -268,9 +274,10 @@ This toolbar contains the following actions:
 
 * Display full screen
 * Fit screen action
+* Show mini map
 * Zoom group
 * Share the diagram link
-* Export diagram as SVG
+* Export diagram as SVG/PNG
 * Display Grid
 * Helper lines
 * Arrange all elements
@@ -279,6 +286,7 @@ This toolbar contains the following actions:
 * Unpin all elements
 * Select _element_
 * Filter elements
+* Collapse toolbar
 
 ===== Label
 Keywords on Nodes and Edges are displayed on the first separate line of the label. If the semantic element is stereotyped, the stereotype is displayed on a second separate line. Finally, the label will be displayed on the third line. The label can be the simple name of the element, or more complex in some specific cases detailed in the corresponding diagram section.
@@ -310,6 +318,12 @@ Users can reconnect Edges by clicking on the source or target end of the Edge to
 A confirmation dialog appears when an element is deleted via the _Delete from model_ tool in the palette or via the Model Explorer. This behavior can be disabled by checking the "Disable this confirmation dialog" checkbox in the dialog.
 
 image::deletion-dialog.png[Semantic Deletion Dialog,300, align="center"]
+
+This behavior can also be configured later in the diagram settings.
+Open the *Settings* page and enable or disable the option *Enable confirmation dialogs* in the *General Settings* section.
+
+image::settings-confirmation-dialogs.png[Confirmation dialogs setting,600, align="center"]
+
 
 [NOTE]
 ====

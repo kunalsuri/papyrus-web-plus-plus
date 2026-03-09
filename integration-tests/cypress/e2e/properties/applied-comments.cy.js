@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -53,12 +53,16 @@ describe('Applied Comments tests', () => {
     cy.get('@comments').findByTestId('reference-value-Comment').find('svg').should('be.visible').click();
     // check that Comment no longer references Class in annotatedElement
     cy.getByTestId('Comment').should('be.visible').click();
+    
+    cy.getByTestId('page-tab-UML').click();
+    cy.getByTestId('page-tab-UML').should('have.class', 'Mui-selected');
+
     cy.getByTestId('view-Details')
       .findByTestId('Annotated element')
       .should('be.visible')
       .find('.MuiChip-root')
       .should('have.length', 0);
-  });
+    });
 
   it('From Class.appliedComments', () => {
     cy.getByTestId('Class').should('be.visible').click();
@@ -73,11 +77,19 @@ describe('Applied Comments tests', () => {
       .type('Comment{downArrow}{enter}');
     // check comment.annotatedElement is containing Class
     cy.getByTestId('Comment').should('be.visible').click();
-    cy.getByTestId('view-Details').as('uml');
-    cy.get('@uml').findByTestId('Annotated element').find('.MuiChip-root').should('have.length', 1);
-    cy.get('@uml').findByTestId('Annotated element').findByTestId('reference-value-Class').should('be.visible');
+    cy.getByTestId('page-tab-UML').as('uml');
+    cy.get('@uml').click();
+    cy.get('@uml').should('have.class', 'Mui-selected');
+    cy.getByTestId('view-Details').findByTestId('Annotated element').should('be.visible');
+    cy.getByTestId('view-Details').findByTestId('Annotated element').find('.MuiChip-root').should('have.length', 1);
+    cy.getByTestId('view-Details').findByTestId('Annotated element').findByTestId('reference-value-Class').should('be.visible');
     // remove Class element from annotatedElement
-    cy.get('@uml').findByTestId('Annotated element-clear').scrollIntoView().should('be.visible').click();
+    cy.getByTestId('view-Details')
+      .findByTestId('reference-value-Class')
+      .find('svg.MuiChip-deleteIcon')
+      .scrollIntoView()
+      .should('be.visible')
+      .click();
     // check that class has no longer Comment in appliedComments
     cy.getByTestId('Class').should('be.visible').click();
     // wait the class is properly loaded
@@ -115,6 +127,8 @@ describe('Applied Comments tests', () => {
 
     // click on new Comment
     cy.getByTestId('reference-value-Comment').click();
+    cy.getByTestId('page-tab-UML').click();
+    cy.getByTestId('page-tab-UML').should('have.class', 'Mui-selected');
     // Set a body to the comment
     cy.getByTestId('input-Body').type('Comment{downArrow}{enter}');
     // check that Activity has a new child

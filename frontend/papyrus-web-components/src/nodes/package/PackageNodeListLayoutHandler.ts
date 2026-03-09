@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -71,21 +71,18 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
         forceDimensions
       );
     } else {
-      this.handleLeafNode(previousDiagram, node, visibleNodes, borderWidth, forceDimensions);
+      this.handleLeafNode(previousDiagram, node, borderWidth, forceDimensions);
     }
   }
 
   handleLeafNode(
     previousDiagram: Diagram | null,
     node: Node<PackageNodeListData, 'packageNodeList'>,
-    visibleNodes: Node<NodeData, DiagramNodeType>[],
     borderWidth: number,
     forceDimensions?: ForcedDimensions
   ) {
-    const labelElement = document.getElementById(`${node.id}-label-${findNodeIndex(visibleNodes, node.id)}`);
-
-    const nodeMinComputeWidth = getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + borderWidth * 2;
-    const nodeMinComputeHeight = (labelElement?.getBoundingClientRect().height ?? 0) + borderWidth * 2;
+    const nodeMinComputeWidth = getInsideLabelWidthConstraint(node.data.insideLabel) + borderWidth * 2;
+    const nodeMinComputeHeight = (node.data.insideLabel?.height ?? 0) + borderWidth * 2;
     const nodeWith = forceDimensions?.width ?? getDefaultOrMinWidth(nodeMinComputeWidth, node);
     const nodeHeight = forceDimensions?.height ?? getDefaultOrMinHeight(nodeMinComputeHeight, node);
 
@@ -126,8 +123,6 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
   ) {
     layoutEngine.layoutNodes(previousDiagram, visibleNodes, directChildren, newlyAddedNodes, forceDimensions);
 
-    const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
     const withHeader: boolean = node.data.insideLabel?.isHeader ?? false;
 
     const borderNodes = directChildren.filter((node) => node.data.isBorderNode);
@@ -153,14 +148,14 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
         previousChildrenContentBoxHeightToConsider =
           (previousNode?.height ?? node.height ?? 0) -
           borderWidth * 2 -
-          (withHeader ? labelElement?.getBoundingClientRect().height ?? 0 : 0);
+          (withHeader ? node.data.insideLabel?.height ?? 0 : 0);
       }
       const fixedWidth: number = Math.max(
         directNodesChildren
           .filter((child) => child.type !== 'customImageNode')
           .reduce<number>(
             (widerWidth, child) => Math.max(child.width ?? 0, widerWidth),
-            getInsideLabelWidthConstraint(node.data.insideLabel, labelElement)
+            getInsideLabelWidthConstraint(node.data.insideLabel)
           ),
         northBorderNodeFootprintWidth,
         southBorderNodeFootprintWidth,
@@ -196,7 +191,7 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
     directNodesChildren.forEach((child, index) => {
       child.position = {
         x: borderWidth,
-        y: borderWidth + (withHeader ? labelElement?.getBoundingClientRect().height ?? 0 : 0) + node.data.topGap,
+        y: borderWidth + (withHeader ? node.data.insideLabel?.height ?? 0 : 0) + node.data.topGap,
       };
       const previousSibling = directNodesChildren[index - 1];
       if (previousSibling) {
@@ -206,7 +201,7 @@ export class PackageNodeListLayoutHandler implements INodeLayoutHandler<PackageN
 
     const childrenContentBox = computeNodesBox(visibleNodes, directNodesChildren);
 
-    const labelOnlyWidth = getInsideLabelWidthConstraint(node.data.insideLabel, labelElement);
+    const labelOnlyWidth = getInsideLabelWidthConstraint(node.data.insideLabel);
     const nodeMinComputeWidth = Math.max(childrenContentBox.width, labelOnlyWidth) + borderWidth * 2;
 
     const directChildrenAwareNodeHeight =

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -47,11 +47,9 @@ export class NoteNodeLayoutHandler implements INodeLayoutHandler<NodeData> {
     const nodeElement = document.getElementById(`${node.id}-noteNode-${nodeIndex}`)?.children[0];
     const borderWidth = nodeElement ? parseFloat(window.getComputedStyle(nodeElement).borderWidth) : 1;
 
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-
     const labelWidth =
-      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + borderWidth * 2 + borderWidth * 2 + 8 + 20;
-    const labelHeight = getHeaderHeightFootprint(labelElement, node.data.insideLabel, 'TOP');
+      getInsideLabelWidthConstraint(node.data.insideLabel) + borderWidth * 2 + borderWidth * 2 + 8 + 20;
+    const labelHeight = getHeaderHeightFootprint(node.data.insideLabel, 'TOP');
 
     const nodeMinComputeWidth = labelWidth;
     const nodeMinComputeHeight = labelHeight + borderWidth * 2;

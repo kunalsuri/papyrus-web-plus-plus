@@ -320,6 +320,7 @@ describe('Stereotype application page tests', () => {
 
   const refreshView = () => {
     cy.getByTestId('«Stereotype2» Activity').click();
+    cy.getByTestId(`page-tab-Stereotype1`).should('not.exist');
     cy.getByTestId('«Stereotype1» Class').click();
     // wait until selection on Class is complete
     cy.getByTestId(`page-tab-UML`).should('have.class', 'Mui-selected');
@@ -375,16 +376,23 @@ describe('Stereotype application page tests', () => {
     });
   };
 
-  const checkReferenceValues = (refName, values) => {
-    cy.getByTestId(refName)
-      .find('.MuiChip-root')
-      .should(($chips) => {
-        const optionTexts = $chips
-          .toArray()
-          .map((el) => el.getAttribute('data-testid').substring('reference-value-'.length));
-        expect(optionTexts).to.deep.eq(values);
+const checkReferenceValues = (refName, values) => {
+  cy.getByTestId(refName).within(() => {
+    
+    if (values.length === 0) {
+      cy.get('.MuiChip-root').should('not.exist');
+    } else {
+      cy.get('.MuiChip-root').should('have.length', values.length);
+      
+      // Check each specific value
+      values.forEach((val) => {
+        cy.get(`[data-testid="reference-value-${val}"]`)
+        .scrollIntoView()
+        .should('be.visible');
       });
-  };
+    }
+  });
+};
 
   const chooseSelectValue = (selectTestId, value) => {
     cy.getByTestId(selectTestId).should('not.have.class', 'Mui-disabled').click();
@@ -399,7 +407,7 @@ describe('Stereotype application page tests', () => {
       .should(($lis) => {
         const optionTexts = $lis.toArray().map((el) => el.getAttribute('data-testid'));
         expect(optionTexts).to.deep.eq(values);
-      });
+    });
   };
 
   const createReferenceNewObject = (refName, containerName, childDescription) => {

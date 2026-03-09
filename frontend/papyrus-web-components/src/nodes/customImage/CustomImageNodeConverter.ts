@@ -123,6 +123,7 @@ const toCustomImageNode = (
 
   data.insideLabel = convertInsideLabel(
     insideLabel,
+    gqlDiagram.layoutData.labelLayoutData,
     data,
     `${style.borderSize}px ${style.borderStyle} ${style.borderColor}`,
     gqlNode.childNodes?.some((child) => child.state !== GQLViewModifier.Hidden)

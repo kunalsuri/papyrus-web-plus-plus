@@ -31,16 +31,22 @@ Cypress.Commands.add('activateDetailsTab', (tabName) => {
  * @returns the searched element
  */
 Cypress.Commands.add('activateDetailsTabAndWaitForElement', (tabName, element) => {
-  cy.getByTestId(`page-tab-${tabName}`)
+  const tabSelector = `[data-testid="page-tab-${tabName}"]`;
+  cy.wait(500);
+  cy.get(tabSelector)
     .should('exist')
     .then(($tab) => {
+      cy.wait(500);
       if (!$tab.hasClass('Mui-selected')) {
         cy.wrap($tab).click();
+
+        // Re-query the tab from the DOM to avoid "detached" error
+        // and wait for it to have the active class
+        cy.get(tabSelector).should('have.class', 'Mui-selected');
       }
-      return cy.wrap($tab);
-    })
-    .should('have.class', 'Mui-selected');
-  return cy.getByTestId('view-Details').findByTestId(element).should('be.exist');
+    });
+
+  return cy.getByTestId('view-Details').findByTestId(element).should('exist');
 });
 
 /**

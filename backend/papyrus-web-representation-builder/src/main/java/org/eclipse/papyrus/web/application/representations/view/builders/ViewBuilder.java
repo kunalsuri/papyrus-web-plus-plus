@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -52,6 +52,7 @@ import org.eclipse.sirius.components.view.diagram.DiagramDescription;
 import org.eclipse.sirius.components.view.diagram.DiagramElementDescription;
 import org.eclipse.sirius.components.view.diagram.DiagramFactory;
 import org.eclipse.sirius.components.view.diagram.DiagramToolSection;
+import org.eclipse.sirius.components.view.diagram.DiagramToolbar;
 import org.eclipse.sirius.components.view.diagram.DropNodeTool;
 import org.eclipse.sirius.components.view.diagram.DropTool;
 import org.eclipse.sirius.components.view.diagram.EdgeDescription;
@@ -875,5 +876,11 @@ public class ViewBuilder {
         // this.defaultInitStyle(nodeStyle);
         // nodeStyle.setBackground(this.styleProvider.getBackgroundColor());
         return nodeStyle;
+    }
+
+    public DiagramToolbar createDefaultDiagramToolbar() {
+        DiagramToolbar toolbar = DiagramFactory.eINSTANCE.createDiagramToolbar();
+        toolbar.setExpandedByDefault(true);
+        return toolbar;
     }
 }

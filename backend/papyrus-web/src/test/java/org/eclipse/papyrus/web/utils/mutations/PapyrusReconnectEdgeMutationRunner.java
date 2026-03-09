@@ -84,7 +84,7 @@ public class PapyrusReconnectEdgeMutationRunner {
 
     public void reconnectEdge(String editingContext, String representationId, String edgeId, String newEdgeEndId, ReconnectEdgeKind reconnectEdgeKind) {
         ReconnectEdgeInput reconnectEdgeInput = new ReconnectEdgeInput(UUID.randomUUID(), editingContext.toString(), representationId.toString(), edgeId.toString(), newEdgeEndId.toString(),
-                reconnectEdgeKind);
+                reconnectEdgeKind, 0, 0);
         GraphQLResult result = this.runner.run(reconnectEdgeInput);
 
         String responseTypeName = JsonPath.read(result.data(), "$.data.reconnectEdge.__typename");

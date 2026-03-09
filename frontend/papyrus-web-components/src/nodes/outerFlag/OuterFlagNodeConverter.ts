@@ -115,6 +115,7 @@ const toOuterFlagNode = (
 
   data.insideLabel = convertInsideLabel(
     insideLabel,
+    gqlDiagram.layoutData.labelLayoutData,
     data,
     `${style.borderSize}px ${style.borderStyle} ${style.borderColor}`
   );

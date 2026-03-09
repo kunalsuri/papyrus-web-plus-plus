@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2024, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -300,6 +300,8 @@ public class ADDiagramDescriptionBuilder extends AbstractRepresentationDescripti
 
         this.adSharedDescription.getChildrenDescriptions().add(this.symbolNodeDescription);
         diagramDescription.getPalette().setDropTool(this.getViewBuilder().createGenericSemanticDropTool(this.getIdBuilder().getDiagramSemanticDropToolName()));
+
+        diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
     }
 
     private void createSharedNodeDescriptions(DiagramDescription diagramDescription) {

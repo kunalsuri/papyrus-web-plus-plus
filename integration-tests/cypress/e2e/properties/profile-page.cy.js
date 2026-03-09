@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -94,6 +94,8 @@ describe('Stereotype application page tests', () => {
 
       // Apply stereotype 1 on class
       cy.getByTestId('Class').first().should('exist').click();
+      cy.getByTestId('page-tab-UML').click();
+      cy.getByTestId('page-tab-UML').should('have.class', 'Mui-selected');
       cy.getByTestId('view-Details').findByTestId('Name').should('be.visible');
       cy.activateDetailsTabAndWaitForElement('Profile', 'primitive-list-autocomplete-textfield-Applied stereotypes');
       cy.addItemInPrimitiveListStrictMode('Applied stereotypes', `Stereotype1 (from ${profileName})`);
@@ -136,6 +138,8 @@ describe('Stereotype application page tests', () => {
 
       // Check that the properties are still working
       cy.getByTestId('«Stereotype1» Class').first().should('exist').click();
+      cy.getByTestId('page-tab-UML').click();
+      cy.getByTestId('page-tab-UML').should('have.class', 'Mui-selected');
       cy.getByTestId('view-Details').findByTestId('Name').should('be.visible');
       // Check the dialog content to reference a stereotype application
       cy.activateDetailsTabAndWaitForElement('Stereotype1', 'testMultiReftoStereotype2-more').click();

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -118,6 +118,8 @@ public class PADDiagramDescriptionBuilder extends AbstractRepresentationDescript
         });
         diagramDescription.getPalette().setDropNodeTool(padGraphicalDropTool);
         diagramDescription.getPalette().setDropTool(this.getViewBuilder().createGenericSemanticDropTool(this.getIdBuilder().getDiagramSemanticDropToolName()));
+
+        diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
     }
 
     /**

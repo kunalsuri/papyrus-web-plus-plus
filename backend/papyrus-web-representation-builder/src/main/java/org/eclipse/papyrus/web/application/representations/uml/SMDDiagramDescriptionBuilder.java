@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025, 2026 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -147,6 +147,7 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
         });
         diagramDescription.getPalette().setDropNodeTool(smdGraphicalDropTool);
 
+        diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
     }
 
     private NodeDescription createStateMachineNodeDescription(DiagramDescription diagramDescription) {

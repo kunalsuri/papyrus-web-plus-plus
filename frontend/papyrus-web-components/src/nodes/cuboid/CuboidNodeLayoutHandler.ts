@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2024, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -70,7 +70,7 @@ export class CuboidNodeLayoutHandler implements INodeLayoutHandler<CuboidNodeDat
         forceWidth
       );
     } else {
-      this.handleLeafNode(previousDiagram, node, visibleNodes, borderWidth, forceWidth);
+      this.handleLeafNode(previousDiagram, node, borderWidth, forceWidth);
     }
   }
 
@@ -86,11 +86,8 @@ export class CuboidNodeLayoutHandler implements INodeLayoutHandler<CuboidNodeDat
   ) {
     layoutEngine.layoutNodes(previousDiagram, visibleNodes, directChildren, newlyAddedNodes);
 
-    const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth =
-      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
-    const headerHeightFootprint = getHeaderHeightFootprint(labelElement, node.data.insideLabel, 'TOP');
+    const labelWidth = getInsideLabelWidthConstraint(node.data.insideLabel) + 2 * borderWidth + labelPadding;
+    const headerHeightFootprint = getHeaderHeightFootprint(node.data.insideLabel, 'TOP');
     const borderNodes = directChildren.filter((node) => node.data.isBorderNode);
     const directNodesChildren = directChildren.filter((child) => !child.data.isBorderNode);
 
@@ -246,17 +243,12 @@ export class CuboidNodeLayoutHandler implements INodeLayoutHandler<CuboidNodeDat
   private handleLeafNode(
     previousDiagram: Diagram | null,
     node: Node<CuboidNodeData, 'cuboidNode'>,
-    visibleNodes: Node<NodeData, DiagramNodeType>[],
     borderWidth: number,
     _forceWidth?: ForcedDimensions
   ) {
-    const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth =
-      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
+    const labelWidth = getInsideLabelWidthConstraint(node.data.insideLabel) + 2 * borderWidth + labelPadding;
 
-    const labelHeight =
-      rectangularNodePadding + (labelElement?.getBoundingClientRect().height ?? 0) + rectangularNodePadding;
+    const labelHeight = rectangularNodePadding + (node.data.insideLabel?.height ?? 0) + rectangularNodePadding;
 
     const minNodeWith = Math.max(labelWidth + cuboidBorder, node.data.defaultWidth ? node.data.defaultWidth : 0);
     const minNodeheight = Math.max(labelHeight, node.data.defaultHeight ? node.data.defaultHeight : 0);

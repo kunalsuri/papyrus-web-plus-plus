@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 Obeo.
+ * Copyright (c) 2024, 2026 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,6 +30,8 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.BasicExtendedMetaData;
 import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.sirius.components.emf.services.JSONResourceFactory;
+import org.eclipse.sirius.web.application.document.services.LoadingReport;
+import org.eclipse.sirius.web.application.document.services.api.ExternalResourceLoadingResult;
 import org.eclipse.sirius.web.application.document.services.api.IExternalResourceLoaderService;
 import org.eclipse.uml2.uml.internal.resource.UMLResourceFactoryImpl;
 import org.slf4j.Logger;
@@ -73,7 +76,7 @@ public class UMLExternalResourceLoaderService implements IExternalResourceLoader
     }
 
     @Override
-    public Optional<Resource> getResource(InputStream inputStream, URI resourceURI, ResourceSet resourceSet, boolean applyMigration) {
+    public Optional<ExternalResourceLoadingResult> getResource(InputStream inputStream, URI resourceURI, ResourceSet resourceSet, boolean applyMigration) {
         Resource jsonResource = null;
         try {
             // Read inside a UMLResource
@@ -93,6 +96,10 @@ public class UMLExternalResourceLoaderService implements IExternalResourceLoader
         } catch (IOException exception) {
             this.logger.warn(exception.getMessage(), exception);
         }
-        return Optional.ofNullable(jsonResource);
+
+        if (jsonResource == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new ExternalResourceLoadingResult(jsonResource, new LoadingReport(List.of())));
     }
 }

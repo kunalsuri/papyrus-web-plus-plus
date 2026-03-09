@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -42,6 +42,8 @@ import org.eclipse.sirius.components.view.diagram.LineStyle;
  * <em>Border Line Style</em>}</li>
  * <li>{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.NoteNodeStyleDescriptionImpl#getChildrenLayoutStrategy
  * <em>Children Layout Strategy</em>}</li>
+ * <li>{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.NoteNodeStyleDescriptionImpl#getDescription
+ * <em>Description</em>}</li>
  * <li>{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.NoteNodeStyleDescriptionImpl#getBackground
  * <em>Background</em>}</li>
  * </ul>
@@ -128,6 +130,26 @@ public class NoteNodeStyleDescriptionImpl extends MinimalEObjectImpl.Container i
      * @ordered
      */
     protected LayoutStrategyDescription childrenLayoutStrategy;
+
+    /**
+     * The default value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!--
+     * end-user-doc -->
+     *
+     * @see #getDescription()
+     * @generated
+     * @ordered
+     */
+    protected static final String DESCRIPTION_EDEFAULT = null;
+
+    /**
+     * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!--
+     * end-user-doc -->
+     *
+     * @see #getDescription()
+     * @generated
+     * @ordered
+     */
+    protected String description = DESCRIPTION_EDEFAULT;
 
     /**
      * The cached value of the '{@link #getBackground() <em>Background</em>}' reference. <!-- begin-user-doc --> <!--
@@ -326,6 +348,29 @@ public class NoteNodeStyleDescriptionImpl extends MinimalEObjectImpl.Container i
      * @generated
      */
     @Override
+    public String getDescription() {
+        return this.description;
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
+    public void setDescription(String newDescription) {
+        String oldDescription = this.description;
+        this.description = newDescription;
+        if (this.eNotificationRequired())
+            this.eNotify(new ENotificationImpl(this, Notification.SET, PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__DESCRIPTION, oldDescription, this.description));
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
     public UserColor getBackground() {
         if (this.background != null && this.background.eIsProxy()) {
             InternalEObject oldBackground = (InternalEObject) this.background;
@@ -395,6 +440,8 @@ public class NoteNodeStyleDescriptionImpl extends MinimalEObjectImpl.Container i
                 return this.getBorderLineStyle();
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 return this.getChildrenLayoutStrategy();
+            case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                return this.getDescription();
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 if (resolve)
                     return this.getBackground();
@@ -426,6 +473,9 @@ public class NoteNodeStyleDescriptionImpl extends MinimalEObjectImpl.Container i
                 return;
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 this.setChildrenLayoutStrategy((LayoutStrategyDescription) newValue);
+                return;
+            case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                this.setDescription((String) newValue);
                 return;
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 this.setBackground((UserColor) newValue);
@@ -459,6 +509,9 @@ public class NoteNodeStyleDescriptionImpl extends MinimalEObjectImpl.Container i
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 this.setChildrenLayoutStrategy((LayoutStrategyDescription) null);
                 return;
+            case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                this.setDescription(DESCRIPTION_EDEFAULT);
+                return;
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 this.setBackground((UserColor) null);
                 return;
@@ -486,6 +539,8 @@ public class NoteNodeStyleDescriptionImpl extends MinimalEObjectImpl.Container i
                 return this.borderLineStyle != BORDER_LINE_STYLE_EDEFAULT;
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 return this.childrenLayoutStrategy != null;
+            case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                return DESCRIPTION_EDEFAULT == null ? this.description != null : !DESCRIPTION_EDEFAULT.equals(this.description);
             case PapyrusCustomNodesPackage.NOTE_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 return this.background != null;
             default:
@@ -510,6 +565,8 @@ public class NoteNodeStyleDescriptionImpl extends MinimalEObjectImpl.Container i
         result.append(this.borderSize);
         result.append(", borderLineStyle: ");
         result.append(this.borderLineStyle);
+        result.append(", description: ");
+        result.append(this.description);
         result.append(')');
         return result.toString();
     }

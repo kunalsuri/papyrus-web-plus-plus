@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2024, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -215,6 +215,8 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
             cpdGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
         diagramDescription.getPalette().setDropNodeTool(cpdGraphicalDropTool);
+
+        diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
     }
 
     /**

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -53,9 +53,9 @@ describe('Basic widgets tests', () => {
     // Verify comment content
     cy.get('@textarea').should('have.value', 'Comment');
     // update the comment
-    cy.get('@textarea').type('_updated');
+    cy.get('@textarea').type('_updated{enter}');
     // Verify the comment content is shown in the explorer tree
-    cy.getByTestId('explorer://').find('[title="uml::Comment"]').should('have.attr', 'data-testid', 'Comment');
+    cy.getByTestId('explorer://').findByTestId('Comment_updated').should('be.visible');
   });
 
   /**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -42,6 +42,8 @@ import org.eclipse.sirius.components.view.diagram.LineStyle;
  * <em>Border Line Style</em>}</li>
  * <li>{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.InnerFlagNodeStyleDescriptionImpl#getChildrenLayoutStrategy
  * <em>Children Layout Strategy</em>}</li>
+ * <li>{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.InnerFlagNodeStyleDescriptionImpl#getDescription
+ * <em>Description</em>}</li>
  * <li>{@link org.eclipse.papyrus.web.customnodes.papyruscustomnodes.impl.InnerFlagNodeStyleDescriptionImpl#getBackground
  * <em>Background</em>}</li>
  * </ul>
@@ -128,6 +130,26 @@ public class InnerFlagNodeStyleDescriptionImpl extends MinimalEObjectImpl.Contai
      * @ordered
      */
     protected LayoutStrategyDescription childrenLayoutStrategy;
+
+    /**
+     * The default value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!--
+     * end-user-doc -->
+     *
+     * @see #getDescription()
+     * @generated
+     * @ordered
+     */
+    protected static final String DESCRIPTION_EDEFAULT = null;
+
+    /**
+     * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!--
+     * end-user-doc -->
+     *
+     * @see #getDescription()
+     * @generated
+     * @ordered
+     */
+    protected String description = DESCRIPTION_EDEFAULT;
 
     /**
      * The cached value of the '{@link #getBackground() <em>Background</em>}' reference. <!-- begin-user-doc --> <!--
@@ -326,6 +348,29 @@ public class InnerFlagNodeStyleDescriptionImpl extends MinimalEObjectImpl.Contai
      * @generated
      */
     @Override
+    public String getDescription() {
+        return this.description;
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
+    public void setDescription(String newDescription) {
+        String oldDescription = this.description;
+        this.description = newDescription;
+        if (this.eNotificationRequired())
+            this.eNotify(new ENotificationImpl(this, Notification.SET, PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__DESCRIPTION, oldDescription, this.description));
+    }
+
+    /**
+     * <!-- begin-user-doc --> <!-- end-user-doc -->
+     *
+     * @generated
+     */
+    @Override
     public UserColor getBackground() {
         if (this.background != null && this.background.eIsProxy()) {
             InternalEObject oldBackground = (InternalEObject) this.background;
@@ -395,6 +440,8 @@ public class InnerFlagNodeStyleDescriptionImpl extends MinimalEObjectImpl.Contai
                 return this.getBorderLineStyle();
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 return this.getChildrenLayoutStrategy();
+            case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                return this.getDescription();
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 if (resolve)
                     return this.getBackground();
@@ -426,6 +473,9 @@ public class InnerFlagNodeStyleDescriptionImpl extends MinimalEObjectImpl.Contai
                 return;
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 this.setChildrenLayoutStrategy((LayoutStrategyDescription) newValue);
+                return;
+            case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                this.setDescription((String) newValue);
                 return;
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 this.setBackground((UserColor) newValue);
@@ -459,6 +509,9 @@ public class InnerFlagNodeStyleDescriptionImpl extends MinimalEObjectImpl.Contai
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 this.setChildrenLayoutStrategy((LayoutStrategyDescription) null);
                 return;
+            case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                this.setDescription(DESCRIPTION_EDEFAULT);
+                return;
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 this.setBackground((UserColor) null);
                 return;
@@ -486,6 +539,8 @@ public class InnerFlagNodeStyleDescriptionImpl extends MinimalEObjectImpl.Contai
                 return this.borderLineStyle != BORDER_LINE_STYLE_EDEFAULT;
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__CHILDREN_LAYOUT_STRATEGY:
                 return this.childrenLayoutStrategy != null;
+            case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__DESCRIPTION:
+                return DESCRIPTION_EDEFAULT == null ? this.description != null : !DESCRIPTION_EDEFAULT.equals(this.description);
             case PapyrusCustomNodesPackage.INNER_FLAG_NODE_STYLE_DESCRIPTION__BACKGROUND:
                 return this.background != null;
             default:
@@ -510,6 +565,8 @@ public class InnerFlagNodeStyleDescriptionImpl extends MinimalEObjectImpl.Contai
         result.append(this.borderSize);
         result.append(", borderLineStyle: ");
         result.append(this.borderLineStyle);
+        result.append(", description: ");
+        result.append(this.description);
         result.append(')');
         return result.toString();
     }

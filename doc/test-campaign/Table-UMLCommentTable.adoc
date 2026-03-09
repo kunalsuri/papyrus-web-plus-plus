@@ -3,7 +3,7 @@
 
 [WARN]
 ====
-Do all those tests sequentially
+Do all these tests sequentially
 ====
 
 == Play with UML Comment Table
@@ -19,15 +19,16 @@ Check that the table can be created, displayed and that the user can interact as
 ** [ ] The table contains the following content:
 +
 image::imgs/UMLCommentTable.png[]
-
-. Select a row in table in the UML Comment row header
-** [ ] The corresponding UML Comment is selected in the Explorer
-. Select `Class 1` cell in `Annotated Elements` column
-** [ ] `Class 1` is selected in the Explorer
+. Select a row in table in the UML Comment row header and apply the focus tool on the Explorer
+** [ ] The corresponding UML Comment is highlighted in the Explorer
+. Select `Class 1` cell in `Annotated Elements` column and apply the focus tool on the Explorer
+** [ ] `Class 1` is highlighted in the Explorer
 . Select a cell in `Body` column and write something to change the cell content
 ** [ ] The documentation body is changed consequently in the Explorer
 . In the Search field write the word `Th` and validate
 ** [ ] The table displays only one row
+. Select a cell in `Body` column and write something to change the cell content
+** [ ] The documentation body is changed consequently in the Explorer
 
 == Fork UML Comment Table
 

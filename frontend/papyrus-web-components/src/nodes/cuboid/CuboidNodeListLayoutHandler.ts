@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -72,7 +72,7 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
         forceDimensions
       );
     } else {
-      this.handleLeafNode(previousDiagram, node, visibleNodes, borderWidth, forceDimensions);
+      this.handleLeafNode(previousDiagram, node, borderWidth, forceDimensions);
     }
   }
 
@@ -88,13 +88,9 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
   ) {
     layoutEngine.layoutNodes(previousDiagram, visibleNodes, directChildren, newlyAddedNodes, forceDimensions);
 
-    const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth =
-      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
-    const labelHeight =
-      rectangularNodePadding + (labelElement?.getBoundingClientRect().height ?? 0) + rectangularNodePadding;
-    let headerHeightFootprint = getHeaderHeightFootprint(labelElement, node.data.insideLabel, 'TOP');
+    const labelWidth = getInsideLabelWidthConstraint(node.data.insideLabel) + 2 * borderWidth + labelPadding;
+    const labelHeight = rectangularNodePadding + (node.data.insideLabel?.height ?? 0) + rectangularNodePadding;
+    let headerHeightFootprint = getHeaderHeightFootprint(node.data.insideLabel, 'TOP');
     const borderNodes = directChildren.filter((node) => node.data.isBorderNode);
     const directNodesChildren = directChildren.filter((child) => !child.data.isBorderNode);
     const minNodeWith = Math.max(labelWidth + cuboidBorder, node.data.defaultWidth ? node.data.defaultWidth : 0);
@@ -123,12 +119,12 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
         previousChildrenContentBoxHeightToConsider =
           (previousNode?.height ?? node.height ?? 0) -
           borderWidth * 2 -
-          (withHeader ? labelElement?.getBoundingClientRect().height ?? 0 : 0);
+          (withHeader ? node.data.insideLabel?.height ?? 0 : 0);
       }
       let fixedWidth: number = Math.max(
         directNodesChildren.reduce<number>(
           (widerWidth, child) => Math.max(child.width ?? 0, widerWidth),
-          labelElement?.getBoundingClientRect().width ?? 0
+          node.data.insideLabel?.width ?? 0
         ),
         northBorderNodeFootprintWidth,
         southBorderNodeFootprintWidth,
@@ -174,7 +170,7 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
 
     const childrenContentBox = computeNodesBox(visibleNodes, directNodesChildren);
 
-    const labelOnlyWidth = getInsideLabelWidthConstraint(node.data.insideLabel, labelElement);
+    const labelOnlyWidth = getInsideLabelWidthConstraint(node.data.insideLabel);
     const nodeMinComputeWidth = Math.max(childrenContentBox.width, labelOnlyWidth) + borderWidth * 2;
 
     const directChildrenAwareNodeHeight =
@@ -223,17 +219,12 @@ export class CuboidNodeListLayoutHandler implements INodeLayoutHandler<CuboidNod
   private handleLeafNode(
     previousDiagram: Diagram | null,
     node: Node<CuboidNodeListData, 'cuboidNodeList'>,
-    visibleNodes: Node<NodeData, DiagramNodeType>[],
     borderWidth: number,
     _forceDimensions?: ForcedDimensions
   ) {
-    const nodeIndex = findNodeIndex(visibleNodes, node.id);
-    const labelElement = document.getElementById(`${node.id}-label-${nodeIndex}`);
-    const labelWidth =
-      getInsideLabelWidthConstraint(node.data.insideLabel, labelElement) + 2 * borderWidth + labelPadding;
+    const labelWidth = getInsideLabelWidthConstraint(node.data.insideLabel) + 2 * borderWidth + labelPadding;
 
-    const labelHeight =
-      rectangularNodePadding + (labelElement?.getBoundingClientRect().height ?? 0) + rectangularNodePadding;
+    const labelHeight = rectangularNodePadding + (node.data.insideLabel?.height ?? 0) + rectangularNodePadding;
 
     const minNodeWith = Math.max(labelWidth + cuboidBorder, node.data.defaultWidth ? node.data.defaultWidth : 0);
     const minNodeheight = Math.max(labelHeight, node.data.defaultHeight ? node.data.defaultHeight : 0);

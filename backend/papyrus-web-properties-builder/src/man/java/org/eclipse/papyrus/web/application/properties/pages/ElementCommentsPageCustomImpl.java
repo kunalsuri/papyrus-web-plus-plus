@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -45,7 +45,7 @@ public class ElementCommentsPageCustomImpl extends ElementCommentsPage {
                 .dropdownOptions("aql:self.getAllReachableElements(uml::Comment)") //
                 .createOperation("aql:parent.create('uml::Comment', feature)") //
                 .addOperation("aql:newValue.addReferenceElement(Sequence{self}, 'annotatedElement')") //
-                .removeOperation("aql:self.delete(item, 'annotatedElement'))") //
+                .removeOperation("aql:self.delete(item, 'annotatedElement')") //
                 .reorderOperation("") // sorting those elements has no sense
                 .clearOperation("aql:self.getAllAppliedComments()->forAll(comment | self.delete(comment, 'annotatedElement'))"); //
         group.getChildren().add(builder.build());
