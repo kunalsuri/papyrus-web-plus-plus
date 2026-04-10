@@ -308,6 +308,7 @@ all tests:
       - backend/papyrus-web/target/classes/
       - backend/papyrus-web/target/test-classes/
       - backend/papyrus-web/target/surefire-reports/
+      - backend/papyrus-web-test-coverage/target/
     reports:
       junit:
         - backend/**/target/surefire-reports/*.xml
