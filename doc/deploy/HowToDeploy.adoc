@@ -96,7 +96,7 @@ Find below the Windows PowerShell script to deploy and start the latest version 
 @'
 services:
   database:
-    image: postgres:12
+    image: postgres:15
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: test_username
@@ -126,7 +126,7 @@ Find below the Linux bash script to deploy and start the latest version of *Papy
 echo '
 services:
   database:
-    image: postgres:12
+    image: postgres:15
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: test_username

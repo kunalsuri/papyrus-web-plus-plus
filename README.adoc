@@ -28,7 +28,7 @@ To run the application using docker compose, it is necessary to have https://doc
 echo '
 services:
   database:
-    image: postgres:12
+    image: postgres:15
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: test_username
@@ -54,7 +54,7 @@ services:
 @'
 services:
   database:
-    image: postgres:12
+    image: postgres:15
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: test_username
@@ -82,7 +82,7 @@ The application is available at http://localhost:8080
 If you want a quick overview of how Papyrus Web looks and feels like without building the sample application yourself, you will simply need:
 
 * Java 17
-* Docker, or an existing PostgreSQL 12 (or later) installation with a DB user that has admin rights on the database (those are needed by the application to create its schema on first startup).
+* Docker, or an existing PostgreSQL 15 (or later) installation with a DB user that has admin rights on the database (those are needed by the application to create its schema on first startup).
 
 To actually run the application:
 
