@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,9 +15,6 @@ package org.eclipse.papyrus.web.utils.mutations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +25,7 @@ import org.springframework.stereotype.Service;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Service used to invoke a semantic deletion tool on one element.
@@ -112,11 +110,12 @@ public class PapyrusDeleteFromDiagramMutationRunner {
 
     private void deleteFromDiagram(String editingContextId, String representationId, String diagramElementId, List<String> nodeIds, List<String> edgeIds) {
         DeleteFromDiagramInput deleteFromDiagramInput = new DeleteFromDiagramInput(UUID.randomUUID(), editingContextId, representationId, nodeIds, edgeIds);
-        ExecutionInput executionInput = ExecutionInput.newExecutionInput(DELETE_FROM_DIAGRAM_QUERY) //
-                .variables(Map.of("input", this.objectMapper.convertValue(deleteFromDiagramInput, new TypeReference<Map<String, Object>>() {
-                    /**/
-                }))) //
+
+        Map<String, Object> variables = Map.of("input", this.objectMapper.convertValue(deleteFromDiagramInput, new tools.jackson.core.type.TypeReference<Map<String, Object>>() { }));
+        ExecutionInput executionInput = ExecutionInput.newExecutionInput(DELETE_FROM_DIAGRAM_QUERY)
+                .variables(variables)
                 .build();
+
         ExecutionResult executionResult = this.graphQL.execute(executionInput);
         assertThat(executionResult.getErrors()).isEmpty();
     }

@@ -218,6 +218,8 @@ public final class CDDiagramDescriptionBuilder extends AbstractRepresentationDes
         diagramDescription.getPalette().setDropNodeTool(cddGraphicalDropTool);
 
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
+
+        diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
     // CHECKSTYLE:ON
 

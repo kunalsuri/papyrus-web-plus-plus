@@ -148,6 +148,8 @@ public class SMDDiagramDescriptionBuilder extends AbstractRepresentationDescript
         diagramDescription.getPalette().setDropNodeTool(smdGraphicalDropTool);
 
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
+
+        diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
 
     private NodeDescription createStateMachineNodeDescription(DiagramDescription diagramDescription) {

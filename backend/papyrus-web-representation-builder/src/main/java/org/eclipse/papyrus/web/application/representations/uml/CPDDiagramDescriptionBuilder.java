@@ -217,6 +217,8 @@ public final class CPDDiagramDescriptionBuilder extends AbstractRepresentationDe
         diagramDescription.getPalette().setDropNodeTool(cpdGraphicalDropTool);
 
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
+
+        diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
 
     /**

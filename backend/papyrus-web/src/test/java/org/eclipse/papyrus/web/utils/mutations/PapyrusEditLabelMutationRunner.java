@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2024 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,9 +15,6 @@ package org.eclipse.papyrus.web.utils.mutations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,6 +24,8 @@ import org.springframework.stereotype.Service;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Service used to edit a label.
@@ -92,11 +91,12 @@ public class PapyrusEditLabelMutationRunner {
      */
     public void editLabel(String editingContextId, String representationId, String labelId, String newLabel) {
         EditLabelInput editLabelInput = new EditLabelInput(UUID.randomUUID(), editingContextId, representationId, labelId, newLabel);
-        ExecutionInput executionInput = ExecutionInput.newExecutionInput(query)//
-                .variables(Map.of("input", this.objectMapper.convertValue(editLabelInput, new TypeReference<Map<String, Object>>() {
-                    /**/
-                }))) //
+
+        Map<String, Object> variables = Map.of("input", this.objectMapper.convertValue(editLabelInput, new TypeReference<Map<String, Object>>() { }));
+        ExecutionInput executionInput = ExecutionInput.newExecutionInput(query)
+                .variables(variables)
                 .build();
+
         ExecutionResult executionResult = this.graphQL.execute(executionInput);
         assertThat(executionResult.getErrors()).isEmpty();
     }

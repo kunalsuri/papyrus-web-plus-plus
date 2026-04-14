@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2023, 2025 CEA LIST, Obeo.
+ * Copyright (c) 2023, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,8 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.utils.mutations;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -93,11 +93,12 @@ public class PapyrusDropOnDiagramMutationRunner {
     public void dropOnDiagram(String editingContextId, String representationId, String targetElementId, List<String> droppedObjectIds) {
         // Starting position isn't relevant when invoking the tool manually, so we set it to 0
         DropOnDiagramInput dropOnDiagramInput = new DropOnDiagramInput(UUID.randomUUID(), editingContextId, representationId, targetElementId, droppedObjectIds, 0, 0);
-        ExecutionInput executionInput = ExecutionInput.newExecutionInput(query)//
-                .variables(Map.of("input", this.objectMapper.convertValue(dropOnDiagramInput, new TypeReference<Map<String, Object>>() {
-                    /**/
-                }))) //
+
+        Map<String, Object> variables = Map.of("input", this.objectMapper.convertValue(dropOnDiagramInput, new TypeReference<Map<String, Object>>() { }));
+        ExecutionInput executionInput = ExecutionInput.newExecutionInput(query)
+                .variables(variables)
                 .build();
+
         ExecutionResult executionResult = this.graphQL.execute(executionInput);
     }
 }

@@ -163,6 +163,8 @@ public final class DDDiagramDescriptionBuilder extends AbstractRepresentationDes
         diagramDescription.getPalette().setDropNodeTool(ddGraphicalDropTool);
 
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
+
+        diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
 
     /**

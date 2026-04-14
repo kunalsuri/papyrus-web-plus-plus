@@ -202,6 +202,8 @@ public final class UCDDiagramDescriptionBuilder extends AbstractRepresentationDe
         diagramDescription.getPalette().setDropNodeTool(ucdGraphicalDropTool);
 
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
+
+        diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
 
     /**

@@ -128,6 +128,8 @@ public class CSDDiagramDescriptionBuilder extends AbstractRepresentationDescript
         diagramDescription.getPalette().setDropTool(this.getViewBuilder().createGenericSemanticDropTool(this.getIdBuilder().getDiagramSemanticDropToolName()));
 
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
+
+        diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
 
     private NodeDescription createClassSharedDescription(DiagramDescription diagramDescription) {

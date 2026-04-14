@@ -231,6 +231,8 @@ public class PRDDiagramDescriptionBuilder extends AbstractRepresentationDescript
         diagramDescription.getPalette().setDropNodeTool(prdGraphicalDropTool);
 
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
+
+        diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
 
     /**

@@ -13,8 +13,8 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.utils.mutations;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -98,10 +98,12 @@ public class PapyrusDropNodeMutationRunner {
      */
     public void dropNodes(String editingContextId, String representationId, List<String> droppedElementIds, String targetElementId) {
         DropNodesInput dropNodeInput = new DropNodesInput(UUID.randomUUID(), editingContextId, representationId, droppedElementIds, targetElementId, List.of(new Position(0, 0)));
-        ExecutionInput executionInput = ExecutionInput.newExecutionInput(query) //
-                .variables(Map.of("input", this.objectMapper.convertValue(dropNodeInput, new TypeReference<Map<String, Object>>() {
-                })))
+
+        Map<String, Object> variables = Map.of("input", this.objectMapper.convertValue(dropNodeInput, new TypeReference<Map<String, Object>>() { }));
+        ExecutionInput executionInput = ExecutionInput.newExecutionInput(query)
+                .variables(variables)
                 .build();
+
         ExecutionResult executionResult = this.graphQL.execute(executionInput);
     }
 }

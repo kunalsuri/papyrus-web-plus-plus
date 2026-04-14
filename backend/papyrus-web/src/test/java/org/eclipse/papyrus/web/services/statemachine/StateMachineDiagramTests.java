@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -15,8 +15,8 @@
 package org.eclipse.papyrus.web.services.statemachine;
 
 import static org.eclipse.papyrus.web.application.representations.uml.AbstractRepresentationDescriptionBuilder.SHARED_SUFFIX;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
@@ -169,11 +169,11 @@ public class StateMachineDiagramTests extends AbstractDiagramTest {
 
         // check that the StateMachine node is created
         Node stateMachineNode = this.getDiagramHelper().assertGetUniqueMatchingNode(SMD_STATEMACHINE_NODE_NAME, this.stateMachine);
-        assertNotNull("The StateMachine node should be created at the diagram refresh because it is synchronized", stateMachineNode);
+        assertNotNull(stateMachineNode, "The StateMachine node should be created at the diagram refresh because it is synchronized");
 
         // check that the Region node is created
         Node regionNode = this.getRegionInSMNode();
-        assertNotNull("The Region node should be created because it is synchronized", regionNode);
+        assertNotNull(regionNode, "The Region node should be created because it is synchronized");
     }
 
     @Test

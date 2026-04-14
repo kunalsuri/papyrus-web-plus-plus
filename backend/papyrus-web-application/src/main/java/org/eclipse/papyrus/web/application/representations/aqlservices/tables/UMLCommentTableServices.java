@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2025 CEA LIST.
+ * Copyright (c) 2025, 2026 CEA LIST.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -13,10 +13,6 @@
  *******************************************************************************/
 
 package org.eclipse.papyrus.web.application.representations.aqlservices.tables;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,6 +35,9 @@ import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * AQL services used in the UML Comment table.
@@ -281,7 +280,7 @@ public class UMLCommentTableServices {
         try {
             return this.objectMapper.readValue(columnFilter.value(), new TypeReference<>() {
             });
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             this.logger.log(exception.getMessage(), ILogger.ILogLevel.WARNING);
         }
         return "";

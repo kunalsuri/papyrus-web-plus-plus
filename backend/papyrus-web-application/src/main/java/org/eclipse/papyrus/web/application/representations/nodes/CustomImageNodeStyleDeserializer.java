@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2025 CEA LIST, Obeo.
+ * Copyright (c) 2025, 2026 CEA LIST, Obeo.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -13,11 +13,13 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.application.representations.nodes;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.sirius.components.collaborative.diagrams.api.ICustomNodeStyleDeserializer;
 import org.eclipse.sirius.components.diagrams.INodeStyle;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Use to correctly deserialize custom node style.
@@ -33,7 +35,7 @@ public class CustomImageNodeStyleDeserializer implements ICustomNodeStyleDeseria
     }
 
     @Override
-    public INodeStyle handle(ObjectMapper mapper, String root) throws JsonProcessingException {
-        return mapper.readValue(root, CustomImageNodeStyle.class);
+    public INodeStyle handle(ObjectNode root, JsonParser jsonParser, DeserializationContext context) throws JacksonException {
+        return context.readTreeAsValue(root, CustomImageNodeStyle.class);
     }
 }

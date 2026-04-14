@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -62,6 +62,7 @@ import org.eclipse.sirius.components.view.ChangeContext;
 import org.eclipse.sirius.components.view.RepresentationDescription;
 import org.eclipse.sirius.components.view.View;
 import org.eclipse.sirius.components.view.ViewFactory;
+import org.eclipse.sirius.components.view.builder.generated.diagram.DiagramBuilders;
 import org.eclipse.sirius.components.view.diagram.ArrowStyle;
 import org.eclipse.sirius.components.view.diagram.DeleteTool;
 import org.eclipse.sirius.components.view.diagram.DiagramDescription;
@@ -192,6 +193,8 @@ public abstract class AbstractRepresentationDescriptionBuilder implements IPapyr
 
     private ViewBuilder viewBuilder;
 
+    private DiagramBuilders diagramBuilders;
+
     private final QueryHelper queryBuilder;
 
     private final IdBuilder idBuilder;
@@ -285,6 +288,7 @@ public abstract class AbstractRepresentationDescriptionBuilder implements IPapyr
     public DiagramDescription createDiagramDescription(View view) {
         this.styleProvider = new StyleProvider(view, this.diagramPrefix);
         this.viewBuilder = new ViewBuilder(this.queryBuilder, this.styleProvider, this.idBuilder, this.umlMetaModelHelper);
+        this.diagramBuilders = new DiagramBuilders();
 
         DiagramDescription diagramDescription = this.getViewBuilder().buildDiagramDescription(this.representationName, this.representationDomainClass);
 
@@ -386,6 +390,10 @@ public abstract class AbstractRepresentationDescriptionBuilder implements IPapyr
 
     protected ViewBuilder getViewBuilder() {
         return this.viewBuilder;
+    }
+
+    protected DiagramBuilders getDiagramBuilders() {
+        return this.diagramBuilders;
     }
 
     protected QueryHelper getQueryBuilder() {

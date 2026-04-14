@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2024, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2024, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -14,10 +14,10 @@
  *****************************************************************************/
 package org.eclipse.papyrus.web.services.communication;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
@@ -227,7 +227,7 @@ public class CommunicationDiagramServiceTests extends AbstractDiagramTest {
 
         // check that the Interaction node is created
         Node interactionNode = this.getDiagramHelper().assertGetUniqueMatchingNode(COD_INTERACTION_NODE_NAME + HOLDER_SUFFIX, this.interaction);
-        assertNotNull("The Interaction node should be created at the diagram refresh because it is synchronized", interactionNode);
+        assertNotNull(interactionNode, "The Interaction node should be created at the diagram refresh because it is synchronized");
 
     }
 

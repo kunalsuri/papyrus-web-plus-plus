@@ -1,5 +1,5 @@
 #############################################################################
-#  Copyright (c) 2025 CEA LIST.
+#  Copyright (c) 2025, 2026 CEA LIST.
 #  
 #  This program and the accompanying materials
 #  are made available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@
 
 # Image for full compilation
 
-FROM node:22.16 AS papyrusweb-build
+FROM node:22.16 AS papyrusweb-front-build
 
 ADD . /build
 WORKDIR /build/
@@ -37,23 +37,29 @@ RUN mkdir -p backend/papyrus-web-frontend/src/main/resources/static &&\
 
 # Update packages and compile the backend in another layer
 
-RUN apt-get update &&\
-  apt-get install openjdk-17-jdk -y &&\
-  apt-get install maven -y &&\
-  mvn clean verify -DskipTests -Dcheckstyle.skip -f backend/pom.xml --settings settings.xml
- 
-RUN export WEBAPP_VERSION=$(grep version frontend/package.json | awk -F \" '{print $4}') &&\
-    cp backend/papyrus-web/target/papyrus-web-${WEBAPP_VERSION}.jar backend/papyrus-web/target/papyrus-web.jar 
+FROM maven:3.9.9-eclipse-temurin-21 AS papyrusweb-back-build
+
+ARG USERNAME
+ARG PASSWORD
+ENV USERNAME=${USERNAME}
+ENV PASSWORD=${PASSWORD}
+
+COPY --from=papyrusweb-front-build /build /build
+WORKDIR /build
+
+RUN mvn clean verify -DskipTests -Dcheckstyle.skip -f backend/pom.xml --settings settings.xml
+
+RUN export WEBAPP_VERSION=$(grep version frontend/package.json | awk -F '\"' '{print $4}') && \
+    cp backend/papyrus-web/target/papyrus-web-${WEBAPP_VERSION}.jar backend/papyrus-web/target/papyrus-web.jar
 
 # Image to run Papyrus Web
 
-FROM eclipse-temurin:17-jre AS papyrus-web
+FROM eclipse-temurin:21-jre AS papyrus-web
 
-COPY --from=papyrusweb-build /build/backend/papyrus-web/target/papyrus-web.jar /papyrus-web.jar
+COPY --from=papyrusweb-back-build /build/backend/papyrus-web/target/papyrus-web.jar /papyrus-web.jar
 
 RUN ls -la /
 
 EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","/papyrus-web.jar"]
-
