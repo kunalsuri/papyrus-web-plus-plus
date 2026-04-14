@@ -8,7 +8,8 @@
     "url": "https://gitlab.eclipse.org/eclipse/papyrus/org.eclipse.papyrus-web"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "engines": {
     "node": "22.16.0",

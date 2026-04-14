@@ -35,6 +35,7 @@ include:
       - "/jobs/eca.gitlab-ci.yml"
       - "/jobs/buildkit.gitlab-ci.yml"
       - "/jobs/repo.eclipse.org.gitlab-ci.yml"
+      - "/jobs/secrets.gitlab-ci.yml"
 
 variables:
   MVN_TESTS_EXECUTIONS:
@@ -217,6 +218,62 @@ deploy maven:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: "$CI_COMMIT_TAG != null"
+
+deploy npm:
+    stage: deploy
+    tags:
+      - ctx:medium
+    needs:
+      -  job: "eca"
+    image: maven:3.9.9-eclipse-temurin-21
+    extends:
+      - .ef-repo-eclipse-org
+      - .secrets
+    variables:
+      NODE_VERSION: "22.16.0"
+      NODE_DIR: "$CI_PROJECT_DIR/.node"
+    id_tokens:
+      VAULT_ID_TOKEN:
+        aud: https://gitlab.eclipse.org
+      SIGSTORE_ID_TOKEN:
+        aud: sigstore
+    secrets:
+      GITHUB_COM_TOKEN:
+        vault: $EF_PROJECT_ID/github.com/registry-token@cbi
+        file: false
+      PASSWORD:
+        vault: $EF_PROJECT_ID/github.com/registry-token@cbi
+        file: false
+      REPO_USERNAME:
+        vault: $EF_PROJECT_ID/repo.eclipse.org/username@cbi
+        file: false
+      REPO_PASSWORD:
+        vault: $EF_PROJECT_ID/repo.eclipse.org/password@cbi
+        file: false
+      NPM_TOKEN:
+       vault: $EF_PROJECT_ID/npmjs.com/token@cbi
+       file: false
+    before_script:
+      - mkdir -p "$NODE_DIR"
+      - curl -o node.tar.gz -fsSL "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz"
+      - tar -xzf node.tar.gz --strip-components=1 -C "$NODE_DIR"
+      - export PATH="$NODE_DIR/bin:$PATH"
+      - node --version
+    script:
+      - pwd
+      - echo '//npm.pkg.github.com/:_authToken=${GITHUB_COM_TOKEN}' >> frontend/.npmrc
+      - npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+      - cd frontend
+      - npm ci
+      - NODE_OPTIONS="--max-old-space-size=4096"
+      - npm run build
+      - npm publish --workspaces --access public
+    artifacts:
+      paths:
+        - frontend/node_modules/
+      expire_in: 1 week
+    rules:
+      - if: "$CI_COMMIT_TAG != null"
 
 smoke tests:
   extends: .runTests

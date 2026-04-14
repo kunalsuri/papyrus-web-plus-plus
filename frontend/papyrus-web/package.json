@@ -5,12 +5,12 @@
   "license": "EPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eclipse-sirius/papyrus-web"
+    "url": "https://gitlab.eclipse.org/eclipse/papyrus/org.eclipse.papyrus-web"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://registry.npmjs.org/",
+	  "access": "public"
   },
-  "private": true,
   "dependencies": {
     "@ObeoNetwork/gantt-task-react": "0.6.3",
     "@ObeoNetwork/react-trello": "2.4.11",
