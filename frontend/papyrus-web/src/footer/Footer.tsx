@@ -35,13 +35,20 @@ export const Footer = () => {
       </Typography>
       <Link
         variant="caption"
+        href="https://github.com/eclipse-sirius/sirius-web"
+        rel="noopener noreferrer"
+        target="_blank">
+        Sirius Web
+      </Link>
+      <Typography variant="caption">.&nbsp;</Typography>
+      <Link
+        variant="caption"
         href="https://gitlab.eclipse.org/eclipse/papyrus/org.eclipse.papyrus-web"
         rel="noopener noreferrer"
         target="_blank">
-        Papyrus Web.
+        Papyrus-Web
       </Link>
-      &nbsp;
-      <Typography variant="caption">Papyrus-Web is developed under the&nbsp;</Typography>
+      <Typography variant="caption">&nbsp;is developed under the&nbsp;</Typography>
       <Link variant="caption" href="https://www.eclipse.org/legal/epl-2.0" rel="noopener noreferrer" target="_blank">
         EPL v2 License.
       </Link>
