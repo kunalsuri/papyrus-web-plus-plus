@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 Obeo.
+ * Copyright (c) 2023, 2026 Obeo.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,11 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
+
+/* The selection rectangle */
+.react-flow__nodesselection-rect {
+  pointer-events: none;
+}
 
 /* The circle used to reconnect an edge */
 .react-flow__edgeupdater {

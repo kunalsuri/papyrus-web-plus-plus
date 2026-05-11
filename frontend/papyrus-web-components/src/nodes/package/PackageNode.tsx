@@ -17,6 +17,7 @@ import {
   ConnectionCreationHandles,
   ConnectionHandles,
   ConnectionTargetHandle,
+  DecoratorContainer,
   DiagramContext,
   DiagramContextValue,
   Label,
@@ -42,6 +43,7 @@ const packageNodeStyle = (
     padding: '0px',
     width: '100%',
     height: '100%',
+    position: 'relative',
     opacity: faded ? '0.4' : '',
     ...style,
     border: 'none',
@@ -174,6 +176,7 @@ export const PackageNode = memo(({ data, id, selected, dragging }: NodeProps<Nod
         onDragOver={onDragOver}
         onDrop={handleOnDrop}
         data-testid={`Package - ${data?.insideLabel?.text}`}>
+        <DecoratorContainer decorators={data.decorators}></DecoratorContainer>
         {!!selected ? <ConnectionCreationHandles nodeId={id} /> : null}
         <ConnectionTargetHandle nodeId={id} nodeDescription={data.nodeDescription} isHovered={data.isHovered} />
         <ConnectionHandles connectionHandles={data.connectionHandles} />

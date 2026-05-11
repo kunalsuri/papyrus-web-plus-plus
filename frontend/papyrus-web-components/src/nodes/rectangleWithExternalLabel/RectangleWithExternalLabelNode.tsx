@@ -17,6 +17,7 @@ import {
   ConnectionCreationHandles,
   ConnectionHandles,
   ConnectionTargetHandle,
+  DecoratorContainer,
   DiagramContext,
   DiagramContextValue,
   Label,
@@ -42,6 +43,7 @@ const rectangleWithExternalLabelInnerRectangleStyle = (
     padding: '8px',
     width: '100%',
     height: '100%',
+    position: 'relative',
     opacity: faded ? '0.4' : '',
     ...style,
     borderColor: getCSSColor(String(style.borderColor), theme),
@@ -135,6 +137,7 @@ export const RectangleWithExternalLabelNode = memo(
           onDrop={handleOnDrop}
           data-testid={`RectangleWithExternalLabel - ${data?.insideLabel?.text}`}>
           {data.insideLabel ? <Label diagramElementId={id} label={data.insideLabel} faded={data.faded} /> : null}
+          <DecoratorContainer decorators={data.decorators}></DecoratorContainer>
           {!!selected ? <ConnectionCreationHandles nodeId={id} /> : null}
           <ConnectionTargetHandle nodeId={id} nodeDescription={data.nodeDescription} isHovered={data.isHovered} />
           <ConnectionHandles connectionHandles={data.connectionHandles} />

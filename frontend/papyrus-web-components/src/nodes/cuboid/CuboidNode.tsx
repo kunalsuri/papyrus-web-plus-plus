@@ -17,6 +17,7 @@ import {
   ConnectionCreationHandles,
   ConnectionHandles,
   ConnectionTargetHandle,
+  DecoratorContainer,
   DiagramContext,
   DiagramContextValue,
   Label,
@@ -57,6 +58,7 @@ const cuboidNodeStyle = (
     padding: '0px',
     width: '100%',
     height: '100%',
+    position: 'relative',
     opacity: faded ? '0.4' : '',
     ...style,
     // No border nor background color: this is handled by the SVG image
@@ -151,6 +153,7 @@ export const CuboidNode = memo(({ data, id, selected, dragging }: NodeProps<Node
             {/* Children */}
           </div>
         </div>
+        <DecoratorContainer decorators={data.decorators}></DecoratorContainer>
         {!!selected ? <ConnectionCreationHandles nodeId={id} /> : null}
         <ConnectionTargetHandle nodeId={id} nodeDescription={data.nodeDescription} isHovered={data.isHovered} />
         <ConnectionHandles connectionHandles={data.connectionHandles} />

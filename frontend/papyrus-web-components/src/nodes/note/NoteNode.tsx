@@ -18,6 +18,7 @@ import {
   ConnectionCreationHandles,
   ConnectionHandles,
   ConnectionTargetHandle,
+  DecoratorContainer,
   defaultHeight,
   defaultWidth,
   DiagramContext,
@@ -57,6 +58,7 @@ const noteNodeStyle = (
     padding: '0px',
     width: '100%',
     height: '100%',
+    position: 'relative',
     opacity: faded ? '0.4' : '',
     ...style,
     // No border nor background color: this is handled by the SVG image
@@ -164,6 +166,7 @@ export const NoteNode = memo(({ data, id, selected, dragging }: NodeProps<Node<N
           </svg>
         </div>
         {data.insideLabel ? <NoteLabel diagramElementId={id} label={updatedLabel} faded={data.faded} /> : null}
+        <DecoratorContainer decorators={data.decorators}></DecoratorContainer>
         {!!selected ? <ConnectionCreationHandles nodeId={id} /> : null}
         <ConnectionTargetHandle nodeId={id} nodeDescription={data.nodeDescription} isHovered={data.isHovered} />
         <ConnectionHandles connectionHandles={data.connectionHandles} />

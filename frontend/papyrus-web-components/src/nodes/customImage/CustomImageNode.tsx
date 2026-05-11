@@ -27,6 +27,7 @@ import { Edge, Node, NodeProps, useStoreApi, NodeResizeControl } from '@xyflow/r
 import { memo, useContext, useEffect, useState } from 'react';
 import { CustomImageNodeData, NodeComponentsMap } from './CustomImageNode.types';
 import {
+  DecoratorContainer,
   EdgeData,
   NodeData,
   useConnectorNodeStyle,
@@ -57,6 +58,7 @@ const customImageNodeStyle = (
     padding: '0px',
     width: '100%',
     height: '100%',
+    position: 'relative',
     opacity: faded ? '0.4' : '',
     ...style,
     border: 'none',
@@ -151,6 +153,7 @@ export const CustomImageNode: NodeComponentsMap['customImageNode'] = memo(
               No image
             </Typography>
           )}
+          <DecoratorContainer decorators={data.decorators}></DecoratorContainer>
         </div>
       </>
     );

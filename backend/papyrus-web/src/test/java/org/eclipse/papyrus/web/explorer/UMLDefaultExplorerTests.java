@@ -231,11 +231,9 @@ public class UMLDefaultExplorerTests extends AbstractIntegrationTest {
 
             // Check static prop
             assertThat(classTreeItem.getChildren()).hasSize(1);
-            TreeItem propTreeItem = classTreeItem.getChildren().get(0);
-            StyledStringFragment propStereoptypeFragment = propTreeItem.getLabel().styledStringFragments().get(0);
-            assertThat(propStereoptypeFragment.text()).isEqualTo("");
 
-            StyledStringFragment propFragment = propTreeItem.getLabel().styledStringFragments().get(1);
+            TreeItem propTreeItem = classTreeItem.getChildren().getFirst();
+            StyledStringFragment propFragment = propTreeItem.getLabel().styledStringFragments().getFirst();
             assertThat(propFragment.text()).isEqualTo("prop1");
             assertThat(propFragment.styledStringFragmentStyle().getUnderlineStyle()).isEqualTo(UnderLineStyle.SOLID);
 

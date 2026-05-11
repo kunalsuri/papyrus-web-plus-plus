@@ -58,6 +58,7 @@ const toCuboidListNode = (
     style,
     labelEditable,
     deletable,
+    decorators,
   } = gqlNode;
 
   const handleLayoutData: GQLHandleLayoutData[] = gqlDiagram.layoutData.nodeLayoutData
@@ -125,6 +126,8 @@ const toCuboidListNode = (
     minComputedHeight: gqlNodeLayoutData?.minComputedSize.height ?? null,
     deletable,
     isLastNodeSelected: false,
+    moving: false,
+    decorators,
   };
 
   data.insideLabel = convertInsideLabel(

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2022, 2025 CEA LIST, Obeo, Artal Technologies.
+ * Copyright (c) 2022, 2026 CEA LIST, Obeo, Artal Technologies.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -440,6 +440,7 @@ public class ViewHelper implements IViewHelper {
                         .childNodes(List.of())//
                         .customizedStyleProperties(Set.of())
                         .initialBorderNodePosition(BorderNodePosition.NONE)
+                        .decorators(List.of())
                         .build();
 
                 fakeNodes.add(node);

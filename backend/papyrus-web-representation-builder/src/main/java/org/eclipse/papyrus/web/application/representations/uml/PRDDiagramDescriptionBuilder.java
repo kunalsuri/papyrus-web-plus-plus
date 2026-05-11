@@ -24,6 +24,7 @@ import org.eclipse.papyrus.web.application.representations.view.aql.CallQuery;
 import org.eclipse.sirius.components.view.diagram.ArrowStyle;
 import org.eclipse.sirius.components.view.diagram.DiagramDescription;
 import org.eclipse.sirius.components.view.diagram.DiagramFactory;
+import org.eclipse.sirius.components.view.diagram.DiagramLayoutOption;
 import org.eclipse.sirius.components.view.diagram.DiagramToolSection;
 import org.eclipse.sirius.components.view.diagram.DropNodeTool;
 import org.eclipse.sirius.components.view.diagram.EdgeDescription;
@@ -217,7 +218,6 @@ public class PRDDiagramDescriptionBuilder extends AbstractRepresentationDescript
         this.createGeneralizationEdgeDescription(diagramDescription);
 
         this.prdSharedDescription.getChildrenDescriptions().add(this.symbolNodeDescription);
-
         diagramDescription.getPalette().setDropTool(this.getViewBuilder().createGenericSemanticDropTool(this.getIdBuilder().getDiagramSemanticDropToolName()));
 
         // Add dropped tool on diagram
@@ -228,10 +228,11 @@ public class PRDDiagramDescriptionBuilder extends AbstractRepresentationDescript
             List<NodeDescription> droppedNodeDescriptions = this.collectNodesWithDomainAndFilterWithoutContent(diagramDescription, children, List.of());
             prdGraphicalDropTool.getAcceptedNodeTypes().addAll(droppedNodeDescriptions);
         });
+
         diagramDescription.getPalette().setDropNodeTool(prdGraphicalDropTool);
-
         diagramDescription.setToolbar(this.getViewBuilder().createDefaultDiagramToolbar());
-
+        diagramDescription.setLayoutOption(DiagramLayoutOption.NONE);
+        diagramDescription.setMinimapVisible(true);
         diagramDescription.setStyle(this.getDiagramBuilders().newDiagramStyleDescription().build());
     }
 
