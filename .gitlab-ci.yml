@@ -139,8 +139,7 @@ deploy docker:
       vault: $EF_PROJECT_ID/github.com/registry-token@cbi
       file: false
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: "$CI_COMMIT_TAG != null"
+    - if: "$CI_COMMIT_TAG != null" #if there is a tag, we publish a Docker image
 
 # Only on schedule and commit tag
 deploy maven:
@@ -210,6 +209,9 @@ deploy maven:
       - backend/papyrus-web/target/surefire-reports/
     expire_in: 1 week
   rules:
+    # we will publish the mvn packages only for master branch, on scheduled job (latest version) or for tagged commits
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # not on master branch
+      when: never
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: "$CI_COMMIT_TAG != null"
 
@@ -267,6 +269,9 @@ deploy npm:
         - frontend/node_modules/
       expire_in: 1 week
     rules:
+      # we will publish the npm packages only for tagged commits from master branch
+      - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # not on master branch
+        when: never
       - if: "$CI_COMMIT_TAG != null"
 
 smoke tests:
