@@ -164,12 +164,6 @@ deploy maven:
     PASSWORD:
       vault: $EF_PROJECT_ID/github.com/registry-token@cbi
       file: false
-    REPO_USERNAME:
-      vault: $EF_PROJECT_ID/repo.eclipse.org/username@cbi
-      file: false
-    REPO_PASSWORD:
-      vault: $EF_PROJECT_ID/repo.eclipse.org/password@cbi
-      file: false
   before_script:
     - mkdir -p "$NODE_DIR"
     - curl -o node.tar.gz -fsSL "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz"
