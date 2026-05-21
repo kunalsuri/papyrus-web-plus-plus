@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>org.eclipse.papyrus.papyrus-web</groupId>
 		<artifactId>papyrus-web-parent</artifactId>
-		<version>2026.3.0</version>
+		<version>2026.5.0</version>
 		<relativePath>../papyrus-web-parent</relativePath>
 	</parent>
 

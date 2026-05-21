@@ -18,7 +18,7 @@
 
 	<groupId>org.eclipse.papyrus.papyrus-web</groupId>
 	<artifactId>papyrus-web-container</artifactId>
-	<version>2026.3.0</version>
+	<version>2026.5.0</version>
 
 	<name>Papyrus Web</name>
 	<description>Papyrus Web</description>
