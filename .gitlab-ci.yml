@@ -210,10 +210,11 @@ deploy maven:
     expire_in: 1 week
   rules:
     # we will publish the mvn packages only for master branch, on scheduled job (latest version) or for tagged commits
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # not on master branch
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: "$CI_COMMIT_TAG != null"
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # when we push a tag, we decided to have a manual action to publish the npm package
+    - if: $CI_COMMIT_TAG != null
+      when: manual
+    - when: never
 
 deploy npm:
     stage: deploy
@@ -270,9 +271,10 @@ deploy npm:
       expire_in: 1 week
     rules:
       # we will publish the npm packages only for tagged commits from master branch
-      - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # not on master branch
-        when: never
-      - if: "$CI_COMMIT_TAG != null"
+      # when we push a tag, we decided to have a manual action to publish the npm package
+      - if: $CI_COMMIT_TAG != null
+        when: manual
+      - when: never
 
 smoke tests:
   extends: .runTests
