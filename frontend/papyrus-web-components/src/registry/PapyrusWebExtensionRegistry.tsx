@@ -10,6 +10,7 @@
  *
  * Contributors:
  *  Obeo - Initial API and implementation
+ *  Vincent LORENZO (CEA LIST) vincent.lorenzo@cea.fr - Issue 283
  *******************************************************************************/
 
 import { ExtensionRegistry } from '@eclipse-sirius/sirius-components-core';
@@ -67,7 +68,12 @@ import {
 } from '@eclipse-sirius/sirius-components-diagrams';
 import { PapyrusPopupToolContribution } from '../diagram-tools/PapyrusPopupToolContribution';
 import { Edge, Node } from '@xyflow/react';
+import {
+  OmniboxCommandOverrideContribution,
+  omniboxCommandOverrideContributionExtensionPoint,
+} from '@eclipse-sirius/sirius-components-omnibox';
 
+import { PublishUMLLibraryCommand } from '../libraries/PublishUMLLibraryCommand';
 const papyrusWebExtensionRegistry: ExtensionRegistry = new ExtensionRegistry();
 
 // Contribution to modify GraphQl requests to handle custom node
@@ -215,6 +221,24 @@ papyrusWebExtensionRegistry.putData(apolloClientOptionsConfigurersExtensionPoint
   identifier: `papyrusweb_${apolloClientOptionsConfigurersExtensionPoint.identifier}`,
   data: [nodeApolloClientOptionsConfigurer, widgetsApolloClientOptionsConfigurer],
 });
+
+//publish library extension registry
+const omniboxCommandOverrides: OmniboxCommandOverrideContribution[] = [
+  {
+    canHandle: (action) => {
+      return action.id === 'publishUMLModel';
+    },
+    component: PublishUMLLibraryCommand,
+  },
+];
+
+papyrusWebExtensionRegistry.putData<OmniboxCommandOverrideContribution[]>(
+  omniboxCommandOverrideContributionExtensionPoint,
+  {
+    identifier: `papyrusweb_${omniboxCommandOverrideContributionExtensionPoint.identifier}`,
+    data: omniboxCommandOverrides,
+  }
+);
 
 // Table contribution
 papyrusWebExtensionRegistry.addAll(forkRegistry, new DefaultExtensionRegistryMergeStrategy());

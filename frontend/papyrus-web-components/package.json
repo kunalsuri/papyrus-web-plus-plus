@@ -50,6 +50,7 @@
     "@eclipse-sirius/sirius-components-widget-reference": "2026.5.0",
     "@eclipse-sirius/sirius-components-widget-table": "2026.5.0",
     "@eclipse-sirius/sirius-web-application": "2026.5.0",
+    "@eclipse-sirius/sirius-web-view-fork": "2026.5.0",
     "@lexical/code": "0.42.0",
     "@lexical/react": "0.42.0",
     "@mui/icons-material": "7.3.10",

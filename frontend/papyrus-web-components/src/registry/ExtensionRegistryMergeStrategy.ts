@@ -9,8 +9,10 @@
  *
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Vincent LORENZO (CEA LIST) vincent.lorenzo@cea.fr - Issue 283
  *******************************************************************************/
 import { DataExtension } from '@eclipse-sirius/sirius-components-core';
+import { omniboxCommandOverrideContributionExtensionPoint } from '@eclipse-sirius/sirius-components-omnibox';
 import { DefaultExtensionRegistryMergeStrategy } from '@eclipse-sirius/sirius-web-application';
 
 export class ExtensionRegistryMergeStrategy extends DefaultExtensionRegistryMergeStrategy {
@@ -24,6 +26,9 @@ export class ExtensionRegistryMergeStrategy extends DefaultExtensionRegistryMerg
     }
     if (identifier === 'navigationBarMenu#helpURL') {
       return this.mergeNavigationBarMenuHelpURL(existingValues, newValues);
+    }
+    if (identifier === omniboxCommandOverrideContributionExtensionPoint.identifier) {
+      return this.mergeOmniboxCommandOverrideContributions(existingValues, newValues);
     }
     return newValues;
   }
@@ -46,5 +51,17 @@ export class ExtensionRegistryMergeStrategy extends DefaultExtensionRegistryMerg
       identifier: '`papyrus_web_doc_navigationBarMenu#helpURL',
       data: apolloClientOptionsConfigurers.data,
     };
+  }
+
+  private mergeOmniboxCommandOverrideContributions(
+    existingOmniboxCommandOverrideContributions: DataExtension<any>,
+    newOmniboxCommandOverrideContributions: DataExtension<any>
+  ): DataExtension<any> {
+    const result = {
+      identifier: `papyrusweb_omnibox${omniboxCommandOverrideContributionExtensionPoint.identifier}_merged`,
+      data: [...existingOmniboxCommandOverrideContributions.data, ...newOmniboxCommandOverrideContributions.data],
+    };
+
+    return result;
   }
 }
