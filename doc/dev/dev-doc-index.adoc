@@ -5,4 +5,5 @@
 - xref:detailsViewSpecifier.adoc[Details View Specifier]
 - xref:explorerSpecifier.adoc[Explorer Specifier]
 - xref:testConfiguration.adoc[Test configuration]
+- xref:theme.adoc[Theme]
 - xref:howTo.adoc[How to...]

@@ -1,0 +1,158 @@
+ifndef::imagesdir[:imagesdir: imgs]
+:tip-caption: 💡
+:warning-caption: ⚠️
+:toclevels: 4
+
+== Theme
+The theme is defined in the file `./frontend/papyrus-web/src/theme/papyrusTheme.ts`. To create it, we started with the SysON theme one that uses less pink colors than the default theme provided by Sirius-Web &#128516;.
+This file is referenced by  in the file `./frontend/papyrus-web/src/index.tsx.`
+
+You will find some examples of usages below.
+
+=== Primary Color Examples
+
+*Definition*
+
+image::theme/primary_definition.png[title="Primary Colors definition", align="left"]
+
+*Usages*
+
+These values are used on the **Create a new project** page.
+
+* `primary.main`
+** the border of the edited field
+** active area
+** button selected by default
+** selected value in ComboBox, but lighter
+* `primary.dark`
+** hover for a button
+* `primary.light`
+** check box in property views
+
+*Examples*
+[%autowidth, cols="a"]
+|===
+| image::theme/primary_main_light_usage.png[title="Primary Main and Light example", align="center"]
+| image::theme/primary_main_usage_1.png[title="Primary Main example",  align="center"]
+| image::theme/primary_main_usage_2.png[title="Primary Main example",  align="center"]
+| image::theme/primary_dark_usage_1.png[title="Primary Dark example", align="center"]
+|===
+
+
+=== Secondary Color Examples
+
+*Definition*
+
+image::theme/secondary_definition.png[title="Secondary Colors definition", align="left"]
+
+*Usages*
+
+* `secondary.main`
+** background of images in navigation bar when the mouse is hover
+** question mark in the Property View
+* `secondary.dark`
+  ** usage not found
+* `secondary.ligth`
+** usage not found
+
+*Examples*
+[%autowidth, cols="a"]
+|===
+| image::theme/secondary_main_usage_1.png[title="Secondary Main example", align="center"]
+| image::theme/secondary_main_usage_2.png[title="Secondary Main example", align="center"]
+| image::theme/secondary_main_usage_3.png[title="Secondary Main example", align="center"]
+| image::theme/secondary_main_usage_4.png[title="Secondary Main example", align="center"]
+|===
+
+=== Text Color Examples
+
+*Definition*
+
+image::theme/text_definition.png[title="Text definition", align="left"]
+
+*Usages*
+
+* `text.primary`
+** a lot of text in the UI
+* `text.disabled`
+** icons of disabled views in the editor
+
+*Examples*
+[%autowidth, cols="a"]
+|===
+| image::theme/text_primary_usage_1.png[title="Text Primary example", align="center"]
+| image::theme/text_primary_and_disabled_usage_1.png[title="Text Primary and disabled example", align="center"]
+|===
+
+=== Navigation Color Examples
+
+*Definition*
+
+image::theme/navigation_definition.png[title="Navigation definition", align="left"]
+
+*Usages*
+
+* `navigation.leftBackground`
+** the vertical bar on the left of the editor
+* `navigation.rightBackground`
+** the vertical bar on the right of the editor
+
+*Examples*
+
+[%autowidth, cols="a"]
+|===
+| image::theme/navigation_left_and_right_usage.png[title="Navigation example", align="center"]
+|===
+
+=== Divider Color Examples
+
+*Definition*
+
+image::theme/divider_definition.png[title="Divider definition", align="left"]
+
+*Usages*
+
+* the line separating the views in the **Workbench**
+* background of two cards of the **Home page** (probably an issue, see https://github.com/eclipse-sirius/sirius-web/issues/6570)
+
+*Examples*
+[%autowidth, cols="a"]
+|===
+| image::theme/divider_usage_1.png[title="Divider Workbench example", align="center"]
+| image::theme/divider_usage_2.png[title="Divider Home page example", align="center"]
+|===
+
+
+
+=== Navigationbar Color Examples
+
+*Definition*
+
+image::theme/navigationbar_definition.png[title="NavigationBar definition", align="left"]
+
+*Usages*
+
+* the top bar of the **Home page** and **Workbench**
+
+*Examples*
+[%autowidth, cols="a"]
+|===
+| image::theme/navigationbar_usage_1.png[title="Divider Workbench example", align="left"]
+|===
+
+=== Selected Color Example
+*Definition*
+
+image::theme/selected_definition.png[title="Selected definition", align="left"]
+
+*Usages*
+
+* the selection of the figures in the diagram
+* the color of a link during its creation on a selected figure
+
+*Examples*
+[%autowidth, cols="a"]
+|===
+| image::theme/selected_usage_1.png[title="Selected example", align="center"]
+| image::theme/selected_usage_2.png[title="Selected example during link creation", align="center"]
+|===

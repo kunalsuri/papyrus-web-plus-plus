@@ -10,6 +10,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *     Titouan BOUETE-GIRAUD (Artal Technologies) - Issue 210
+ *     Vincent LORENZO (CEA LIST) vincent.lorenzo@cea.fr - Issue GL-324
  *******************************************************************************/
 import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 
@@ -35,6 +36,7 @@ import {
 import { createRoot } from 'react-dom/client';
 import { Footer } from './footer/Footer';
 import { PapyrusNavigationBarIcon } from './core/PapyrusNavigationBarIcon';
+import { papyrusTheme } from './theme/papyrusTheme';
 
 if (process.env.NODE_ENV !== 'production') {
   loadDevMessages();
@@ -65,6 +67,7 @@ root.render(
   <SiriusWebApplication
     httpOrigin={httpOrigin}
     wsOrigin={wsOrigin}
+    theme={papyrusTheme}
     extensionRegistry={papyrusWebExtensionRegistry}
     extensionRegistryMergeStrategy={new ExtensionRegistryMergeStrategy()}>
     <DiagramRepresentationConfiguration nodeTypeRegistry={papyrusNodeTypeRegistryValue} />
