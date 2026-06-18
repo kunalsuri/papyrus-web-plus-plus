@@ -41,7 +41,7 @@ describe('Language expression tests', () => {
       .should('have.css', 'border-color', 'rgba(0, 0, 0, 0.125)');
     cy.getByTestId('le-add-language-dialog-ok').should('have.class', 'Mui-disabled');
     cy.getByTestId('le-add-language-dialog-language-JAVA').should('be.visible').click();
-    cy.getByTestId('le-add-language-dialog-know-languages').should('have.css', 'border-color', 'rgb(190, 26, 120)');
+    cy.getByTestId('le-add-language-dialog-know-languages').should('have.css', 'border-color', 'rgb(255, 152, 0)');
     cy.getByTestId('le-add-language-dialog-ok').should('not.have.class', 'Mui-disabled').click();
     cy.getByTestId('le-language-JAVA').should('be.visible');
     cy.getByTestId('le-language-JAVA-body').should('not.be.visible');

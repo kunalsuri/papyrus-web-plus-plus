@@ -149,10 +149,12 @@ image::theme/selected_definition.png[title="Selected definition", align="left"]
 
 * the selection of the figures in the diagram
 * the color of a link during its creation on a selected figure
+* border of some selection widgets, like for the edition of **FunctionBehavior#language** (maybe a Sirius-Web issue, see https://github.com/eclipse-sirius/sirius-web/issues/6570)
 
 *Examples*
 [%autowidth, cols="a"]
 |===
 | image::theme/selected_usage_1.png[title="Selected example", align="center"]
 | image::theme/selected_usage_2.png[title="Selected example during link creation", align="center"]
+| image::theme/selected_usage_3.png[title="Border of some selection widget", align="center"]
 |===
