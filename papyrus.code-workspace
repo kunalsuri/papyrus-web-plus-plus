@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "name": "Backend (Java)",
+      "path": "backend"
+    },
+    {
+      "name": "Frontend (TS)",
+      "path": "frontend"
+    },
+    {
+      "name": "Root Project",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "java.compile.nullAnalysis.mode": "automatic"
+  }
+}

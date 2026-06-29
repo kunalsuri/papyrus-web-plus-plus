@@ -39,17 +39,45 @@ if (-not $BackendOnly) {
     Write-Section 'Build :: Frontend'
     Push-Location $PwppFrontendDir
     try {
-        Write-Step 'Installing dependencies (npm ci)...'
-        npm ci
-        if ($LASTEXITCODE -ne 0) { Write-Err 'npm ci failed (check ~/.npmrc auth?).'; exit 1 }
+        $needsInstall = $true
+        $hashFile = Join-Path 'node_modules' '.package-lock.hash'
+        if (Test-Path 'node_modules') {
+            if (Test-Path $hashFile) {
+                $lockFile = Get-Item 'package-lock.json' -ErrorAction SilentlyContinue
+                if ($lockFile) {
+                    $currentHash = (Get-FileHash $lockFile.FullName -Algorithm SHA256).Hash
+                    $cachedHash = Get-Content $hashFile -ErrorAction SilentlyContinue
+                    if ($currentHash -eq $cachedHash) {
+                        $needsInstall = $false
+                    }
+                }
+            }
+        }
+
+        if ($needsInstall) {
+            Write-Step 'Installing dependencies (npm ci --verbose)...'
+            npm ci --verbose
+            if ($LASTEXITCODE -ne 0) { Write-Err 'npm ci failed (check ~/.npmrc auth?).'; exit 1 }
+            
+            # Cache the hash of the package-lock.json we just installed
+            if (Test-Path 'node_modules') {
+                $lockFile = Get-Item 'package-lock.json' -ErrorAction SilentlyContinue
+                if ($lockFile) {
+                    $currentHash = (Get-FileHash $lockFile.FullName -Algorithm SHA256).Hash
+                    Set-Content -Path $hashFile -Value $currentHash -Encoding ASCII
+                }
+            }
+        } else {
+            Write-Info 'node_modules is up to date with package-lock.json (hash match); skipping package installation.'
+        }
 
         if ($FixFormat) {
             Write-Step 'Formatting sources (npm run format)...'
             npm run format
         }
 
-        Write-Step 'Building frontend (npm run build -> turbo: components then app)...'
-        npm run build
+        Write-Step 'Building frontend (npm run build -- --log-order=stream)...'
+        npm run build -- --log-order=stream
         if ($LASTEXITCODE -ne 0) {
             Write-Err 'Frontend build failed.'
             Write-Info 'If it failed on format-lint, re-run with -FixFormat.'
@@ -83,7 +111,7 @@ if (-not $FrontendOnly) {
         exit 1
     }
 
-    $mvnArgs = @('clean', 'package')
+    $mvnArgs = @('clean', 'package', '--errors')
     if (-not $WithTests) { $mvnArgs += '-DskipTests' }
 
     Write-Step "Running: mvn $($mvnArgs -join ' ')"
