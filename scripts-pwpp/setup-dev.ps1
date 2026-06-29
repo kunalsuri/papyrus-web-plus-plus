@@ -73,7 +73,7 @@ Write-Section 'Phase 2 - GitHub Packages auth'
 $mavenSettings = Join-Path $HOME '.m2\settings.xml'
 $npmrc         = Join-Path $HOME '.npmrc'
 $githubUser    = $env:GITHUB_USERNAME
-$githubToken   = if ($env:GITHUB_TOKEN) { $env:GITHUB_TOKEN } else { $env:GITHUB_AUTH_TOKEN }
+$githubToken   = if ($env:GITHUB_TOKEN) { $env:GITHUB_TOKEN } elseif ($env:GITHUB_AUTH_TOKEN) { $env:GITHUB_AUTH_TOKEN } else { $env:PASSWORD }
 
 $mavenAuthOk = (Test-Path $mavenSettings) -and (Select-String -Path $mavenSettings -Pattern 'github-sirius-components' -Quiet)
 $npmAuthOk   = (Test-Path $npmrc) -and (Select-String -Path $npmrc -Pattern 'npm\.pkg\.github\.com' -Quiet)
