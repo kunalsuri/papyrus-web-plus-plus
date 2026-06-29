@@ -1,0 +1,37 @@
+# Copyright (c) 2026 Kunal Suri.
+# SPDX-License-Identifier: EPL-2.0
+#
+# Local development database for papyrus-web-plus-plus.
+#
+# The values below are chosen to MATCH the defaults baked into
+# backend/papyrus-web/src/main/resources/application.properties:
+#
+#     spring.datasource.url=jdbc:postgresql://localhost:5439/papyrus-web-db
+#     spring.datasource.username=dbuser
+#     spring.datasource.password=dbpwd
+#
+# Because they match, the backend fat JAR runs with NO datasource arguments.
+# Data is kept in a named volume so it survives `docker compose stop`; use
+# `stop-dev.ps1 -RemoveData` (i.e. `docker compose down -v`) to wipe it.
+
+services:
+  papyrus-web-db:
+    image: postgres:15
+    container_name: papyrus-web-postgres
+    ports:
+      - "5439:5432"
+    environment:
+      POSTGRES_DB: papyrus-web-db
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: dbpwd
+    volumes:
+      - papyrus-web-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d papyrus-web-db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  papyrus-web-pgdata:
+    name: papyrus-web-pgdata

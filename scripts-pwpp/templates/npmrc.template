@@ -1,0 +1,9 @@
+# npm settings template for building the papyrus-web-plus-plus frontend.
+#
+# Some @eclipse-* packages are hosted on GitHub Packages, so npm needs the same
+# GitHub token (read:package scope) used by Maven.
+#
+# setup-dev.ps1 -ConfigureAuth replaces the placeholder from the GITHUB_TOKEN
+# environment variable and writes the result to $HOME/.npmrc. You can also copy
+# this line into your existing ~/.npmrc by hand.
+//npm.pkg.github.com/:_authToken=__GITHUB_TOKEN__

@@ -90,3 +90,13 @@ odweb-maven-repository
 *.iws
 *.iml
 *.ipr
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+### Claude Code ###
+# Local, per-user settings - can contain machine paths and your OS username.
+# Keep this out of the public repo. (A shared .claude/settings.json may still be committed.)
+.claude/settings.local.json

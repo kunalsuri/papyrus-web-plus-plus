@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Maven settings template for building papyrus-web-plus-plus.
+
+  The backend depends on artifacts published to GitHub Packages, so Maven needs
+  a GitHub Personal Access Token with the `read:package` scope. The server <id>
+  values below MUST match the repository ids referenced by the project POMs -
+  do not rename them.
+
+  setup-dev.ps1 -ConfigureAuth fills the two placeholders from the
+  GITHUB_USERNAME and GITHUB_TOKEN environment variables and writes the result
+  to $HOME/.m2/settings.xml. You can also copy this file there by hand.
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <server>
+      <id>github-sirius-emfjson</id>
+      <username>__GITHUB_USERNAME__</username>
+      <password>__GITHUB_TOKEN__</password>
+    </server>
+    <server>
+      <id>github-emfjson</id>
+      <username>__GITHUB_USERNAME__</username>
+      <password>__GITHUB_TOKEN__</password>
+    </server>
+    <server>
+      <id>github-papyrus-sirius-uml2</id>
+      <username>__GITHUB_USERNAME__</username>
+      <password>__GITHUB_TOKEN__</password>
+    </server>
+    <server>
+      <id>papyrus-uml-services</id>
+      <username>__GITHUB_USERNAME__</username>
+      <password>__GITHUB_TOKEN__</password>
+    </server>
+    <server>
+      <id>github-sirius-components</id>
+      <username>__GITHUB_USERNAME__</username>
+      <password>__GITHUB_TOKEN__</password>
+    </server>
+  </servers>
+</settings>
