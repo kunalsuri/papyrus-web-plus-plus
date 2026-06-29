@@ -1,0 +1,46 @@
+classDiagram
+    %% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+    
+    class Project {
+        +String id
+        +String name
+        +List~Document~ documents
+    }
+
+    class Document {
+        +String id
+        +String name
+        +String type
+        +SemanticModelRoot rootElement
+    }
+
+    class EditingContext {
+        +String id
+        +List~Document~ loadedDocuments
+        +List~Representation~ activeRepresentations
+        +boolean isDirty()
+    }
+
+    class Representation {
+        +String id
+        +String name
+        +String type
+        +SemanticModelElement target
+    }
+
+    class SemanticModelRoot {
+        +String umlVersion
+    }
+
+    class SemanticModelElement {
+        +String id
+        +String name
+        +String stereotype
+    }
+
+    Project "1" *-- "*" Document : contains
+    EditingContext "1" o-- "*" Document : manages
+    EditingContext "1" o-- "*" Representation : holds
+    Document "1" *-- "1" SemanticModelRoot : contains
+    Representation "*" --> "1" SemanticModelElement : represents
+    SemanticModelRoot --|> SemanticModelElement : is a

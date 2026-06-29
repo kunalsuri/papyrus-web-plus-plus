@@ -7,14 +7,14 @@ other tools read this file directly.
 
 ## Project
 Papyrus web is a web UML modeler to easily create UML diagrams directly from a web browser. It is based on Eclipse Sirius Components (https://www.eclipse.org... This is a FORK of **papyrus/org.eclipse.papyrus-web** (upstream).
-Stack: <fill in>.
+Stack: Java 21 & Spring Boot on Eclipse Sirius Components (backend) · TypeScript, React 18, Vite 8, MUI 7 & Turbo (frontend) · PostgreSQL 15.
 
 ## Rules every agent must follow
 1. **Frozen upstream.** Code inherited from **papyrus/org.eclipse.papyrus-web** is off-limits unless the task explicitly requires it. New work goes in our own modules.
 2. **No layout churn.** Don't reorganize directories; existing contributors depend on
    the structure.
 3. **Test before done.** Run the suite matching your change; never declare success
-   untested. Build: `<fill in>` · Test: `<fill in>`
+   untested. Build: `powershell -File .\scripts-pwpp\build-all.ps1` · Test: `powershell -File .\scripts-pwpp\build-all.ps1 -WithTests`
 4. **Match license headers** on every new source file, copying from neighboring files.
 5. **Locate, then read.** Use `ai/guide/MODULE_MAP.md` to find code; grep before
    reading whole files.

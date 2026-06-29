@@ -1,0 +1,28 @@
+graph LR
+    %% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+    
+    subgraph Browser ["Web Browser"]
+        ReactApp["React Modeler (papyrus-web)"]
+        Apollo["Apollo GraphQL Client"]
+        ReactApp --> Apollo
+    end
+
+    subgraph Server ["Spring Boot Server (port :8080)"]
+        StaticFilter["Static Resource Handler"]
+        GraphQLController["GraphQL Controller"]
+        SiriusEngine["Eclipse Sirius Components Engine"]
+        
+        StaticFilter --> GraphQLController
+        GraphQLController --> SiriusEngine
+    end
+
+    subgraph Data ["Data Layer"]
+        DB[(PostgreSQL 15 Container)]
+    end
+
+    %% Communication Seams
+    Apollo -->|"HTTP GET/POST /graphql<br>(Queries & Mutations)"| GraphQLController
+    Apollo -->|"WebSockets /graphql<br>(Subscriptions - transport-ws)"| GraphQLController
+    Browser -->|"HTTP GET /index.html & assets"| StaticFilter
+    
+    SiriusEngine -->|"JDBC (port :5439)"| DB

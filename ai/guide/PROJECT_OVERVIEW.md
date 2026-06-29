@@ -9,13 +9,13 @@
 Papyrus Web is a **web-based UML modeler** — create UML diagrams directly from a
 browser. It is built on **Eclipse Sirius Components / Sirius Web**
 (https://www.eclipse.org/sirius/sirius-web.html). This repository is a **fork of
-`papyrus/org.eclipse.papyrus-web`** (upstream lives on GitLab; this fork on GitHub).
+papyrus/org.eclipse.papyrus-web** (upstream lives on GitLab; this fork on GitHub).
 It is a **mono-repo** holding both the frontend and the backend.
 
 ## Stack (verified 2026-06-29 against config files)
 - **Backend:** Java **21** (Temurin), **Maven 3.9.9** multi-module reactor (21 modules),
   Spring Boot server on Eclipse Sirius Components. Persists to **PostgreSQL 15**.
-- **Frontend:** **TypeScript**, **Vite 8**, **React 18**, **MUI 7**, `@xyflow/react`
+- **Frontend:** **TypeScript**, **Vite 8**, **React 18**, **MUI 7**, @xyflow/react
   diagram canvas, **Apollo GraphQL** client. Monorepo via **npm workspaces + turbo 2.4.4**.
   Requires **Node ≥ 22.16.0**, **npm ≥ 10.9.2**.
 - **API / seam:** GraphQL over **HTTP** (queries/mutations) + **WebSocket** subscriptions
@@ -25,7 +25,7 @@ It is a **mono-repo** holding both the frontend and the backend.
   a **single fat JAR** on **:8080** (see `ARCHITECTURE.md`).
 
 ### Build / Test (verified — `README.adoc` §Building + `scripts-pwpp/build-all.ps1`)
-- **Frontend** (from `frontend/`): `npm ci` → `npm run build` (turbo: components lib → app → `papyrus-web/dist`).
+- **Frontend** (from `frontend/`): `npm ci` → `npm run build` (turbo: components lib → app → `frontend/papyrus-web/dist`).
 - **Bundle:** copy `frontend/papyrus-web/dist/*` → `backend/papyrus-web-frontend/src/main/resources/static`.
 - **Backend** (from `backend/`): `mvn clean verify` (runs tests; **needs Docker**) · `mvn clean verify -DskipTests` to skip.
 - **All-in-one (ours):** `scripts-pwpp/build-all.ps1` (`-WithTests`, `-FixFormat`, `-FrontendOnly`, `-BackendOnly`).

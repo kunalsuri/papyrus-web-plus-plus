@@ -1,0 +1,43 @@
+graph TD
+    %% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+    
+    subgraph Frontend ["Frontend (npm monorepo)"]
+        FW["frontend/papyrus-web"] --> FWC["frontend/papyrus-web-components"]
+    end
+
+    subgraph Backend ["Backend (Maven Reactor)"]
+        PW["backend/papyrus-web (App JAR)"] --> PWA["backend/papyrus-web-application"]
+        PW --> PWI["backend/papyrus-web-infra"]
+        PW --> PWF["backend/papyrus-web-frontend"]
+        
+        %% Profiles
+        PW --> CPP["backend/papyrus-web-cpp-profile"]
+        PW --> JAVA["backend/papyrus-web-java-profile"]
+        PW --> CG["backend/papyrus-web-codegen-profile"]
+        PW --> TRANS["backend/papyrus-web-transformation-profile"]
+        
+        %% Application Module Wiring
+        PWA --> PWR["backend/papyrus-web-representation-builder"]
+        PWA --> PWP["backend/papyrus-web-properties-builder"]
+        PWA --> PWCW["backend/papyrus-web-custom-widgets"]
+        PWA --> PWCWV["backend/papyrus-web-custom-widgets-view"]
+        PWA --> PWCN["backend/papyrus-web-customnodes"]
+        PWA --> PWS["backend/papyrus-web-sirius-contributions"]
+        PWA --> PWD["backend/papyrus-web-domain"]
+        
+        %% Inter-module dependencies
+        PWR --> PWD
+        PWR --> PWS
+        PWP --> PWCW
+        PWCWV --> PWCW
+        PWCN --> PWD
+        
+        %% Parent
+        subgraph Parent ["Maven Parent"]
+            PWPOM["backend/papyrus-web-parent"]
+        end
+        PW & PWA & PWI & PWF & CPP & JAVA & CG & TRANS & PWR & PWP & PWCW & PWCWV & PWCN & PWS & PWD -.-> PWPOM
+    end
+
+    %% Packaging seam
+    FW -.->|"Vite build copies static assets"| PWF

@@ -5,15 +5,12 @@
 
 > ## Provenance & scope
 >
-> **Optional split file.** Only use this if papyrus-web-plus-plus has a distinct backend
-> (services, database, web/API tier). If it does not — a CLI, a library, a frontend-only
-> app — leave this file empty or delete it.
+> **Status: [inferred].** This catalog is populated on demand by `/create-feature-catalog` on 2026-06-29.
 >
-> The example row below uses an `<angle-bracket>` placeholder on purpose: it is
-> illustrative and the `verify` command ignores it. `/create-feature-catalog` replaces
-> it with real, backtick-quoted entries.
->
-> **Cold-start snapshot — 2026-06-29**, once generated.
+> **Confidence key used throughout (same scheme as `ai/INDEX.md`):**
+> - `[inferred]` — written by an agent or tool; a guess until a human checks it
+> - `[verified]` — a human confirmed it, with the date. Agents never set this tag.
+> - `?` in Status column — requires a human decision/audit
 
 ---
 
@@ -21,15 +18,20 @@
 
 | Module / Package | Key Class / Service | Layer / Responsibility | Status |
 |---|---|---|---|
-| `<module-or-package>` | `<KeyService>` | Domain logic / Service layer | `?` |
+| `backend/papyrus-web-application` | `[UMLProfileService.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-application/src/main/java/org/eclipse/papyrus/web/application/profile/services/UMLProfileService.java)` | Service layer for Profile actions. | `?` |
+| `backend/papyrus-web-application` | `[UMLStereotypeService.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-application/src/main/java/org/eclipse/papyrus/web/application/profile/services/UMLStereotypeService.java)` | Service layer for Stereotype application. | `?` |
+| `backend/papyrus-web-application` | `[PapyrusUMLLibraryPublisher.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-application/src/main/java/org/eclipse/papyrus/web/application/uml/services/library/PapyrusUMLLibraryPublisher.java)` | Service for packaging UML libraries. | `?` |
+| `backend/papyrus-web-application` | `[PapyrusResourceService.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-application/src/main/java/org/eclipse/papyrus/web/application/uml/services/library/PapyrusResourceService.java)` | Loading external resources and library imports. | `?` |
+| `backend/papyrus-web-domain` | `[ProfileResourceEntity.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-domain/src/main/java/org/eclipse/papyrus/web/domain/boundedcontext/profile/ProfileResourceEntity.java)` | Database-mapped profile entity representation. | `?` |
+| `backend/papyrus-web-infra` | `[PapyrusWeb.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web/src/main/java/org/eclipse/papyrus/web/PapyrusWeb.java)` | Main Spring Boot application bootstrap loader. | `?` |
 
 ---
 
-## §2 Database Schema & Persistence (if applicable)
+## §2 Database Schema & Persistence
 
 | Table / Collection | Key Model | Description |
 |---|---|---|
-| `<table-name>` | `<ModelType>` | What it stores |
+| `profile` | `[ProfileResourceEntity](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-domain/src/main/java/org/eclipse/papyrus/web/domain/boundedcontext/profile/ProfileResourceEntity.java)` | Stores dynamic dynamic/custom UML profile contents as XML payloads mapped by UUID keys. |
 
 ---
 
@@ -37,4 +39,6 @@
 
 | Test Class / Path | Target Component | Description |
 |---|---|---|
-| `<src/test_example.ext>` | `<KeyService>` | Verifies domain behavior |
+| `[PRDDiagramCreationTest.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web/src/test/java/org/eclipse/papyrus/web/tools/profile/PRDDiagramCreationTest.java)` | Profile Diagram creation tools | Verifies creation of profile diagrams and stereotype definitions. |
+| `[CustomImageTest.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-custom-widgets/src/test/java/org/eclipse/papyrus/web/custom/widgets/customimage/CustomImageTest.java)` | Custom Image Widget | Tests custom image widget properties pane bindings. |
+| `[LanguageExpressionComponentTest.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-custom-widgets/src/test/java/org/eclipse/papyrus/web/custom/widgets/languageexpression/LanguageExpressionComponentTest.java)` | Language Expression Widget | Verifies language expression widget properties mapping. |

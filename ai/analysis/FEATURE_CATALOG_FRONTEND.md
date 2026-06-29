@@ -5,15 +5,12 @@
 
 > ## Provenance & scope
 >
-> **Optional split file.** Only use this if papyrus-web-plus-plus has a frontend / UI tier.
-> If it does not — a CLI, a library, a backend-only service — leave this file empty or
-> delete it.
+> **Status: [inferred].** This catalog is populated on demand by `/create-feature-catalog` on 2026-06-29.
 >
-> The example rows below use `<angle-bracket>` placeholders on purpose: they are
-> illustrative and the `verify` command ignores them. `/create-feature-catalog` replaces
-> them with real, backtick-quoted entries.
->
-> **Cold-start snapshot — 2026-06-29**, once generated.
+> **Confidence key used throughout (same scheme as `ai/INDEX.md`):**
+> - `[inferred]` — written by an agent or tool; a guess until a human checks it
+> - `[verified]` — a human confirmed it, with the date. Agents never set this tag.
+> - `?` in Status column — requires a human decision/audit
 
 ---
 
@@ -21,7 +18,13 @@
 
 | Page / Component | Path | Responsibility | Status |
 |---|---|---|---|
-| `<ComponentName>` | `<src/pages/Example.ext>` | What the view does | `?` |
+| `ProfilesPage` | `[ProfilesPage.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web/src/profiles/ProfilesPage.tsx)` | Main profiles management page UI dashboard. | `?` |
+| `DisplayProfileView` | `[DisplayProfileView.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web/src/profiles/DisplayProfileView.tsx)` | Detailed view for managing versions and content of specific profiles. | `?` |
+| `ApplyProfileModal` | `[ApplyProfileModal.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web-components/src/profile/apply-profile/ApplyProfileModal.tsx)` | Dialog component to search, select, and apply profiles. | `?` |
+| `ApplyStereotypeModal` | `[ApplyStereotypeModal.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web-components/src/profile/apply-stereotype/ApplyStereotypeModal.tsx)` | Dialog component to select and apply stereotypes to elements. | `?` |
+| `PublishProfileDialog` | `[PublishProfileDialog.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web-components/src/profile/publish-profile/PublishProfileDialog.tsx)` | Form Dialog to fill in meta information for publishing profile diagrams. | `?` |
+| `PublishUMLLibraryCommand` | `[PublishUMLLibraryCommand.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web-components/src/libraries/PublishUMLLibraryCommand.tsx)` | UI Omnibox command element for triggering UML library publishing. | `?` |
+| `Footer` | `[Footer.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web/src/footer/Footer.tsx)` | Customized application bottom panel. | `?` |
 
 ---
 
@@ -29,7 +32,8 @@
 
 | Hook / Store | Path | Responsibility |
 |---|---|---|
-| `<useExample>` | `<src/hooks/useExample.ext>` | What state it owns |
+| `ApplyProfileModalMachine` | `[ApplyProfileModalMachine.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web-components/src/profile/apply-profile/ApplyProfileModalMachine.tsx)` | XState machine orchestrating the interactive steps of applying a profile. |
+| `ApplyStereotypeModalMachine` | `[ApplyStereotypeModalMachine.ts](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web-components/src/profile/apply-stereotype/ApplyStereotypeModalMachine.ts)` | XState machine orchestrating the stereotyping options and form interactions. |
 
 ---
 
@@ -37,4 +41,4 @@
 
 | Test File | Target Component | Description |
 |---|---|---|
-| `<src/Example.test.ext>` | `<ComponentName>` | Verifies layout and interactivity |
+| `integration-tests/cypress/e2e/` | UML Modeler layout & features | End-to-end Cypress integration tests validating user navigation, diagram shapes, context menus, and profiles. |

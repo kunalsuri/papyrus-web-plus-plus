@@ -6,11 +6,11 @@
 # Relative link for non-Claude agents: [AGENTS.md](AGENTS.md)
 
 Papyrus web is a web UML modeler to easily create UML diagrams directly from a web browser. It is based on Eclipse Sirius Components (https://www.eclipse.org... This is a FORK of **papyrus/org.eclipse.papyrus-web** (upstream).
-Stack: <fill in>.
+Stack: Java 21 & Spring Boot on Eclipse Sirius Components (backend) · TypeScript, React 18, Vite 8, MUI 7 & Turbo (frontend) · PostgreSQL 15.
 
 ## Build & test — VERIFY in the cold-start pass before trusting
-- Build: `<fill in>`
-- Test:  `<fill in>`
+- Build: powershell -File .\scripts-pwpp\build-all.ps1
+- Test:  powershell -File .\scripts-pwpp\build-all.ps1 -WithTests
 - Test locations: integration-tests/
 - Run the suite matching what you changed BEFORE claiming success.
 

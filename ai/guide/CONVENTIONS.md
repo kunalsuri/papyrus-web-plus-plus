@@ -1,25 +1,20 @@
 <!-- Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved. -->
 # Conventions — how to write code that fits papyrus-web-plus-plus
 
-> [!NOTE]
-> **This is a scaffolded template.** Run the `/cold-start` slash command in Claude Code (or see [docs/FAQ.md#cursor-copilot-codex](../../docs/FAQ.md#cursor-copilot-codex) for other tools) to have the agent explore your repository and automatically populate this file.
-
-> Status: skeleton (2026-06-29). /cold-start drafts observations `[inferred]`; humans
-> confirm and add the rules that live only in heads.
+> Status: drafted by `/cold-start` on 2026-06-29; every section `[inferred]` until a human audits it.
 
 ## Languages & style  `[inferred]`
-- <fill in>
-- <formatter/linter and config file, if found>
+- **Java 21 (Backend):** Styling is governed by Checkstyle. The configuration resides in [CheckstyleConfiguration.xml](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-resources/checkstyle/CheckstyleConfiguration.xml). Eclipse cleanups and formatter profiles are located in the resource directory.
+- **TypeScript / React 18 (Frontend):** Formatted using Prettier as defined in [.prettierrc](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/.prettierrc). The `format-lint` check is run automatically on build and fails on unformatted code. Use `npm run format` to auto-format before building.
 
 ## Patterns to follow  `[inferred]`
-<2–6 bullets: error handling, naming, layering, DI, test placement — each pointing to
-one exemplar file an agent can imitate.>
+- **Backend Mutations & Queries (Sirius Components):** Implement discrete data-fetcher classes (e.g. extending `MutationDeletePrimitiveListItemDataFetcher` or implementing `DataFetcher`). See [NewValueDataFetcher.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-custom-widgets/src/main/java/org/eclipse/papyrus/web/custom/widgets/primitiveradio/datafetchers/NewValueDataFetcher.java) or [UMLImportLibraryCommandProvider.java](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/backend/papyrus-web-application/src/main/java/org/eclipse/papyrus/web/application/uml/services/library/UMLImportLibraryCommandProvider.java) for implementation patterns.
+- **Frontend Components:** Separate MUI presentation components from GraphQL data fetching. See [ProfilesPage.tsx](file:///c:/Users/ks248120/Documents/GitHub/papyrus-web-plus-plus/frontend/papyrus-web/src/profiles/ProfilesPage.tsx) for layout and query integration patterns.
 
 ## Things that look wrong but are right  `[verified] required`
-<Only humans add rows. The institutional knowledge that prevents "helpful" breakage.>
+*(No human-defined exceptions/rules have been documented yet. Only humans may add rows to this section.)*
 
 ## Definition of done
-- Builds: `<fill in>`
-- Tests pass: `<fill in>`
-- License headers match neighbors; diffs are surgical; ai/ knowledge updated if the
-  change moved or added modules/features.
+- Builds: `powershell -File .\scripts-pwpp\build-all.ps1`
+- Tests pass: `powershell -File .\scripts-pwpp\build-all.ps1 -WithTests` (runs both backend Maven verification and frontend unit/Cypress E2E test suites)
+- License headers match neighbors; diffs are surgical; `ai/` knowledge is updated and tagged `[inferred]` if any layout or feature mappings changed.
