@@ -1,8 +1,6 @@
 <!-- Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved. -->
 <div align="center">
 
-<img src="papyrus-web-plus-plus-banner.png" width="800" alt="Papyrus Web++ Banner Image"/>
-
 <h1>🛸 Papyrus Web++ </h1>
 <h3>The AI-Native Project</h3>
 
