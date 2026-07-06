@@ -90,3 +90,11 @@ odweb-maven-repository
 *.iws
 *.iml
 *.ipr
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
