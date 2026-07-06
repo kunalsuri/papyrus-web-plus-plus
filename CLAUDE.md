@@ -5,13 +5,13 @@
 @AGENTS.md
 # Relative link for non-Claude agents: [AGENTS.md](AGENTS.md)
 
-> **An experimental sandbox for turning a complex, industrial-grade codebase into an AI-native This is a FORK of **papyrus/org.eclipse.papyrus-web** (upstream).
-Stack: <fill in>.
+> **An experimental sandbox for turning a complex, industrial-grade codebase into an AI-native one.** This is a FORK of **papyrus/org.eclipse.papyrus-web** (upstream).
+Stack: Java 21 + Spring Boot + Sirius Components 2026.5.0 backend (Maven multi-module) · React 18 + TypeScript 5.4 + Vite frontend (npm/turbo workspaces, Node 22.16.0) · PostgreSQL 15.
 
-## Build & test — VERIFY in the cold-start pass before trusting
-- Build: `<fill in>`
-- Test:  `<fill in>`
-- Test locations: integration-tests/
+## Build & test (source: `ai/guide/PROJECT_OVERVIEW.md`, verified against README + scripts-pwpp on 2026-07-06)
+- Build: `.\scripts-pwpp\build-all.ps1` (manual: `npm ci && npm run build` in `frontend/`, then `mvn clean verify -DskipTests` in `backend/`)
+- Test:  `mvn clean verify` in `backend/` · `npm run test` in `frontend/papyrus-web/` (vitest) · Cypress in `integration-tests/`
+- Test locations: `backend/*/src/test/java` (JUnit) · `frontend/papyrus-web/` (vitest) · `integration-tests/` (Cypress e2e)
 - Run the suite matching what you changed BEFORE claiming success.
 
 ## Hard rules (non-negotiable)
@@ -20,7 +20,7 @@ Stack: <fill in>.
 - Anything you write into `ai/` is `[inferred]` until a human flips it to `[verified]`.
   Never flip that tag yourself.
 - **No Phantom Bugs & Configuration Churn:** Do not rewrite, restructure, or simplify configuration or instruction files (`CLAUDE.md`, `AGENTS.md`, `package.json`, or anything in `ai/guide/`) based on quick searches or automated suggestions. Keep edits surgical. Never replace detailed guides with simplified stubs.
-- **Verify claims:** Before declaring a task finished, run `node install.mjs verify . --strict` (or your repo's verify script) to ensure no file paths in the knowledge documents are broken.
+- **Verify claims:** Before declaring a task finished, ensure no file paths in the knowledge documents are broken. The verifier lives in the **ai-fication-kit checkout, not in this repo** — run it from there: `node install.mjs verify <path-to-this-repo> --strict`. If the kit isn't available in your session, mechanically existence-check every backticked path your change added or moved.
 - **Record work:** Every unit of work (feature, bugfix, refactor, process change) ends with a row appended to `ai/lab/WORKLOG.md` — even work done outside the slash commands.
 
 ## Where to look — read on demand, do NOT pre-load
