@@ -6,10 +6,10 @@ description: Run verification and drift checks on the AI knowledge-base to ident
 
 Run the mechanical verification and drift analysis to inspect the state of the `ai/` knowledge-base:
 
-1. Run the path verifier:
-   `node install.mjs verify . --strict`
-2. Run the drift detector with git history comparison:
-   `node install.mjs drift . --git --strict`
+1. Run the path verifier (from the ai-fication-kit checkout — the script is not in this repo):
+   `node install.mjs verify <path-to-this-repo> --strict`
+2. Run the drift detector with git history comparison (same kit checkout):
+   `node install.mjs drift <path-to-this-repo> --git --strict`
 3. Run `git status` to inspect modified and untracked files.
 
 If any issues are reported, or if `git status` reveals newly added or modified source files/templates that are not yet covered in the maps:

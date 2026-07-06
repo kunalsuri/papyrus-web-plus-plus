@@ -95,7 +95,7 @@ New features are built spec-first, with automated feedback loops — so structur
 
 ## 🧱 AI-Native Guardrails (what actually exists today)
 
-* **Knowledge-layer verification** — Run `node install.mjs verify . --strict` (or equivalent verification script) to ensure that no file paths or references in the `ai/` knowledge documents are broken, preventing knowledge drift.
+* **Knowledge-layer verification** — Run `node install.mjs verify <path-to-this-repo> --strict` from the [ai-fication-kit](https://github.com/kunalsuri/ai-fication-kit) checkout (the script lives in the kit, not in this repo) to ensure that no file paths or references in the `ai/` knowledge documents are broken, preventing knowledge drift.
 * **Surgical Diff enforcement** — Coding agents are constrained by the [AGENTS.md](AGENTS.md) rules to keep edits surgical and respect stability boundaries (no touch zones on upstream code).
 
 ---

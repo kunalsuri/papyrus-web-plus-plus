@@ -6,15 +6,15 @@ Copilot, Windsurf). Claude Code reads these via `@AGENTS.md` in `CLAUDE.md` (see
 other tools read this file directly.
 
 ## Project
-> **An experimental sandbox for turning a complex, industrial-grade codebase into an AI-native This is a FORK of **papyrus/org.eclipse.papyrus-web** (upstream).
-Stack: <fill in>.
+> **An experimental sandbox for turning a complex, industrial-grade codebase into an AI-native one.** This is a FORK of **papyrus/org.eclipse.papyrus-web** (upstream).
+Stack: Java 21 + Spring Boot + Sirius Components 2026.5.0 backend (Maven multi-module) · React 18 + TypeScript 5.4 + Vite frontend (npm/turbo workspaces, Node 22.16.0) · PostgreSQL 15.
 
 ## Rules every agent must follow
 1. **Frozen upstream.** Code inherited from **papyrus/org.eclipse.papyrus-web** is off-limits unless the task explicitly requires it. New work goes in our own modules.
 2. **No layout churn.** Don't reorganize directories; existing contributors depend on
    the structure.
 3. **Test before done.** Run the suite matching your change; never declare success
-   untested. Build: `<fill in>` · Test: `<fill in>`
+   untested. Build: `.\scripts-pwpp\build-all.ps1` (manual: `npm ci && npm run build` in `frontend/`, then `mvn clean verify -DskipTests` in `backend/`) · Test: `mvn clean verify` in `backend/` · `npm run test` in `frontend/papyrus-web/` (vitest) · Cypress in `integration-tests/`
 4. **Match license headers** on every new source file, copying from neighboring files.
 5. **Locate, then read.** Use `ai/guide/MODULE_MAP.md` to find code; grep before
    reading whole files.
@@ -22,7 +22,7 @@ Stack: <fill in>.
 7. **Provenance.** Anything you write into `ai/` is `[inferred]` until a human flips
    it to `[verified]`. Never flip that tag yourself.
 8. **No Phantom Bugs & Configuration Churn.** Do not rewrite, restructure, or simplify configuration or instruction files (`CLAUDE.md`, `AGENTS.md`, `package.json`, or `ai/guide/` documents) based on quick searches or automated suggestions. Keep edits surgical. Never replace detailed guides with simplified stubs.
-9. **Verify claims.** Before declaring a task finished, run `node install.mjs verify . --strict` (or equivalent test runner validation script) to ensure no file paths in the knowledge documents are broken.
+9. **Verify claims.** Before declaring a task finished, ensure no file paths in the knowledge documents are broken. The verifier lives in the **ai-fication-kit checkout, not in this repo** — run it from there: `node install.mjs verify <path-to-this-repo> --strict`. If the kit isn't available in your session, mechanically existence-check every backticked path your change added or moved.
 10. **Record work.** Every unit of work ends with an appended row in `ai/lab/WORKLOG.md` linking its spec, review, and commits — even work done outside the command workflows.
 
 ## Knowledge map

@@ -1,0 +1,42 @@
+%% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+%% package-deps.mmd — module/package dependency graph, drafted by /cold-start 2026-07-06
+%% [inferred] Module list OBSERVED from backend/pom.xml <modules> and frontend/package.json
+%% workspaces; the EDGES between backend modules are INFERRED from names and layering
+%% conventions, NOT verified against each pom's <dependencies>. Audit before trusting.
+graph TD
+  subgraph FE["frontend/ — npm + turbo workspace (upstream, frozen?)"]
+    pw["papyrus-web<br/>(React 18 SPA, Vite)"]
+    pwc["papyrus-web-components<br/>(shared component lib)"]
+    sirius["@eclipse-sirius/sirius-web-application<br/>2026.5.0 (external dep)"]
+    pw --> pwc
+    pw --> sirius
+  end
+
+  subgraph BE["backend/ — Maven multi-module (upstream, frozen?)"]
+    boot["papyrus-web<br/>(Spring Boot fat JAR, main: PapyrusWeb.java)"]
+    app["papyrus-web-application<br/>(GraphQL fetchers, UML services, representations)"]
+    dom["papyrus-web-domain<br/>(profile bounded context)"]
+    contrib["papyrus-web-sirius-contributions"]
+    stat["papyrus-web-frontend<br/>(frontend dist as static resources)"]
+    builders["papyrus-web-representation-builder<br/>papyrus-web-properties-builder"]
+    widgets["papyrus-web-custom-widgets (+view, +view-edit)<br/>papyrus-web-customnodes (+edit)"]
+    profiles["UML profiles: cpp / java /<br/>codegen / transformation"]
+    boot --> app
+    boot --> stat
+    app --> dom
+    app --> contrib
+    app --> builders
+    app --> widgets
+    app --> profiles
+  end
+
+  subgraph OURS["fork additions (ours)"]
+    scripts["scripts-pwpp/<br/>(setup, build-all, start/stop dev stack)"]
+    ai["ai/ + .claude/ + .agents/ + .cursor/<br/>(AI knowledge layer & agent configs)"]
+  end
+
+  pw -. "vite build → dist copied into" .-> stat
+  pw == "GraphQL over HTTP + WS" ==> boot
+  boot --> db[("PostgreSQL 15<br/>dev: localhost:5439")]
+  scripts -. "builds & runs" .-> FE
+  scripts -. "builds & runs" .-> BE

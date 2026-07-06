@@ -36,5 +36,11 @@ this ledger says *what was done to it, when, and under which contract*.
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | W-001 | 2026-07-06 | process | Ignore Eclipse project files and hide from VS Code | — | — | — | — | — | `.gitignore`, `.vscode/settings.json` | shipped | [inferred] |
 | W-002 | 2026-07-06 | process | Untrack Eclipse project, classpath, and settings files from Git repository | — | — | — | — | — | — | shipped | [inferred] |
+| W-003 | 2026-07-06 | process | /cold-start bootstrap: drafted module map, guides, and diagrams for human audit | — | — | — | — | (uncommitted) | `ai/guide/MODULE_MAP.md`, `ai/guide/ARCHITECTURE.md`, `ai/guide/PROJECT_OVERVIEW.md`, `ai/guide/FEATURE_MAP.md`, `ai/guide/CONVENTIONS.md`, `ai/analysis/diagrams/package-deps.mmd`, `ai/analysis/diagrams/domain-core.mmd`, `ai/analysis/diagrams/seam.mmd` | in-review | [inferred] |
+| W-004 | 2026-07-06 | process | Fill Stack/Build/Test placeholders in config files (maintainer-approved, per /review-agent-config findings C5–C7, A3, A10) | — | — | — | — | (uncommitted) | `CLAUDE.md`, `AGENTS.md` | shipped | [inferred] |
+| W-005 | 2026-07-06 | process | Record maintainer verification of MODULE_MAP (flip to [verified] at maintainer's explicit direction); fix truncated description sentence | — | — | — | — | (uncommitted) | `ai/guide/MODULE_MAP.md`, `CLAUDE.md`, `AGENTS.md` | shipped | [inferred] |
+| W-006 | 2026-07-06 | process | /post-cold-start-verification audit: 1 P1, 3 P2, 4 P3 findings | — | — | — | — | (uncommitted) | `ai/analysis/audit-reports/2026-07-06-post-cold-start.md` | shipped | [inferred] |
+| W-007 | 2026-07-06 | process | Fix verify-gate wording: command runs from the kit checkout, not repo root (audit finding P1-1) | — | — | — | — | (uncommitted) | `CLAUDE.md`, `AGENTS.md` | shipped | [inferred] |
+| W-008 | 2026-07-06 | process | Propagate verify/drift kit-checkout wording to README and the four check-drift mirrors | — | — | — | — | (uncommitted) | `README.md`, `.claude/commands/check-drift.md`, `.cursor/rules/check-drift.mdc`, `.agents/workflows/check-drift.md`, `.github/prompts/check-drift.prompt.md` | shipped | [inferred] |
 
 

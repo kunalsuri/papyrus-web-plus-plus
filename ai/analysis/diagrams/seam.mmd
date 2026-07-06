@@ -1,0 +1,23 @@
+%% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+%% seam.mmd — the main frontend ↔ backend boundary, drafted by /cold-start 2026-07-06
+%% [inferred] Protocol evidence OBSERVED: `graphql` + `@apollo/client` + `subscriptions-transport-ws`
+%% in frontend/papyrus-web/package.json; wsOrigin passed to SiriusWebApplication in
+%% frontend/papyrus-web/src/index.tsx; sirius-components IDataFetcher pattern in
+%% backend/papyrus-web-application (e.g. profile/controllers/MutationApplyProfileDataFetcher.java).
+%% The EXACT GraphQL endpoint paths are managed inside @eclipse-sirius/sirius-web-application —
+%% UNSURE, needs human (not verified in this repo's source).
+graph LR
+  browser["Browser<br/>React 18 SPA (frontend/papyrus-web)<br/>SiriusWebApplication shell"]
+  gqlHttp["GraphQL over HTTP<br/>(Apollo Client — inside Sirius Web lib)"]
+  gqlWs["GraphQL subscriptions over WebSocket<br/>(subscriptions-transport-ws, wsOrigin)"]
+  server["Spring Boot server :8080<br/>(backend/papyrus-web → papyrus-web-application)<br/>Sirius Components data fetchers (IDataFetcher)"]
+  db[("PostgreSQL 15<br/>dev: localhost:5439, db papyrus-web-db")]
+
+  browser --> gqlHttp --> server
+  browser <--> gqlWs <--> server
+  server --> db
+
+  %% Dev topology (OBSERVED from scripts-pwpp + cypress.config.ts):
+  %% - Vite dev server :5173 serves the SPA in development
+  %% - Production/e2e: dist is baked into the JAR (papyrus-web-frontend) and served at :8080
+  %% - Cypress baseUrl is http://localhost:8080 (tests the backend-served app, not Vite)

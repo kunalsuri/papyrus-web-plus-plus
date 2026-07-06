@@ -1,0 +1,41 @@
+%% Copyright (c) 2026 Kunal Suri (CEA LIST). All rights reserved.
+%% domain-core.mmd — core domain types, drafted by /cold-start 2026-07-06
+%% [inferred] Type names OBSERVED from file names under
+%% backend/papyrus-web-domain/src/main/java/org/eclipse/papyrus/web/domain/boundedcontext/profile
+%% — relationships INFERRED from naming conventions only (files not read). Audit before trusting.
+%% NOTE: this module holds only the `profile` bounded context. The broader UML domain logic
+%% comes from the external dependency `papyrus-uml-domain-services` (1.0.0, see
+%% backend/papyrus-web-parent/pom.xml) and from Sirius Components — UNSURE, needs human.
+classDiagram
+  class ProfileResourceEntity {
+    <<entity>>
+  }
+  class IProfileRepository {
+    <<repository>>
+  }
+  class IProfileCreationService {
+    <<interface>>
+  }
+  class IProfileDeletionService {
+    <<interface>>
+  }
+  class IProfileSearchService {
+    <<interface>>
+  }
+  class ProfileCreationService
+  class ProfileDeletionService
+  class ProfileSearchService
+  class IProfileEvent {
+    <<event>>
+  }
+  class ProfilePublishedEvent
+
+  ProfileCreationService ..|> IProfileCreationService
+  ProfileDeletionService ..|> IProfileDeletionService
+  ProfileSearchService ..|> IProfileSearchService
+  ProfileCreationService --> IProfileRepository : uses (inferred)
+  ProfileDeletionService --> IProfileRepository : uses (inferred)
+  ProfileSearchService --> IProfileRepository : uses (inferred)
+  IProfileRepository --> ProfileResourceEntity : persists
+  ProfilePublishedEvent ..|> IProfileEvent
+  ProfileCreationService --> ProfilePublishedEvent : publishes (inferred)
