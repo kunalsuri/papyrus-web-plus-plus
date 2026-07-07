@@ -42,5 +42,6 @@ this ledger says *what was done to it, when, and under which contract*.
 | W-006 | 2026-07-06 | process | /post-cold-start-verification audit: 1 P1, 3 P2, 4 P3 findings | — | — | — | — | (uncommitted) | `ai/analysis/audit-reports/2026-07-06-post-cold-start.md` | shipped | [inferred] |
 | W-007 | 2026-07-06 | process | Fix verify-gate wording: command runs from the kit checkout, not repo root (audit finding P1-1) | — | — | — | — | (uncommitted) | `CLAUDE.md`, `AGENTS.md` | shipped | [inferred] |
 | W-008 | 2026-07-06 | process | Propagate verify/drift kit-checkout wording to README and the four check-drift mirrors | — | — | — | — | (uncommitted) | `README.md`, `.claude/commands/check-drift.md`, `.cursor/rules/check-drift.mdc`, `.agents/workflows/check-drift.md`, `.github/prompts/check-drift.prompt.md` | shipped | [inferred] |
+| W-009 | 2026-07-07 | docs | /create-feature-catalog: mined full frontend+backend feature catalog (17 features, GraphQL/REST surface, per-feature touch lists, decision tree, 3-file rule, sampling guide) | — | — | — | — | (uncommitted) | `ai/analysis/FEATURE_CATALOG.md`, `ai/analysis/FEATURE_CATALOG_BACKEND.md`, `ai/analysis/FEATURE_CATALOG_FRONTEND.md`, `ai/guide/FEATURE_MAP.md` | shipped | [inferred] |
 
 
